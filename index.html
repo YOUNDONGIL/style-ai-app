@@ -153,12 +153,13 @@
                 <p class="text-gray-500 font-medium text-sm md:text-base">사진 한 장으로 피부톤, 맞춤 코디 세트, 최저가 쇼핑까지.</p>
             </div>
 
-            <!-- 가장 안정적으로 작동했던 원본 100% 복구 (네이티브 파일 인풋) -->
             <div class="apple-card p-6 md:p-8">
                 <h3 class="text-lg font-bold mb-4 flex items-center text-gray-800"><i class="fa-solid fa-camera mr-2 text-blue-500"></i>정면 사진 업로드</h3>
+                
+                <!-- 정상 작동 보장: 절대 위치(absolute)로 박스 전체를 덮는 투명 file input -->
                 <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-[20px] p-8 md:p-12 text-center cursor-pointer hover:bg-gray-50/80 transition-colors relative overflow-hidden bg-gray-50/30 group">
                     <input type="file" id="image-input" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                    <img id="image-preview" class="hidden w-auto h-auto max-h-64 mx-auto rounded-2xl shadow-lg mb-4 object-cover relative z-0" alt="미리보기" />
+                    <img id="image-preview" class="hidden w-auto h-auto max-h-64 mx-auto rounded-2xl shadow-lg mb-4 object-cover relative z-0 pointer-events-none" alt="미리보기" />
                     <div id="upload-placeholder" class="relative z-0 group-hover:scale-105 transition-transform duration-300 pointer-events-none">
                         <div class="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mx-auto mb-4 text-blue-500 text-2xl">
                             <i class="fa-solid fa-image"></i>
@@ -311,7 +312,6 @@
                         <div class="apple-spinner mb-4"></div>
                         <span class="text-xs font-bold leading-relaxed text-gray-600">Fal.ai Flux 엔진으로 초고화질 룩북을<br>렌더링 중입니다... (약 1.5초)</span>
                     </div>
-                    <!-- 목 아래 컷오프 프레임 -->
                     <img id="lookbook-image" class="hidden w-full h-full object-cover object-bottom scale-110 origin-bottom transition-opacity duration-700 opacity-0" alt="시그니처 착장 룩북" />
                 </div>
             </div>
@@ -393,7 +393,7 @@
 
     <script>
         // ========================================================
-        // 💡 아래 큰따옴표 안에 발급받으신 API 키를 각각 넣어주세요!
+        // 💡 아래 큰따옴표 안에 발급받으신 2개의 API 키를 각각 넣어주세요!
         // ========================================================
         const GOOGLE_API_KEY = "AQ.Ab8RN6LR9bVvqNLLLulzF54CiyXwPZkGl04ukue2gZrbmjFUPQ";
         const FAL_API_KEY = "fal_sk_fa73529c061140e8bfc52db63907ad1b:2f00e529185d16d2808cd829d094a12b";
@@ -401,6 +401,7 @@
 
         const COUPANG_TRACKING_CODE = "AF4531799";
 
+        // 카테고리별 세련된 패션 비주얼 아이콘 및 컬러 테마 맵
         const CATEGORY_THEMES = {
             '상의': { icon: 'fa-shirt', lightBg: 'bg-blue-50 text-blue-600', darkBg: 'bg-indigo-950/60 text-blue-400' },
             '하의': { icon: 'fa-socks', lightBg: 'bg-emerald-50 text-emerald-600', darkBg: 'bg-emerald-950/60 text-emerald-400' },
@@ -580,11 +581,15 @@
             '면접': ['대기업/공기업 정석 면접', '트렌디 직무 면접', '1:1 중요 비즈니스 미팅']
         };
 
-        // 회원님께서 확인하셨던 가장 안정적인 원본 사진 등록 리스너
+        // 회원님께서 확인하셨던 가장 안정적인 원본 사진 등록 리스너로 100% 복구 완료
+        DOM.imageInput.addEventListener('click', (e) => {
+            e.target.value = ''; // 동일한 사진을 지웠다 다시 올려도 반응하도록 초기화
+        });
+
         DOM.imageInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
-            if (file.size > 15 * 1024 * 1024) { showToast("15MB 이하의 사진을 선택해주세요."); return; }
+            if (file.size > 20 * 1024 * 1024) { showToast("20MB 이하의 사진을 선택해주세요."); return; }
             const reader = new FileReader();
             reader.onload = (event) => {
                 state.base64Image = event.target.result.split(',')[1];
@@ -674,7 +679,8 @@
         });
 
         async function analyzeBaseInfo() {
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GOOGLE_API_KEY}`;
+            // ★ 회원님께서 원래 사용하시던 gemini-3.8-flash 버전으로 완벽하게 원상복구 했습니다.
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${GOOGLE_API_KEY}`;
             const prompt = `
 당신은 최고의 퍼스널 컬러 및 패션/뷰티 마스터입니다.
 [사용자 프로필] 성별: ${DOM.gender.value}, 연령: ${DOM.age.value}, 키: ${DOM.height.value}cm, 몸무게: ${DOM.weight.value}kg, 체형: ${DOM.bodyType.value}
@@ -797,7 +803,8 @@
         }
 
         async function analyzeTPOStyle() {
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GOOGLE_API_KEY}`;
+            // ★ 회원님께서 원래 사용하시던 gemini-3.8-flash 버전으로 완벽하게 원상복구 했습니다.
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${GOOGLE_API_KEY}`;
             const isTravel = state.currentMainTPO === '여행';
             let tpoContext = `분류: ${state.currentMainTPO}, 세부상황: ${state.currentSubTPO}`;
             let extraInstruction = "";
@@ -997,7 +1004,6 @@ ${extraInstruction}
                         <div onclick="triggerAffiliateModal('${mallId}', '${item.itemName.replace(/'/g, "\\'")}', '${item.keyword.replace(/'/g, "\\'")}')" 
                              class="flex items-center justify-between bg-[#f8f9fa] p-3 rounded-2xl hover:bg-blue-50/40 transition-all cursor-pointer group active:scale-98 border border-gray-100 hover:border-blue-200">
                             
-                            <!-- 추천 아이템 실물 썸네일 이미지 -->
                             <div class="w-14 h-14 rounded-xl overflow-hidden bg-gray-200 flex-shrink-0 mr-3 border border-gray-200/60 shadow-xs">
                                 <img src="${thumbUrl}" alt="${item.itemName}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
                             </div>

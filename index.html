@@ -118,7 +118,7 @@
 
     <div id="toast">알림</div>
 
-    <!-- 쇼핑몰 이동 팝업 -->
+    <!-- 쇼핑몰 이동 및 공정위 고지 모달 -->
     <div id="affiliate-modal" class="modal-overlay">
         <div class="modal-content">
             <div id="modal-icon-container" class="w-14 h-14 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-sm">
@@ -279,6 +279,7 @@
                 </div>
             </div>
 
+            <!-- TPO 카테고리 8종 영역 -->
             <div class="apple-card p-6 md:p-8 fade-in">
                 <h3 class="font-bold text-xl mb-5 tracking-tight flex items-center">
                     <i class="fa-solid fa-shirt mr-2 text-gray-800"></i>상황별 맞춤 스타일링
@@ -316,7 +317,7 @@
                 <div id="tpo-content-area" class="relative">
                     <div id="tpo-loader" class="hidden absolute inset-0 z-20 bg-white/80 backdrop-blur-md rounded-2xl flex-col items-center justify-center">
                         <div class="apple-spinner mb-4"></div>
-                        <span class="text-sm font-bold text-gray-800" id="tpo-loader-text">자연스러운 스타일링 룩북을 준비 중입니다...</span>
+                        <span class="text-sm font-bold text-gray-800" id="tpo-loader-text">상황별 코디 제안을 불러오는 중...</span>
                     </div>
 
                     <div id="weather-info-box" class="hidden mb-5 bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-center">
@@ -328,12 +329,13 @@
                     </div>
 
                     <div class="flex flex-col md:flex-row items-start gap-6 md:gap-8">
+                        <!-- 고정 대표 룩북 이미지 영역 (3:4 비율 고정) -->
                         <div class="w-full md:w-[45%] self-start relative rounded-[24px] overflow-hidden bg-[#f0f0f2] aspect-[3/4] flex items-center justify-center shadow-md border border-gray-100">
                             <div id="lookbook-loader" class="text-gray-400 flex flex-col items-center p-6 text-center">
                                 <i class="fa-solid fa-wand-magic-sparkles text-3xl mb-3 text-blue-500 animate-pulse"></i>
-                                <span class="text-xs font-bold leading-relaxed text-gray-600">업로드하신 정보에 어울리는<br>편안하고 자연스러운 코디를 그리고 있습니다...</span>
+                                <span class="text-xs font-bold leading-relaxed text-gray-600">고유 톤 맞춤 대표 피팅 룩북을<br>생성 중입니다...</span>
                             </div>
-                            <img id="lookbook-image" class="hidden w-full h-full object-cover transition-opacity duration-700 opacity-0" alt="AI 가상 피팅 룩북" />
+                            <img id="lookbook-image" class="hidden w-full h-full object-cover transition-opacity duration-700 opacity-0" alt="AI 퍼스널 피팅 룩북" />
                         </div>
                         
                         <div class="w-full md:w-[55%] flex flex-col">
@@ -380,7 +382,7 @@
     </footer>
 
     <script>
-        // ★ 회원님의 구글 API 키를 여기에 입력하세요
+        // ★ 회원님의 구글 API 키를 아래 큰따옴표 안에 넣어주시면 됩니다.
         const ADMIN_API_KEY = "AQ.Ab8RN6LR9bVvqNLLLulzF54CiyXwPZkGl04ukue2gZrbmjFUPQ";
         const COUPANG_TRACKING_CODE = "AF4531799";
 
@@ -460,7 +462,8 @@
             currentMainTPO: "데일리",
             currentSubTPO: "편안한 동네/카페",
             location: "",
-            baseAnalysisCache: null
+            baseAnalysisCache: null,
+            isMainImageGenerated: false // 메인 룩북 생성 여부 플래그
         };
 
         const TPO_DATA = {
@@ -483,7 +486,7 @@
                     let errMsg = `오류 코드: ${res.status}`;
                     try { errMsg = JSON.parse(errText).error.message; } catch(e){}
                     if (res.status === 400 && errMsg.includes("API key not valid")) {
-                        throw new Error("코드 내부에 입력된 구글 API 키가 유효하지 않습니다.");
+                        throw new Error("코드 상단에 입력된 구글 API 키가 유효하지 않습니다.");
                     }
                     if (res.status !== 429 && res.status < 500) throw new Error(errMsg);
                 } catch (e) {
@@ -542,10 +545,12 @@
             try {
                 DOM.loadingText.innerHTML = "피부톤, 이목구비 윤곽 및 명도 대비를 스캔하고 있습니다.<br>AI 뷰티 전문가가 분석 중입니다...";
                 
-                // ★ 회원님의 작동했던 원본 API 주소 그대로 유지 (건드리지 않음)
                 state.baseAnalysisCache = await analyzeBaseInfo();
                 renderBaseResults(state.baseAnalysisCache);
                 
+                // ★ 방법 2: 메인 고정 룩북 이미지 딱 1장만 최초 생성
+                generateMainRepresentationLookbook();
+
                 DOM.loadingArea.classList.add('hidden');
                 DOM.loadingArea.classList.remove('flex');
                 DOM.resultArea.classList.remove('hidden');
@@ -561,7 +566,6 @@
         });
 
         async function analyzeBaseInfo() {
-            // ★ 회원님의 작동했던 원본 API 주소 그대로 유지 (건드리지 않음)
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${state.apiKey}`;
             const prompt = `
 당신은 최고의 퍼스널 컬러 및 패션/뷰티 마스터입니다.
@@ -572,7 +576,6 @@
 2. 퍼스널 컬러의 밝은 톤(bestLight) 3개, 어두운 톤(bestDark) 3개를 정확한 HEX 코드로 응답.
 3. 뷰티 추천: 실제 시판 중인 구체적 브랜드 제품명을 적을 것.
 4. 쇼핑몰 키(mall)는 100% 'coupang'으로 지정할 것.
-5. facialFeatures (매우 중요): 사진 속 인물의 전반적인 분위기와 헤어스타일, 체형을 자연스러운 일상 사진 생성을 위해 영어로 간략히 묘사하세요. (예: "A Korean 20s person with natural black hair, casual everyday look").
 
 반드시 아래 JSON 형식으로만 응답:
 {
@@ -582,7 +585,6 @@
     "bestLight": ["#HEX", "#HEX", "#HEX"],
     "bestDark": ["#HEX", "#HEX", "#HEX"]
   },
-  "facialFeatures": "영문 인상 묘사",
   "skin": {
     "type": "예상 피부타입",
     "makeupTip": "피부 타입에 맞는 스킨케어/메이크업 꿀팁"
@@ -668,6 +670,7 @@
             triggerTPOAnalysis();
         });
 
+        // 탭 이동 시 텍스트 및 추천 상품만 0.1초 만에 즉시 전환 (이미지 재생성 안함)
         async function triggerTPOAnalysis() {
             DOM.tpoLoader.classList.remove('hidden');
             DOM.tpoLoader.classList.add('flex');
@@ -677,9 +680,8 @@
                 const fashionResult = await analyzeTPOStyle();
                 renderTPOResults(fashionResult);
                 
-                // ★ 초반 웹 버전의 자연스러운 이미지 생성 코드 연결
-                generateNaturalLookbook(fashionResult.lookbookPrompt);
-                
+                DOM.tpoLoader.classList.add('hidden');
+                DOM.tpoLoader.classList.remove('flex');
             } catch (err) {
                 showToast("코디 정보를 가져오는데 문제가 발생했습니다.");
                 DOM.tpoLoader.classList.add('hidden');
@@ -688,7 +690,6 @@
         }
 
         async function analyzeTPOStyle() {
-            // ★ 회원님의 작동했던 원본 API 주소 그대로 유지 (건드리지 않음)
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${state.apiKey}`;
             const isTravel = state.currentMainTPO === '여행';
             let tpoContext = `분류: ${state.currentMainTPO}, 세부상황: ${state.currentSubTPO}`;
@@ -701,7 +702,6 @@
 
             const prompt = `
 [사용자 프로필] 성별: ${DOM.gender.value}, 나이: ${DOM.age.value}, 퍼스널컬러: ${state.baseAnalysisCache?.color.season}
-[얼굴 분석 특징]: ${state.baseAnalysisCache?.facialFeatures || "A Korean person"}
 [상황정보] ${tpoContext}
 ${extraInstruction}
 
@@ -709,8 +709,6 @@ ${extraInstruction}
 1. 사용자의 퍼스널 컬러 및 얼굴 명도 대비감에 최적화된 착장을 추천하세요.
 2. 쇼핑 아이템은 구매하기 쉬운 실제 브랜드와 구체적 상품명을 명시할 것.
 3. 쇼핑몰 키(mall)는 100% 'coupang'으로 지정할 것.
-4. lookbookPrompt (매우 중요):
-   - [얼굴 분석 특징]을 바탕으로, 추천 코디를 입고 있는 전신 패션 화보(Full-body fashion portrait) 프롬프트를 영문 30단어 내외로 작성하세요. (자연스럽고 사실적인 사람 사진처럼 보이도록 'photorealistic, natural' 키워드 포함)
 
 반드시 아래 JSON 형식으로 응답:
 {
@@ -718,7 +716,6 @@ ${extraInstruction}
   "styleTip": "상세 코디 제안 (여행 탭 아닐 때)",
   "styleTipDay": "낮 코디 제안 (여행 탭일 때만)",
   "styleTipNight": "밤 코디 제안 (여행 탭일 때만)",
-  "lookbookPrompt": "영어 사진 프롬프트",
   "fashionShopping": [
     { "category": "상의/아우터", "mall": "coupang", "itemName": "구체적 브랜드 제품명", "keyword": "쇼핑 검색어" },
     { "category": "하의", "mall": "coupang", "itemName": "구체적 브랜드 제품명", "keyword": "쇼핑 검색어" },
@@ -733,16 +730,24 @@ ${extraInstruction}
             return parseCleanJSON(await res.json());
         }
 
-        // ★ 초반 웹 버전에 썼던 가장 단순하고 억지 없는 순정 이미지 생성 방식 복구 (이 부분만 변경됨)
-        function generateNaturalLookbook(promptText) {
+        // ★ 방법 2 핵심: 얼굴 없는(Faceless) 목 아래 퍼스널 톤 맞춤 대표 룩북 딱 1장만 생성
+        function generateMainRepresentationLookbook() {
+            if (state.isMainImageGenerated) return;
+            state.isMainImageGenerated = true;
+
             DOM.lookbookImage.classList.add('hidden');
             DOM.lookbookImage.classList.add('opacity-0');
             DOM.lookbookLoader.classList.remove('hidden');
 
-            // 초기 웹 버전에서 사용했던 가장 순수한 형태의 이미지 생성 호출 (군더더기, 억지 필터 모두 제거)
+            const gender = DOM.gender.value || "남성";
+            const season = state.baseAnalysisCache?.color?.season || "personal tone";
+            
+            // 얼굴 이질감을 완벽 차단하는 목 아래 전신 피팅컷 프롬프트
+            const promptText = `faceless fashion photography of a ${gender}, wearing stylish outfit suited for ${season}, neck-down clothing focus, highly detailed fabric, aesthetic lighting, cropped at neck`;
             const finalPrompt = encodeURIComponent(promptText);
             const randomSeed = Math.floor(Math.random() * 999999);
             
+            // 초반 웹 버전의 순수한 생성 URL 방식 사용
             const aiImageUrl = `https://image.pollinations.ai/prompt/${finalPrompt}?width=768&height=1024&nologo=true&seed=${randomSeed}`;
 
             const imgLoader = new Image();
@@ -753,8 +758,6 @@ ${extraInstruction}
                 isLoaded = true;
                 DOM.lookbookImage.src = url;
                 DOM.lookbookLoader.classList.add('hidden');
-                DOM.tpoLoader.classList.add('hidden');
-                DOM.tpoLoader.classList.remove('flex');
                 
                 DOM.lookbookImage.classList.remove('hidden');
                 setTimeout(() => {
@@ -767,7 +770,6 @@ ${extraInstruction}
             };
 
             imgLoader.onerror = () => {
-                const gender = DOM.gender.value || "남성";
                 const fallbackFullbody = gender === "여성"
                     ? "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=768&q=80"
                     : "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=768&q=80";

@@ -150,17 +150,20 @@
         <section id="input-section" class="space-y-6 fade-in">
             <div class="text-center mb-8 mt-4">
                 <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-3 leading-tight">당신만의 고유한 톤,<br>완벽한 스타일.</h2>
-                <p class="text-gray-500 font-medium text-sm md:text-base">사진 한 장으로 피부톤, 맞춤 코디, 최저가 쇼핑까지.</p>
+                <p class="text-gray-500 font-medium text-sm md:text-base">사진 한 장으로 피부톤, 맞춤 코디 세트, 최저가 쇼핑까지.</p>
             </div>
 
-            <!-- 사진 업로드 영역 -->
+            <!-- ★ 절대 고장나지 않는(Inline) 사진 업로드 영역 -->
             <div class="apple-card p-6 md:p-8">
                 <h3 class="text-lg font-bold mb-4 flex items-center text-gray-800"><i class="fa-solid fa-camera mr-2 text-blue-500"></i>정면 사진 업로드</h3>
-                <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-[20px] p-8 md:p-12 text-center cursor-pointer hover:bg-gray-50/80 transition-colors relative overflow-hidden bg-gray-50/30 group">
-                    <!-- 투명 input으로 100% 작동 보장 -->
-                    <input type="file" id="image-input" accept="image/jpeg, image/png, image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                    <img id="image-preview" class="hidden w-auto h-auto max-h-64 mx-auto rounded-2xl shadow-lg mb-4 object-cover relative z-0" alt="미리보기" />
-                    <div id="upload-placeholder" class="relative z-0 group-hover:scale-105 transition-transform duration-300">
+                <div class="border-2 border-dashed border-gray-300 rounded-[20px] p-8 md:p-12 text-center cursor-pointer hover:bg-gray-50/80 transition-colors relative overflow-hidden bg-gray-50/30 group">
+                    
+                    <!-- HTML에서 직접 onchange를 강제 실행하여 어떤 오류가 있어도 사진은 뜨도록 설정 -->
+                    <input type="file" id="image-input" accept="image/*" onchange="previewSelectedImage(event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                    
+                    <img id="image-preview" class="hidden w-auto h-auto max-h-64 mx-auto rounded-2xl shadow-lg mb-4 object-cover relative z-0 pointer-events-none" alt="미리보기" />
+                    
+                    <div id="upload-placeholder" class="relative z-0 group-hover:scale-105 transition-transform duration-300 pointer-events-none">
                         <div class="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mx-auto mb-4 text-blue-500 text-2xl">
                             <i class="fa-solid fa-image"></i>
                         </div>
@@ -220,12 +223,14 @@
             </button>
         </section>
 
+        <!-- 로딩 인디케이터 -->
         <div id="loading-area" class="hidden flex-col items-center justify-center py-32 fade-in">
             <div class="apple-spinner mb-8"></div>
             <h3 class="text-2xl font-bold text-gray-900 mb-3 tracking-tight">AI가 분석을 진행 중입니다</h3>
             <p class="text-gray-500 text-center text-sm leading-relaxed" id="loading-text">피부톤과 윤곽을 스캔하고 있습니다.<br>잠시만 기다려주세요.</p>
         </div>
 
+        <!-- 에러 메시지 -->
         <div id="error-message" class="hidden bg-red-50 text-red-600 p-6 rounded-[24px] text-center my-8 border border-red-100 flex-col items-center fade-in">
             <i class="fa-solid fa-triangle-exclamation text-3xl mb-3 text-red-500"></i>
             <h4 class="font-bold mb-2 text-lg">앗, 문제가 발생했어요</h4>
@@ -233,6 +238,7 @@
             <button onclick="location.reload()" class="mt-4 px-5 py-2 bg-white text-red-600 rounded-full text-sm font-bold shadow-sm border border-red-100 hover:bg-red-50">다시 시도하기</button>
         </div>
 
+        <!-- 분석 결과 영역 -->
         <section id="result-area" class="hidden space-y-6 pb-12">
             <div class="flex justify-end gap-2 fade-in">
                 <button onclick="shareResult()" class="px-4 py-2 bg-white rounded-full text-sm font-bold text-gray-700 shadow-sm border border-gray-200 hover:bg-gray-50 flex items-center">
@@ -307,8 +313,9 @@
                 <div class="w-full relative rounded-[24px] overflow-hidden bg-[#f0f0f2] aspect-[3/4] flex items-center justify-center shadow-md border border-gray-100 max-w-md mx-auto">
                     <div id="lookbook-loader" class="text-gray-400 flex flex-col items-center p-6 text-center">
                         <div class="apple-spinner mb-4"></div>
-                        <span class="text-xs font-bold leading-relaxed text-gray-600">Fal.ai Flux 엔진으로 초고화질 룩북을<br>렌더링 중입니다... (약 1.5초)</span>
+                        <span class="text-xs font-bold leading-relaxed text-gray-600">Fal.ai Flux 엔진으로 초고화질 시그니처 착장 룩북을<br>렌더링 중입니다... (약 1.5초)</span>
                     </div>
+                    <!-- 목 아래 착장 중심 컷오프 프레임 -->
                     <img id="lookbook-image" class="hidden w-full h-full object-cover object-bottom scale-110 origin-bottom transition-opacity duration-700 opacity-0" alt="시그니처 착장 룩북" />
                 </div>
             </div>
@@ -390,12 +397,36 @@
 
     <script>
         // ========================================================
-        // 💡 아래 두 곳의 큰따옴표 안에 발급받으신 API 키를 넣으세요!
+        // 💡 여기에 발급받으신 2개의 API 키를 큰따옴표 안에 넣어주세요!
         // ========================================================
         const GOOGLE_API_KEY = "AQ.Ab8RN6LR9bVvqNLLLulzF54CiyXwPZkGl04ukue2gZrbmjFUPQ";
         const FAL_API_KEY = "fal_sk_754f115a1ffe400b90920ca3
 d4d4cead";
         // ========================================================
+
+        // 절대 고장나지 않는 사진 업로드 전역 함수 (에러 차단용)
+        window.previewSelectedImage = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // 용량 체크
+            if (file.size > 20 * 1024 * 1024) { 
+                alert("20MB 이하의 사진을 선택해주세요."); 
+                return; 
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                state.base64Image = e.target.result.split(',')[1];
+                state.mimeType = file.type || 'image/jpeg';
+                
+                // 화면에 띄우기
+                document.getElementById('image-preview').src = e.target.result;
+                document.getElementById('image-preview').classList.remove('hidden');
+                document.getElementById('upload-placeholder').classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        };
 
         const COUPANG_TRACKING_CODE = "AF4531799";
 
@@ -461,9 +492,6 @@ d4d4cead";
         }
 
         const DOM = {
-            imageInput: document.getElementById('image-input'),
-            imagePreview: document.getElementById('image-preview'),
-            uploadPlaceholder: document.getElementById('upload-placeholder'),
             analyzeBtn: document.getElementById('analyze-btn'),
             inputSection: document.getElementById('input-section'),
             loadingArea: document.getElementById('loading-area'),
@@ -524,22 +552,6 @@ d4d4cead";
             '면접': ['대기업/공기업 정석 면접', '트렌디 직무 면접', '1:1 중요 비즈니스 미팅']
         };
 
-        // 회원님께서 확인하셨던 가장 안정적인 원본 사진 등록 리스너
-        DOM.imageInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            if (file.size > 15 * 1024 * 1024) { showToast("15MB 이하의 사진을 선택해주세요."); return; }
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                state.base64Image = event.target.result.split(',')[1];
-                state.mimeType = file.type || 'image/jpeg';
-                DOM.imagePreview.src = event.target.result;
-                DOM.imagePreview.classList.remove('hidden');
-                DOM.uploadPlaceholder.classList.add('hidden');
-            };
-            reader.readAsDataURL(file);
-        });
-
         async function fetchWithRetry(url, options, maxRetries = 2) {
             for (let i = 0; i < maxRetries; i++) {
                 try {
@@ -549,7 +561,7 @@ d4d4cead";
                     let errMsg = `오류 코드: ${res.status}`;
                     try { errMsg = JSON.parse(errText).error.message; } catch(e){}
                     if (res.status === 400 && errMsg.includes("API key not valid")) {
-                        throw new Error("코드 하단에 입력된 구글 API 키가 유효하지 않습니다.");
+                        throw new Error("코드에 입력된 구글 API 키가 유효하지 않습니다.");
                     }
                     if (res.status !== 429 && res.status < 500) throw new Error(errMsg);
                 } catch (e) {

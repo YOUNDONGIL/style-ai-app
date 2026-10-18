@@ -282,3 +282,650 @@
                     <div class="flex items-center mb-4">
                         <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
                             <i class="fa-solid fa-droplet text-sm"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-900 text-lg tracking-tight">AI 스킨케어 & 뷰티</h4>
+                    </div>
+                    <p id="res-skin-type" class="text-sm font-bold text-blue-600 mb-2"></p>
+                    <p id="res-makeup-tip" class="text-sm text-gray-600 leading-relaxed mb-6"></p>
+                    
+                    <div class="space-y-3">
+                        <p class="text-[11px] font-bold text-gray-400 tracking-wider">🔥 추천 뷰티 아이템</p>
+                        <div id="beauty-shopping-list" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="apple-card p-6 md:p-8 fade-in">
+                <h3 class="font-bold text-xl mb-5 tracking-tight flex items-center">
+                    <i class="fa-solid fa-shirt mr-2 text-gray-800"></i>상황별 맞춤 스타일링
+                </h3>
+                
+                <div class="relative mb-5">
+                    <div id="main-tpo-tabs" class="flex overflow-x-auto gap-2 pb-2 hide-scroll snap-x">
+                        <button class="main-tab snap-start flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-bold bg-gray-900 text-white transition-all shadow-md" data-tpo="데일리">👕 데일리/마실</button>
+                        <button class="main-tab snap-start flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="출근">💼 출근/오피스</button>
+                        <button class="main-tab snap-start flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="데이트">🌹 데이트/소개팅</button>
+                        <button class="main-tab snap-start flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="경조사">👔 경조사/포멀</button>
+                        <button class="main-tab snap-start flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="여행">✈️ 여행/휴양지</button>
+                        <button class="main-tab snap-start flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="운동">🏃 운동/애슬레저</button>
+                        <button class="main-tab snap-start flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="모임">🎉 모임/파티/클럽</button>
+                        <button class="main-tab snap-start flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="면접">🎯 면접/중요미팅</button>
+                    </div>
+                    <div class="absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-white/80 to-transparent pointer-events-none rounded-r-lg"></div>
+                </div>
+
+                <div id="sub-tpo-container" class="bg-[#f8f9fa] rounded-2xl p-5 mb-6 border border-gray-100">
+                    <div id="sub-tabs-area" class="flex flex-wrap gap-2"></div>
+                    
+                    <div id="location-input-area" class="hidden mt-4">
+                        <label class="block text-[12px] font-bold text-gray-500 mb-2">어디로 가시나요? (날씨 반영)</label>
+                        <div class="flex gap-2">
+                            <div class="relative flex-1">
+                                <i class="fa-solid fa-location-dot absolute left-3.5 top-3.5 text-blue-500"></i>
+                                <input type="text" id="location-input" class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all shadow-sm" />
+                            </div>
+                            <button id="apply-location-btn" class="bg-gray-900 hover:bg-black text-white font-bold px-5 rounded-xl text-sm transition-colors whitespace-nowrap shadow-sm">날씨 적용</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tpo-content-area" class="relative">
+                    <div id="tpo-loader" class="hidden absolute inset-0 z-20 bg-white/80 backdrop-blur-md rounded-2xl flex-col items-center justify-center">
+                        <div class="apple-spinner mb-4"></div>
+                        <span class="text-sm font-bold text-gray-800" id="tpo-loader-text">얼굴 톤 대비 실사 가상 룩북 렌더링 중...</span>
+                    </div>
+
+                    <div id="weather-info-box" class="hidden mb-5 bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-center">
+                        <i class="fa-solid fa-cloud-sun text-xl text-blue-500 mr-3"></i>
+                        <div>
+                            <p class="text-xs font-bold text-blue-800 tracking-wider">현지 실시간 날씨 기반</p>
+                            <p id="res-weather-summary" class="text-sm text-gray-700 font-medium"></p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row items-start gap-6 md:gap-8">
+                        <div class="w-full md:w-[45%] self-start relative rounded-[24px] overflow-hidden bg-[#f0f0f2] aspect-[3/4] flex items-center justify-center shadow-md border border-gray-100">
+                            <div id="lookbook-loader" class="text-gray-400 flex flex-col items-center p-6 text-center">
+                                <i class="fa-solid fa-wand-magic-sparkles text-3xl mb-3 text-blue-500 animate-pulse"></i>
+                                <span class="text-xs font-bold leading-relaxed text-gray-600">업로드하신 얼굴의 이목구비와 비율을 분석하여<br>실사 패션 룩북을 피팅 중입니다...</span>
+                            </div>
+                            <img id="lookbook-image" class="hidden w-full h-full object-cover transition-opacity duration-700 opacity-0" alt="AI 실사 가상 피팅 룩북" />
+                        </div>
+                        
+                        <div class="w-full md:w-[55%] flex flex-col">
+                            <h4 class="text-xl font-extrabold mb-3 tracking-tight text-gray-900" id="res-tpo-title">코디 제안</h4>
+                            
+                            <div id="standard-tip-area" class="mb-5">
+                                <p id="res-style-tip" class="text-[15px] text-gray-600 leading-relaxed"></p>
+                            </div>
+                            
+                            <div id="travel-tip-area" class="hidden mb-5 space-y-4">
+                                <div class="bg-orange-50/50 p-4 rounded-xl border border-orange-100">
+                                    <h5 class="font-bold text-orange-800 text-sm mb-1"><i class="fa-solid fa-sun mr-1.5"></i>낮 코디 제안</h5>
+                                    <p id="res-style-tip-day" class="text-[14px] text-gray-700 leading-relaxed"></p>
+                                </div>
+                                <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
+                                    <h5 class="font-bold text-indigo-800 text-sm mb-1"><i class="fa-solid fa-moon mr-1.5"></i>밤 코디 제안</h5>
+                                    <p id="res-style-tip-night" class="text-[14px] text-gray-700 leading-relaxed"></p>
+                                </div>
+                            </div>
+
+                            <div class="bg-white border border-gray-200 p-4 rounded-2xl mb-6 flex items-start gap-3 shadow-sm">
+                                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <i class="fa-solid fa-ruler-combined text-gray-600 text-sm"></i>
+                                </div>
+                                <div>
+                                    <p id="res-size-recommend" class="font-bold text-gray-900 text-sm mb-1"></p>
+                                    <p id="res-fit-tip" class="text-[13px] text-gray-500 leading-relaxed"></p>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto">
+                                <p class="text-[11px] font-bold text-gray-400 tracking-wider mb-3">🔥 스타일 완성 아이템</p>
+                                <div id="fashion-shopping-list" class="space-y-2.5"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center py-6 text-[11px] text-gray-400">
+        <p>StyleAI는 파트너스 활동을 통해 일정액의 수수료를 제공받을 수 있습니다.</p>
+    </footer>
+
+    <script>
+        const ADMIN_API_KEY = "여기에_회원님의_구글_API_키를_넣으세요";
+        const COUPANG_TRACKING_CODE = "AF4531799";
+
+        const AFFILIATE_MALLS = {
+            'coupang': { 
+                name: '온라인 최저가 스토어', 
+                buildUrl: (keyword) => `https://www.coupang.com/np/search?q=${encodeURIComponent(keyword)}&channel=user&lptag=${COUPANG_TRACKING_CODE}`
+            }
+        };
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        let badgeClickCount = 0;
+        let badgeClickTimer = null;
+        document.getElementById('admin-badge').addEventListener('click', () => {
+            badgeClickCount++;
+            clearTimeout(badgeClickTimer);
+            if (badgeClickCount >= 3) {
+                badgeClickCount = 0;
+                document.getElementById('admin-key-input').value = localStorage.getItem('styleai_admin_key') || "";
+                document.getElementById('admin-modal').classList.add('active');
+            } else {
+                badgeClickTimer = setTimeout(() => { badgeClickCount = 0; }, 1000);
+            }
+        });
+
+        function closeAdminModal() {
+            document.getElementById('admin-modal').classList.remove('active');
+        }
+
+        function saveAdminKey() {
+            const key = document.getElementById('admin-key-input').value.trim();
+            if (key) {
+                localStorage.setItem('styleai_admin_key', key);
+                state.apiKey = key;
+                showToast("관리자 API 키가 브라우저에 저장되었습니다!");
+                closeAdminModal();
+            } else {
+                showToast("키를 입력해주세요.");
+            }
+        }
+
+        function triggerAffiliateModal(mallKey, itemName, keyword) {
+            const mall = AFFILIATE_MALLS[mallKey] || AFFILIATE_MALLS['coupang'];
+            const targetUrl = mall.buildUrl(keyword);
+
+            document.getElementById('modal-item-name').textContent = `선택 아이템: ${itemName}`;
+            document.getElementById('modal-redirect-btn').href = targetUrl;
+            document.getElementById('affiliate-modal').classList.add('active');
+        }
+
+        function closeAffiliateModal() {
+            document.getElementById('affiliate-modal').classList.remove('active');
+        }
+
+        const DOM = {
+            imageInput: document.getElementById('image-input'),
+            imagePreview: document.getElementById('image-preview'),
+            uploadPlaceholder: document.getElementById('upload-placeholder'),
+            analyzeBtn: document.getElementById('analyze-btn'),
+            inputSection: document.getElementById('input-section'),
+            loadingArea: document.getElementById('loading-area'),
+            loadingText: document.getElementById('loading-text'),
+            resultArea: document.getElementById('result-area'),
+            errorMsg: document.getElementById('error-message'),
+            errorText: document.getElementById('error-text'),
+            gender: document.getElementById('gender-input'),
+            age: document.getElementById('age-input'),
+            height: document.getElementById('height-input'),
+            weight: document.getElementById('weight-input'),
+            bodyType: document.getElementById('body-type-input'),
+            mainTabs: document.querySelectorAll('.main-tab'),
+            subTabsArea: document.getElementById('sub-tabs-area'),
+            locationInputArea: document.getElementById('location-input-area'),
+            locationInput: document.getElementById('location-input'),
+            applyLocationBtn: document.getElementById('apply-location-btn'),
+            tpoContentArea: document.getElementById('tpo-content-area'),
+            tpoLoader: document.getElementById('tpo-loader'),
+            lookbookLoader: document.getElementById('lookbook-loader'),
+            lookbookImage: document.getElementById('lookbook-image'),
+            weatherInfoBox: document.getElementById('weather-info-box'),
+            weatherSummary: document.getElementById('res-weather-summary'),
+            standardTipArea: document.getElementById('standard-tip-area'),
+            travelTipArea: document.getElementById('travel-tip-area')
+        };
+
+        DOM.gender.addEventListener('change', (e) => {
+            const selectedGender = e.target.value;
+            if (selectedGender === '남성') {
+                DOM.height.placeholder = "예: 174 (남성 평균)";
+                DOM.weight.placeholder = "예: 74 (남성 평균)";
+            } else if (selectedGender === '여성') {
+                DOM.height.placeholder = "예: 161 (여성 평균)";
+                DOM.weight.placeholder = "예: 56 (여성 평균)";
+            }
+        });
+
+        const state = {
+            base64Image: null,
+            mimeType: null,
+            apiKey: localStorage.getItem('styleai_admin_key') || ADMIN_API_KEY,
+            currentMainTPO: "데일리",
+            currentSubTPO: "편안한 동네/카페",
+            location: "",
+            baseAnalysisCache: null
+        };
+
+        const TPO_DATA = {
+            '데일리': ['편안한 동네/카페', '쇼핑/핫플 방문', '가벼운 산책/마실'],
+            '출근': ['비즈니스 캐주얼', '격식 있는 정장', '자유로운 IT/스타트업'],
+            '데이트': ['분위기 있는 레스토랑', '야외 공원/피크닉', '실내 쇼핑몰/전시회'],
+            '경조사': ['결혼식 하객룩', '장례식 조문', '상견례/격식 모임'],
+            '여행': [],
+            '운동': ['헬스/피트니스 짐웨어', '러닝/야외 트레이닝', '골프/테니스 클래식'],
+            '모임': ['동창회/연말 파티', '핫플 펍/클럽', '야외 페스티벌'],
+            '면접': ['대기업/공기업 정석 면접', '트렌디 직무 면접', '1:1 중요 비즈니스 미팅']
+        };
+
+        function parseCleanJSON(apiResult) {
+            try {
+                if (apiResult.error) throw new Error(apiResult.error.message);
+                let text = apiResult.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!text) throw new Error("결과를 받지 못했습니다. 사진을 다시 선택해 보세요.");
+                text = text.replace(/```json/gi, '').replace(/```/gi, '').trim();
+                return JSON.parse(text);
+            } catch (e) {
+                throw new Error("데이터 분석 중 오류가 발생했습니다.");
+            }
+        }
+
+        // 다중 우회 접속을 위한 커스텀 API 호출 함수
+        async function callGeminiAPI(prompt, imageData = null) {
+            const isImage = !!imageData;
+            // 1순위 1.5 플래시 -> 2순위 1.5 프로 -> 3순위 (이미지는 1.0 프로 비전, 텍스트는 1.0 프로)
+            const models = isImage 
+                ? ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-1.0-pro-vision-latest'] 
+                : ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-1.0-pro-latest'];
+
+            let lastErrorMsg = "";
+
+            for (let i = 0; i < models.length; i++) {
+                const model = models[i];
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${state.apiKey}`;
+                
+                const parts = [{ text: prompt }];
+                if (isImage) {
+                    parts.push({ inlineData: { mimeType: state.mimeType, data: imageData } });
+                }
+
+                const payload = { contents: [{ role: "user", parts: parts }] };
+                
+                // 구형 모델(1.0)은 JSON 강제 설정 포맷(responseMimeType)을 지원하지 않아 에러를 뿜으므로, 1.5 버전에만 적용
+                if (model.includes('1.5')) {
+                    payload.generationConfig = { responseMimeType: "application/json" };
+                }
+
+                try {
+                    const res = await fetch(apiUrl, { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify(payload) 
+                    });
+                    
+                    if (res.ok) {
+                        const data = await res.json();
+                        return parseCleanJSON(data);
+                    }
+                    
+                    const errText = await res.text();
+                    lastErrorMsg = errText;
+
+                    if (res.status === 400 && errText.includes("API key not valid")) {
+                        throw new Error("구글 API 키가 유효하지 않습니다. 우측 상단 뱃지를 눌러 키를 다시 확인해주세요.");
+                    }
+                    // 모델 접근 권한이 없거나 (404 Not Found), 기타 일시적 서버 에러인 경우 루프를 돌며 다음 모델을 자동으로 시도합니다.
+                } catch (e) {
+                    if (e.message.includes("구글 API 키")) throw e;
+                    lastErrorMsg = e.message;
+                }
+            }
+            throw new Error("보유하신 구글 API 키의 AI 접근이 완전히 제한되어 있습니다. 구글 AI Studio에서 'Create API Key'를 눌러 완전히 새로운 키를 발급받아 교체해주세요.");
+        }
+
+        DOM.imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (file.size > 5 * 1024 * 1024) { showToast("5MB 이하의 사진을 선택해주세요."); return; }
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                state.base64Image = event.target.result.split(',')[1];
+                state.mimeType = file.type;
+                DOM.imagePreview.src = event.target.result;
+                DOM.imagePreview.classList.remove('hidden');
+                DOM.uploadPlaceholder.classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        });
+
+        DOM.analyzeBtn.addEventListener('click', async () => {
+            const currentKey = localStorage.getItem('styleai_admin_key') || state.apiKey;
+            if (!currentKey || currentKey === "여기에_회원님의_구글_API_키를_넣으세요") { 
+                showToast("API 키가 설정되지 않았습니다. 우측 상단 'AI Studio Pro'를 3번 터치해 키를 입력해주세요!"); 
+                return; 
+            }
+            state.apiKey = currentKey;
+
+            if (!state.base64Image) { showToast("본인의 사진을 먼저 업로드해주세요."); return; }
+            if (!DOM.gender.value) { showToast("성별을 선택해주세요."); return; }
+            if (!DOM.age.value) { showToast("연령대를 선택해주세요."); return; }
+            if (!DOM.height.value) { showToast("키(cm)를 입력해주세요."); return; }
+            if (!DOM.weight.value) { showToast("체중(kg)을 입력해주세요."); return; }
+            if (!DOM.bodyType.value) { showToast("체형을 선택해주세요."); return; }
+            
+            DOM.inputSection.classList.add('hidden');
+            DOM.errorMsg.classList.add('hidden');
+            DOM.loadingArea.classList.remove('hidden');
+            DOM.loadingArea.classList.add('flex');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            try {
+                DOM.loadingText.innerHTML = "피부톤, 이목구비 윤곽 및 명도 대비를 스캔하고 있습니다.<br>AI 뷰티 전문가가 분석 중입니다...";
+                state.baseAnalysisCache = await analyzeBaseInfo();
+                renderBaseResults(state.baseAnalysisCache);
+                
+                DOM.loadingArea.classList.add('hidden');
+                DOM.loadingArea.classList.remove('flex');
+                DOM.resultArea.classList.remove('hidden');
+                
+                renderSubTabs('데일리');
+            } catch (error) {
+                DOM.loadingArea.classList.add('hidden');
+                DOM.loadingArea.classList.remove('flex');
+                DOM.inputSection.classList.remove('hidden');
+                DOM.errorText.textContent = error.message;
+                DOM.errorMsg.classList.remove('hidden');
+            }
+        });
+
+        async function analyzeBaseInfo() {
+            const prompt = `
+당신은 최고의 퍼스널 컬러 및 패션/뷰티 마스터입니다.
+[사용자 프로필] 성별: ${DOM.gender.value}, 연령: ${DOM.age.value}, 키: ${DOM.height.value}cm, 몸무게: ${DOM.weight.value}kg, 체형: ${DOM.bodyType.value}
+
+* 필수 지시사항:
+1. 사진 속 실제 인물의 얼굴 피부 톤, 얼굴형, 눈매, 헤어스타일(가르마, 길이, 컬러)을 매우 사실적으로 분석하세요.
+2. 퍼스널 컬러의 밝은 톤(bestLight) 3개, 어두운 톤(bestDark) 3개를 정확한 HEX 코드로 응답.
+3. 뷰티 추천: 실제 시판 중인 구체적 브랜드 제품명을 적을 것.
+4. 쇼핑몰 키(mall)는 100% 'coupang'으로 지정할 것.
+5. facialFeatures (매우 중요): 사진 속 인물의 이목구비, 헤어스타일, 인상을 실사 사진 생성을 위해 매우 정밀하게 영어로 묘사하세요. (예: "A real Korean 20s young adult, natural black hair, clear skin, realistic human face, authentic facial shape").
+
+반드시 아래 JSON 형식으로 응답:
+{
+  "color": {
+    "season": "예: 가을 웜 뮤트",
+    "description": "얼굴 명도 대비감과 퍼스널 톤 특징 요약 (2-3문장)",
+    "bestLight": ["#HEX", "#HEX", "#HEX"],
+    "bestDark": ["#HEX", "#HEX", "#HEX"]
+  },
+  "facialFeatures": "영문 실사 인상 묘사",
+  "skin": {
+    "type": "예상 피부타입",
+    "makeupTip": "피부 타입에 맞는 스킨케어/메이크업 꿀팁"
+  },
+  "body": {
+    "size": "추천 상의/하의 사이즈",
+    "fitTip": "체형 보완 핏 추천"
+  },
+  "beautyShopping": [
+    { "category": "스킨/토너", "mall": "coupang", "itemName": "구체적 브랜드 제품명", "keyword": "쇼핑 검색 키워드" },
+    { "category": "로션/크림", "mall": "coupang", "itemName": "구체적 브랜드 제품명", "keyword": "쇼핑 검색 키워드" },
+    { "category": "포인트 뷰티", "mall": "coupang", "itemName": "톤 맞춤 제품명", "keyword": "쇼핑 검색 키워드" }
+  ]
+}`;
+            // 다중 우회 접속 함수 호출 (이미지 포함)
+            return await callGeminiAPI(prompt, state.base64Image);
+        }
+
+        DOM.mainTabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                DOM.mainTabs.forEach(t => {
+                    t.classList.remove('bg-gray-900', 'text-white', 'shadow-md');
+                    t.classList.add('bg-gray-100', 'text-gray-600');
+                });
+                const currentBtn = e.currentTarget;
+                currentBtn.classList.remove('bg-gray-100', 'text-gray-600');
+                currentBtn.classList.add('bg-gray-900', 'text-white', 'shadow-md');
+
+                state.currentMainTPO = currentBtn.dataset.tpo;
+                renderSubTabs(state.currentMainTPO);
+            });
+        });
+
+        function renderSubTabs(mainTPO) {
+            DOM.subTabsArea.innerHTML = '';
+            DOM.weatherInfoBox.classList.add('hidden');
+            
+            if (mainTPO === '여행' || mainTPO === '데일리') {
+                DOM.locationInputArea.classList.remove('hidden');
+                DOM.locationInput.placeholder = mainTPO === '여행' ? "여행 도시 입력 (예: 삿포로, 다낭)" : "현재 지역 입력 (예: 강남구, 해운대구)";
+                state.currentSubTPO = mainTPO === '여행' ? "여행 패션" : "편안한 동네/카페";
+                
+                if (mainTPO === '데일리') {
+                    createSubTabButtons(TPO_DATA[mainTPO]);
+                } else {
+                    DOM.tpoContentArea.style.opacity = '0.5';
+                }
+            } else {
+                DOM.locationInputArea.classList.add('hidden');
+                DOM.tpoContentArea.style.opacity = '1';
+                createSubTabButtons(TPO_DATA[mainTPO]);
+                state.currentSubTPO = TPO_DATA[mainTPO][0];
+                triggerTPOAnalysis();
+            }
+        }
+
+        function createSubTabButtons(tabs) {
+            tabs.forEach((sub, index) => {
+                const btn = document.createElement('button');
+                btn.className = `sub-tab px-4 py-2 rounded-xl text-[13px] font-bold transition-all ${index === 0 ? 'bg-blue-100 text-blue-700 shadow-sm' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}`;
+                btn.textContent = sub;
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.sub-tab').forEach(b => {
+                        b.className = 'sub-tab px-4 py-2 rounded-xl text-[13px] font-bold bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 transition-all';
+                    });
+                    const current = e.currentTarget;
+                    current.className = 'sub-tab px-4 py-2 rounded-xl text-[13px] font-bold bg-blue-100 text-blue-700 shadow-sm transition-all';
+                    state.currentSubTPO = sub;
+                    triggerTPOAnalysis();
+                });
+                DOM.subTabsArea.appendChild(btn);
+            });
+        }
+
+        DOM.applyLocationBtn.addEventListener('click', () => {
+            if (!DOM.locationInput.value.trim()) { showToast("지역/도시를 입력해주세요."); return; }
+            state.location = DOM.locationInput.value.trim();
+            DOM.tpoContentArea.style.opacity = '1';
+            triggerTPOAnalysis();
+        });
+
+        async function triggerTPOAnalysis() {
+            DOM.tpoLoader.classList.remove('hidden');
+            DOM.tpoLoader.classList.add('flex');
+            DOM.weatherInfoBox.classList.add('hidden');
+            
+            try {
+                const fashionResult = await analyzeTPOStyle();
+                renderTPOResults(fashionResult);
+                
+                generatePhotorealisticLookbook(fashionResult.lookbookPrompt);
+                
+            } catch (err) {
+                showToast("코디 정보를 가져오는데 문제가 발생했습니다.");
+                DOM.tpoLoader.classList.add('hidden');
+                DOM.tpoLoader.classList.remove('flex');
+            }
+        }
+
+        async function analyzeTPOStyle() {
+            const isTravel = state.currentMainTPO === '여행';
+            let tpoContext = `분류: ${state.currentMainTPO}, 세부상황: ${state.currentSubTPO}`;
+            let extraInstruction = "";
+
+            if (state.location && (isTravel || state.currentMainTPO === '데일리')) {
+                tpoContext += `, 위치: ${state.location}`;
+                extraInstruction = `* 중요: 지정된 위치(${state.location})의 계절감과 날씨를 반영하세요.`;
+            }
+
+            const prompt = `
+[사용자 프로필] 성별: ${DOM.gender.value}, 나이: ${DOM.age.value}, 퍼스널컬러: ${state.baseAnalysisCache?.color.season}
+[실제 얼굴 분석 특징]: ${state.baseAnalysisCache?.facialFeatures || "A real Korean person"}
+[상황정보] ${tpoContext}
+${extraInstruction}
+
+지시사항:
+1. 사용자의 퍼스널 컬러 및 얼굴 명도 대비감에 최적화된 착장을 추천하세요.
+2. 쇼핑 아이템은 구매하기 쉬운 실제 브랜드와 구체적 상품명을 명시할 것.
+3. 쇼핑몰 키(mall)는 100% 'coupang'으로 지정할 것.
+4. lookbookPrompt (매우 중요):
+   - 만화, 일러스트, 3D 느낌을 일체 배제하고 실제 DSLR 카메라로 찍은 실사 스트리트 스냅(Candid raw photograph) 프롬프트를 영어로 작성하세요.
+   - [실제 얼굴 분석 특징]을 반드시 주어에 포함하고, 추천된 옷과 신발을 착용한 전신 룩북(Full-body fashion portrait) 구도를 45단어 내외로 묘사할 것.
+
+반드시 아래 JSON 형식으로 응답:
+{
+  "weatherSummary": "날씨 요약 (위치 입력 없으면 빈 문자열)",
+  "styleTip": "상세 코디 제안 (여행 탭 아닐 때)",
+  "styleTipDay": "낮 코디 제안 (여행 탭일 때만)",
+  "styleTipNight": "밤 코디 제안 (여행 탭일 때만)",
+  "lookbookPrompt": "영어 실사 인물 사진 프롬프트",
+  "fashionShopping": [
+    { "category": "상의/아우터", "mall": "coupang", "itemName": "구체적 브랜드 제품명", "keyword": "쇼핑 검색어" },
+    { "category": "하의", "mall": "coupang", "itemName": "구체적 브랜드 제품명", "keyword": "쇼핑 검색어" },
+    { "category": "신발/잡화", "mall": "coupang", "itemName": "구체적 브랜드 제품명", "keyword": "쇼핑 검색어" }
+  ]
+}`;
+            // 다중 우회 접속 함수 호출 (이미지 미포함 텍스트 분석)
+            return await callGeminiAPI(prompt, null);
+        }
+
+        function generatePhotorealisticLookbook(promptText) {
+            DOM.lookbookImage.classList.add('hidden');
+            DOM.lookbookImage.classList.add('opacity-0');
+            DOM.lookbookLoader.classList.remove('hidden');
+
+            const realisticTokens = "RAW photo, hyper-realistic everyday photography, natural skin texture, realistic authentic Korean face, candid street snap, shot on 85mm lens, photorealistic";
+            const negativeFilter = "anime, cartoon, 3d render, plastic, doll, illustration, ugly, deformed";
+            
+            const finalPrompt = encodeURIComponent(`${promptText}, ${realisticTokens}, ${negativeFilter}`);
+            const randomSeed = Math.floor(Math.random() * 999999);
+            
+            const aiImageUrl = `https://image.pollinations.ai/prompt/${finalPrompt}?width=768&height=1024&nologo=true&model=flux&seed=${randomSeed}`;
+
+            const imgLoader = new Image();
+            let isLoaded = false;
+
+            const displayImage = (url) => {
+                if (isLoaded) return;
+                isLoaded = true;
+                DOM.lookbookImage.src = url;
+                DOM.lookbookLoader.classList.add('hidden');
+                DOM.tpoLoader.classList.add('hidden');
+                DOM.tpoLoader.classList.remove('flex');
+                
+                DOM.lookbookImage.classList.remove('hidden');
+                setTimeout(() => {
+                    DOM.lookbookImage.classList.remove('opacity-0');
+                }, 80);
+            };
+
+            imgLoader.onload = () => {
+                displayImage(aiImageUrl);
+            };
+
+            imgLoader.onerror = () => {
+                const gender = DOM.gender.value || "남성";
+                const fallbackFullbody = gender === "여성"
+                    ? "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=768&q=80"
+                    : "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=768&q=80";
+                displayImage(fallbackFullbody);
+            };
+
+            setTimeout(() => {
+                if (!isLoaded) {
+                    displayImage(aiImageUrl);
+                }
+            }, 15000);
+
+            imgLoader.src = aiImageUrl;
+        }
+
+        function renderBaseResults(data) {
+            document.getElementById('res-season').textContent = data.color.season;
+            document.getElementById('res-color-desc').textContent = data.color.description;
+            
+            const renderColors = (colors, id) => {
+                const container = document.getElementById(id);
+                container.innerHTML = '';
+                (colors || []).forEach(hex => {
+                    const el = document.createElement('div');
+                    el.className = 'color-swatch';
+                    el.style.backgroundColor = hex;
+                    container.appendChild(el);
+                });
+            };
+            renderColors(data.color.bestLight, 'res-best-light');
+            renderColors(data.color.bestDark, 'res-best-dark');
+
+            document.getElementById('res-skin-type').textContent = data.skin.type;
+            document.getElementById('res-makeup-tip').textContent = data.skin.makeupTip;
+            document.getElementById('res-size-recommend').textContent = data.body.size;
+            document.getElementById('res-fit-tip').textContent = data.body.fitTip;
+
+            renderShoppingList(data.beautyShopping, 'beauty-shopping-list');
+        }
+
+        function renderTPOResults(data) {
+            document.getElementById('res-tpo-title').innerHTML = `스타일링 포인트`;
+            
+            if (data.weatherSummary) {
+                DOM.weatherSummary.textContent = data.weatherSummary;
+                DOM.weatherInfoBox.classList.remove('hidden');
+            }
+
+            if (state.currentMainTPO === '여행' && data.styleTipDay && data.styleTipNight) {
+                DOM.standardTipArea.classList.add('hidden');
+                DOM.travelTipArea.classList.remove('hidden');
+                document.getElementById('res-style-tip-day').textContent = data.styleTipDay;
+                document.getElementById('res-style-tip-night').textContent = data.styleTipNight;
+            } else {
+                DOM.standardTipArea.classList.remove('hidden');
+                DOM.travelTipArea.classList.add('hidden');
+                document.getElementById('res-style-tip').textContent = data.styleTip;
+            }
+
+            renderShoppingList(data.fashionShopping, 'fashion-shopping-list');
+        }
+
+        function renderShoppingList(items, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            items.forEach(item => {
+                const mallId = item.mall.toLowerCase();
+                const mallInfo = AFFILIATE_MALLS[mallId] || AFFILIATE_MALLS['coupang'];
+
+                const card = document.createElement('div');
+                card.onclick = () => triggerAffiliateModal(mallId, item.itemName, item.keyword);
+                card.className = 'flex items-center justify-between bg-[#f8f9fa] p-3.5 rounded-[16px] hover:bg-white transition-all shadow-sm border border-transparent hover:border-blue-200 group cursor-pointer active:scale-98';
+                
+                card.innerHTML = `
+                    <div class="flex-1 min-w-0 pr-3">
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <span class="text-[10px] text-gray-500 font-bold whitespace-nowrap bg-gray-100 px-2 py-0.5 rounded-full">${item.category}</span>
+                            <span class="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded-full font-bold">AI 맞춤 추천</span>
+                        </div>
+                        <p class="font-bold text-gray-900 text-[14px] truncate mb-0.5">${item.itemName}</p>
+                        <p class="text-[11px] text-blue-500 truncate group-hover:underline"><i class="fa-solid fa-search mr-1"></i>"${item.keyword}" 최저가 검색</p>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400 group-hover:text-blue-500 group-hover:scale-110 transition-all flex-shrink-0">
+                        <i class="fa-solid fa-arrow-right -rotate-45 text-sm"></i>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>

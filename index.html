@@ -590,7 +590,7 @@
             try {
                 DOM.loadingText.innerHTML = "피부톤, 이목구비 윤곽 및 명도 대비를 스캔하고 있습니다.<br>AI 뷰티 전문가가 분석 중입니다...";
                 
-                // ★ 가장 안정적으로 작동했던 오리지널 호출 방식
+                // ★ 정확하게 작동하는 gemini-1.5-flash 모델 적용 완료
                 state.baseAnalysisCache = await analyzeBaseInfo();
                 renderBaseResults(state.baseAnalysisCache);
                 
@@ -609,8 +609,8 @@
         });
 
         async function analyzeBaseInfo() {
-            // ★ 오류가 없었던 오리지널 API 식별자(gemini-1.5-flash-latest)로 완벽 복구
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${state.apiKey}`;
+            // ★ 정확히 일치하는 공식 모델명 gemini-1.5-flash
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${state.apiKey}`;
             const prompt = `
 당신은 최고의 퍼스널 컬러 및 패션/뷰티 마스터입니다.
 [사용자 프로필] 성별: ${DOM.gender.value}, 연령: ${DOM.age.value}, 키: ${DOM.height.value}cm, 몸무게: ${DOM.weight.value}kg, 체형: ${DOM.bodyType.value}
@@ -735,7 +735,8 @@
         }
 
         async function analyzeTPOStyle() {
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${state.apiKey}`;
+            // ★ 정확히 일치하는 공식 모델명 gemini-1.5-flash
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${state.apiKey}`;
             const isTravel = state.currentMainTPO === '여행';
             let tpoContext = `분류: ${state.currentMainTPO}, 세부상황: ${state.currentSubTPO}`;
             let extraInstruction = "";
@@ -756,8 +757,9 @@ ${extraInstruction}
 2. 쇼핑 아이템은 구매하기 쉬운 실제 브랜드와 구체적 상품명을 명시할 것.
 3. 쇼핑몰 키(mall)는 100% 'coupang'으로 지정할 것.
 4. lookbookPrompt (매우 중요):
-   - 만화, 일러스트, 3D 느낌을 일체 배제하고 실제 DSLR 카메라로 찍은 실사 스트리트 스냅(Candid raw photograph) 프롬프트를 영어로 작성하세요.
-   - [실제 얼굴 분석 특징]을 반드시 주어에 포함하고, 추천된 옷과 신발을 착용한 전신 룩북(Full-body fashion portrait) 구도를 45단어 내외로 묘사할 것.
+   - 화보나 스튜디오 사진(editorial, studio)이라는 단어를 절대 쓰지 마세요. 인위적인 AI 느낌이 납니다.
+   - 거울 셀카(mirror selfie)나 친구가 폰으로 대충 찍어준 일상 무보정 사진(amateur smartphone photo, raw unedited candid) 컨셉으로 작성하세요.
+   - [실제 얼굴 분석 특징]을 주어에 포함하고, 추천된 옷을 입은 모습을 40단어 내외로 영어로 묘사할 것.
 
 반드시 아래 JSON 형식으로 응답:
 {
@@ -765,7 +767,7 @@ ${extraInstruction}
   "styleTip": "상세 코디 제안 (여행 탭 아닐 때)",
   "styleTipDay": "낮 코디 제안 (여행 탭일 때만)",
   "styleTipNight": "밤 코디 제안 (여행 탭일 때만)",
-  "lookbookPrompt": "영어 실사 인물 사진 프롬프트",
+  "lookbookPrompt": "영어 일상 실사 사진 프롬프트",
   "fashionShopping": [
     { "category": "상의/아우터", "mall": "coupang", "itemName": "구체적 브랜드 제품명", "keyword": "쇼핑 검색어" },
     { "category": "하의", "mall": "coupang", "itemName": "구체적 브랜드 제품명", "keyword": "쇼핑 검색어" },

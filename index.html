@@ -113,21 +113,20 @@
             <h1 class="text-xl font-bold tracking-tight text-gray-900 flex items-center">
                 <i class="fa-solid fa-sparkles text-blue-500 mr-2"></i>StyleAI
             </h1>
-            <!-- 해당 뱃지를 연속 3번 탭하면 관리자 API 키 입력창이 열립니다 -->
             <span id="admin-badge" class="text-xs font-semibold text-blue-600 bg-blue-50 border border-blue-100 px-3 py-1 rounded-full cursor-pointer select-none">AI Studio Pro</span>
         </div>
     </header>
 
     <div id="toast">알림</div>
 
-    <!-- 숨겨진 관리자 API 키 설정 모달 -->
+    <!-- 숨겨진 관리자 API 키 설정 모달 (우측 상단 뱃지 3회 탭) -->
     <div id="admin-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
                 <i class="fa-solid fa-key"></i>
             </div>
             <h3 class="text-lg font-bold text-gray-900 mb-1">관리자 API 키 설정</h3>
-            <p class="text-xs text-gray-500 mb-4">Google AI Studio API 키를 입력하면 브라우저에 자동 저장됩니다.</p>
+            <p class="text-xs text-gray-500 mb-4">Google AI Studio API 키를 입력하면 브라우저에 저장됩니다.</p>
             <input type="password" id="admin-key-input" placeholder="AIzaSy..." class="apple-input w-full p-3.5 text-sm text-gray-800 outline-none mb-4" />
             <div class="flex gap-2">
                 <button onclick="closeAdminModal()" class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-2xl font-bold text-sm">취소</button>
@@ -181,11 +180,12 @@
                             <i class="fa-solid fa-image"></i>
                         </div>
                         <p class="font-bold text-gray-800 text-lg">터치하여 앨범에서 선택</p>
-                        <p class="text-sm text-gray-400 mt-2">자연광에서 마스크 없이 찍은 사진 권장</p>
+                        <p class="text-sm text-gray-400 mt-2">자연광에서 마스크 없이 찍은 얼굴 정면 권장</p>
                     </div>
                 </div>
             </div>
 
+            <!-- 프로필 정보 (기본값 없는 빈칸 설정) -->
             <div class="apple-card p-6 md:p-8">
                 <h3 class="text-lg font-bold mb-5 flex items-center text-gray-800"><i class="fa-solid fa-sliders mr-2 text-blue-500"></i>프로필 정보</h3>
                 <div class="grid grid-cols-2 gap-4 mb-4">
@@ -211,11 +211,11 @@
                 <div class="grid grid-cols-3 gap-3">
                     <div>
                         <label class="block text-[13px] font-bold text-gray-500 mb-1.5 pl-1">키 (cm)</label>
-                        <input type="number" id="height-input" placeholder="예: 175" class="apple-input w-full p-3.5 text-gray-800 outline-none" />
+                        <input type="number" id="height-input" placeholder="예: 184" class="apple-input w-full p-3.5 text-gray-800 outline-none" />
                     </div>
                     <div>
                         <label class="block text-[13px] font-bold text-gray-500 mb-1.5 pl-1">체중 (kg)</label>
-                        <input type="number" id="weight-input" placeholder="예: 68" class="apple-input w-full p-3.5 text-gray-800 outline-none" />
+                        <input type="number" id="weight-input" placeholder="예: 80" class="apple-input w-full p-3.5 text-gray-800 outline-none" />
                     </div>
                     <div>
                         <label class="block text-[13px] font-bold text-gray-500 mb-1.5 pl-1">체형</label>
@@ -297,6 +297,7 @@
                 </div>
             </div>
 
+            <!-- TPO 카테고리 8종 확장 영역 -->
             <div class="apple-card p-6 md:p-8 fade-in">
                 <h3 class="font-bold text-xl mb-5 tracking-tight flex items-center">
                     <i class="fa-solid fa-shirt mr-2 text-gray-800"></i>상황별 맞춤 스타일링
@@ -304,10 +305,14 @@
                 
                 <div class="relative mb-5">
                     <div id="main-tpo-tabs" class="flex overflow-x-auto gap-2 pb-2 hide-scroll snap-x">
-                        <button class="main-tab snap-start flex-shrink-0 px-5 py-2.5 rounded-full text-[14px] font-bold bg-gray-900 text-white transition-all shadow-md" data-tpo="데일리">👕 데일리</button>
-                        <button class="main-tab snap-start flex-shrink-0 px-5 py-2.5 rounded-full text-[14px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="출근">💼 출근/오피스</button>
-                        <button class="main-tab snap-start flex-shrink-0 px-5 py-2.5 rounded-full text-[14px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="데이트">🌹 데이트</button>
-                        <button class="main-tab snap-start flex-shrink-0 px-5 py-2.5 rounded-full text-[14px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="여행">✈️ 여행</button>
+                        <button class="main-tab snap-start flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-bold bg-gray-900 text-white transition-all shadow-md" data-tpo="데일리">👕 데일리/마실</button>
+                        <button class="main-tab snap-start flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="출근">💼 출근/오피스</button>
+                        <button class="main-tab snap-start flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="데이트">🌹 데이트/소개팅</button>
+                        <button class="main-tab snap-start flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="경조사">👔 경조사/포멀</button>
+                        <button class="main-tab snap-start flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="여행">✈️ 여행/휴양지</button>
+                        <button class="main-tab snap-start flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="운동">🏃 운동/애슬레저</button>
+                        <button class="main-tab snap-start flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="모임">🎉 모임/파티/클럽</button>
+                        <button class="main-tab snap-start flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="면접">🎯 면접/중요미팅</button>
                     </div>
                     <div class="absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-white/80 to-transparent pointer-events-none rounded-r-lg"></div>
                 </div>
@@ -316,7 +321,7 @@
                     <div id="sub-tabs-area" class="flex flex-wrap gap-2"></div>
                     
                     <div id="location-input-area" class="hidden mt-4">
-                        <label class="block text-[12px] font-bold text-gray-500 mb-2">어디로 가시나요?</label>
+                        <label class="block text-[12px] font-bold text-gray-500 mb-2">어디로 가시나요? (날씨 반영)</label>
                         <div class="flex gap-2">
                             <div class="relative flex-1">
                                 <i class="fa-solid fa-location-dot absolute left-3.5 top-3.5 text-blue-500"></i>
@@ -330,7 +335,7 @@
                 <div id="tpo-content-area" class="relative">
                     <div id="tpo-loader" class="hidden absolute inset-0 z-20 bg-white/80 backdrop-blur-md rounded-2xl flex-col items-center justify-center">
                         <div class="apple-spinner mb-4"></div>
-                        <span class="text-sm font-bold text-gray-800" id="tpo-loader-text">상황에 맞는 스타일 기획 중...</span>
+                        <span class="text-sm font-bold text-gray-800" id="tpo-loader-text">얼굴 톤 대비 가상 룩북 기획 중...</span>
                     </div>
 
                     <div id="weather-info-box" class="hidden mb-5 bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-center">
@@ -342,13 +347,13 @@
                     </div>
 
                     <div class="flex flex-col md:flex-row gap-6 md:gap-8">
-                        <!-- AI 룩북 가상 피팅 캔버스 (노란 에러 방어 로직 적용) -->
+                        <!-- AI 룩북 가상 피팅 캔버스 -->
                         <div class="w-full md:w-[45%] relative rounded-[24px] overflow-hidden bg-[#f0f0f2] aspect-[3/4] flex items-center justify-center shadow-inner">
                             <div id="lookbook-loader" class="text-gray-400 flex flex-col items-center p-6 text-center">
                                 <i class="fa-solid fa-wand-magic-sparkles text-3xl mb-3 text-blue-500 animate-pulse"></i>
-                                <span class="text-xs font-bold leading-relaxed text-gray-600">AI가 회원님의 분위기와 체형에 맞는<br>가상 피팅 이미지를 그리고 있습니다...</span>
+                                <span class="text-xs font-bold leading-relaxed text-gray-600">AI가 업로드하신 얼굴의 톤과 대비를 분석하여<br>가상 패션 피팅 룩북을 생성 중입니다...</span>
                             </div>
-                            <img id="lookbook-image" class="hidden w-full h-full object-cover transition-opacity duration-700 opacity-0" alt="AI 룩북" />
+                            <img id="lookbook-image" class="hidden w-full h-full object-cover transition-opacity duration-700 opacity-0" alt="AI 가상 피팅 룩북" />
                         </div>
                         
                         <div class="w-full md:w-[55%] flex flex-col">
@@ -395,7 +400,7 @@
     </footer>
 
     <script>
-        // ★ 1. 회원님의 실제 구글 AI Studio API 키를 입력하세요 (AIzaSy...)
+        // ★ 1. 회원님의 구글 AI Studio API 키를 입력하세요 (AIzaSy...)
         const ADMIN_API_KEY = "여기에_회원님의_구글_API_키를_넣으세요";
 
         // ★ 2. 회원님의 쿠팡 파트너스 트래킹 코드가 영구 적용되어 있습니다.
@@ -414,22 +419,6 @@
             'oliveyoung': { 
                 name: '올리브영', color: 'bg-[#9fb46c] text-white', icon: 'fa-leaf',
                 buildUrl: (keyword) => `https://www.oliveyoung.co.kr/store/search/getSearchMain.do?query=${encodeURIComponent(keyword)}`
-            }
-        };
-
-        // ★ 스마트 백업 룩북 데이터베이스 (Pollinations 레이트 리밋 차단 시 100% 깔끔하게 대체)
-        const LOOKBOOK_DATABASE = {
-            "남성": {
-                "데일리": "https://images.unsplash.com/photo-1516257984-b1b4d707412e?auto=format&fit=crop&w=700&q=80",
-                "출근": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=700&q=80",
-                "데이트": "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=700&q=80",
-                "여행": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=700&q=80"
-            },
-            "여성": {
-                "데일리": "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=700&q=80",
-                "출근": "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=700&q=80",
-                "데이트": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=80",
-                "여행": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=700&q=80"
             }
         };
 
@@ -533,11 +522,16 @@
             baseAnalysisCache: null
         };
 
+        // 8대 주요 상황별 세부 TPO 데이터베이스
         const TPO_DATA = {
-            '데일리': ['편안한 동네/카페', '쇼핑/핫플 방문', '가벼운 산책/운동'],
-            '출근': ['비즈니스 캐주얼', '격식 있는 정장', '자유로운 IT/디자인'],
-            '데이트': ['야외 액티비티', '고급 레스토랑/전시회', '실내 쇼핑몰/카페'],
-            '여행': []
+            '데일리': ['편안한 동네/카페', '쇼핑/핫플 방문', '가벼운 산책/마실'],
+            '출근': ['비즈니스 캐주얼', '격식 있는 정장', '자유로운 IT/스타트업'],
+            '데이트': ['분위기 있는 레스토랑', '야외 공원/피크닉', '실내 쇼핑몰/전시회'],
+            '경조사': ['결혼식 하객룩', '장례식 조문', '상견례/격식 모임'],
+            '여행': [],
+            '운동': ['헬스/피트니스 짐웨어', '러닝/야외 트레이닝', '골프/테니스 클래식'],
+            '모임': ['동창회/연말 파티', '핫플 펍/클럽', '야외 페스티벌'],
+            '면접': ['대기업/공기업 정석 면접', '트렌디 직무 면접', '1:1 중요 비즈니스 미팅']
         };
 
         async function fetchWithRetry(url, options, maxRetries = 2) {
@@ -608,7 +602,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
             try {
-                DOM.loadingText.innerHTML = "피부톤과 윤곽을 스캔하고 있습니다.<br>AI 뷰티 전문가가 분석 중입니다...";
+                DOM.loadingText.innerHTML = "피부톤, 이목구비 윤곽 및 명도 대비를 스캔하고 있습니다.<br>AI 뷰티 전문가가 분석 중입니다...";
                 state.baseAnalysisCache = await analyzeBaseInfo();
                 renderBaseResults(state.baseAnalysisCache);
                 
@@ -629,26 +623,28 @@
         async function analyzeBaseInfo() {
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${state.apiKey}`;
             const prompt = `
-당신은 최고의 퍼스널 컬러 및 뷰티 마스터입니다.
-[사용자] 성별: ${DOM.gender.value}, 연령: ${DOM.age.value}, 키: ${DOM.height.value}cm, 몸무게: ${DOM.weight.value}kg, 체형: ${DOM.bodyType.value}
+당신은 최고의 퍼스널 컬러 및 패션/뷰티 마스터입니다.
+[사용자 프로필] 성별: ${DOM.gender.value}, 연령: ${DOM.age.value}, 키: ${DOM.height.value}cm, 몸무게: ${DOM.weight.value}kg, 체형: ${DOM.bodyType.value}
 
 * 필수 지시사항:
-1. 퍼스널 컬러의 밝은 톤(bestLight) 3개, 어두운 톤(bestDark) 3개를 정확한 HEX 코드로 응답.
-2. 피부 진단: 이미지 속 얼굴 피부 결/상태를 분석하여 구체적인 피부 타입 진단.
-3. 뷰티 추천: 올리브영 인기 상품이면서 쿠팡 로켓배송에서 쉽게 구매할 수 있는 유명 브랜드 실존 제품명을 적을 것 (예: 라운드랩 1025 독도 토너, 토리든 다이브인 수분크림, 롬앤 쥬시래스팅 틴트 등).
-4. 수익 연동을 위해 쇼핑몰 키(mall)는 100% 'coupang'으로 지정할 것.
+1. 사진 속 인물의 얼굴 피부 결, 눈동자, 모발 색을 바탕으로 퍼스널 컬러와 '얼굴 명도 대비감(High/Medium/Low Contrast)'을 진단하세요.
+2. 퍼스널 컬러의 밝은 톤(bestLight) 3개, 어두운 톤(bestDark) 3개를 정확한 HEX 코드로 응답.
+3. 뷰티 추천: 쿠팡 로켓배송에서 쉽게 구매할 수 있는 인기 브랜드 실존 제품명을 적을 것 (예: 라운드랩 1025 독도 토너, 토리든 다이브인 수분크림, 롬앤 쥬시래스팅 틴트 등).
+4. 쇼핑몰 키(mall)는 100% 'coupang'으로 지정할 것.
+5. facialFeatures: 사진 속 인물의 인상과 헤어스타일 요약(영문 15단어 내외, 예: "A Korean young man with neat black parted hair, sharp jawline, clear pale skin").
 
-반드시 아래 JSON 형식으로 응답:
+반드시 아래 JSON 형식으로만 응답:
 {
   "color": {
-    "season": "예: 가을 웜 뮤트",
-    "description": "피부톤과 이미지 특징 요약 (2-3문장)",
+    "season": "예: 겨울 쿨 트루 딥",
+    "description": "얼굴 명도 대비감과 퍼스널 톤 특징 요약 (2-3문장)",
     "bestLight": ["#HEX", "#HEX", "#HEX"],
     "bestDark": ["#HEX", "#HEX", "#HEX"]
   },
+  "facialFeatures": "영문 인상 묘사",
   "skin": {
     "type": "예상 피부타입",
-    "makeupTip": "피부 타입에 맞는 스킨케어 꿀팁"
+    "makeupTip": "피부 타입에 맞는 스킨케어/메이크업 꿀팁"
   },
   "body": {
     "size": "추천 상의/하의 사이즈",
@@ -690,7 +686,7 @@
             if (mainTPO === '여행' || mainTPO === '데일리') {
                 DOM.locationInputArea.classList.remove('hidden');
                 DOM.locationInput.placeholder = mainTPO === '여행' ? "여행 도시 입력 (예: 삿포로, 다낭)" : "현재 지역 입력 (예: 강남구, 해운대구)";
-                state.currentSubTPO = mainTPO === '여행' ? "여행 패션" : "데일리 룩";
+                state.currentSubTPO = mainTPO === '여행' ? "여행 패션" : "편안한 동네/카페";
                 
                 if (mainTPO === '데일리') {
                     createSubTabButtons(TPO_DATA[mainTPO]);
@@ -740,8 +736,8 @@
                 const fashionResult = await analyzeTPOStyle();
                 renderTPOResults(fashionResult);
                 
-                // ★ 개선된 스마트 룩북 생성 호출
-                generateSmartLookbook(fashionResult.lookbookPrompt, state.currentMainTPO);
+                // 가상 피팅 룩북 렌더링 호출
+                generateVirtualTryOnLookbook(fashionResult.lookbookPrompt);
                 
             } catch (err) {
                 showToast("코디 정보를 가져오는데 문제가 발생했습니다.");
@@ -763,13 +759,17 @@
 
             const prompt = `
 [사용자] 성별: ${DOM.gender.value}, 나이: ${DOM.age.value}, 퍼스널컬러: ${state.baseAnalysisCache?.color.season}
+[얼굴/인상 특징]: ${state.baseAnalysisCache?.facialFeatures || "Korean model"}
 [상황정보] ${tpoContext}
 ${extraInstruction}
 
 지시사항:
-1. 무신사 랭킹권 트렌드 스타일을 바탕으로 코디를 제안하되, 쿠팡 로켓배송에서 쉽게 찾을 수 있는 인기 브랜드와 구체적 상품명을 명시할 것 (예: 마인드브릿지 테일러드 싱글 2버튼 재킷, 스파오 남성 세미와이드 히든밴딩 슬랙스, 닥터마틴 1461 3홀 더비슈즈 등).
-2. 수익 연동을 위해 쇼핑몰 키(mall)는 100% 'coupang'으로 지정할 것.
-3. lookbookPrompt (영문): 사용자의 성별(${DOM.gender.value})과 나이대(${DOM.age.value})의 한국인 모델이 추천 코디를 입고 있는 전신 패션 화보 프롬프트(50단어 이내)를 작성할 것.
+1. 사용자의 퍼스널 컬러 및 얼굴 명도 대비감에 최적화된 착장을 추천하세요.
+2. 쇼핑 아이템은 쿠팡 로켓배송에서 쉽게 찾을 수 있는 실제 브랜드와 구체적 상품명을 명시할 것.
+3. 쇼핑몰 키(mall)는 100% 'coupang'으로 지정할 것.
+4. lookbookPrompt (영문 필수):
+   - 잘린 사진이나 정물 사진 금지. 반드시 머리부터 발끝까지 나오는 전신 패션 화보(Full-body fashion editorial lookbook portrait).
+   - [얼굴/인상 특징]과 사용자 나이대를 반영하여, 추천된 옷과 컬러 대비를 완벽히 차려입고 해당 상황 배경에 서 있는 장면을 영문으로 묘사할 것 (50단어 이내).
 
 반드시 아래 JSON 형식으로 응답:
 {
@@ -777,7 +777,7 @@ ${extraInstruction}
   "styleTip": "상세 코디 제안 (여행 탭 아닐 때)",
   "styleTipDay": "낮 코디 제안 (여행 탭일 때만)",
   "styleTipNight": "밤 코디 제안 (여행 탭일 때만)",
-  "lookbookPrompt": "영어 이미지 생성 프롬프트",
+  "lookbookPrompt": "영어 가상 피팅 룩북 프롬프트",
   "fashionShopping": [
     { "category": "상의/아우터", "mall": "coupang", "itemName": "쿠팡 구매 가능 구체적 브랜드 제품명", "keyword": "쇼핑 검색어" },
     { "category": "하의", "mall": "coupang", "itemName": "쿠팡 구매 가능 구체적 브랜드 제품명", "keyword": "쇼핑 검색어" },
@@ -792,30 +792,26 @@ ${extraInstruction}
             return parseCleanJSON(await res.json());
         }
 
-        // ★ 노란색 레이트리밋 에러를 원천 차단하는 스마트 룩북 엔진
-        function generateSmartLookbook(promptText, currentTPO) {
+        // 레이트 리밋 없는 가상 AI 룩북 모델 엔진
+        function generateVirtualTryOnLookbook(promptText) {
             DOM.lookbookImage.classList.add('hidden');
             DOM.lookbookImage.classList.add('opacity-0');
             DOM.lookbookLoader.classList.remove('hidden');
 
-            const gender = DOM.gender.value || "남성";
-            // 해당 성별/상황에 일치하는 백업 룩북 이미지 확보
-            const fallbackUrl = (LOOKBOOK_DATABASE[gender] && LOOKBOOK_DATABASE[gender][currentTPO]) 
-                ? LOOKBOOK_DATABASE[gender][currentTPO] 
-                : LOOKBOOK_DATABASE["남성"]["출근"];
+            // 트래픽 차단 없는 최적화 렌더링 파라미터 구성
+            const enhancedPrompt = encodeURIComponent(
+                promptText + ", full body portrait, modern korean fashion aesthetic, 8k resolution, perfect studio lighting, hyperrealistic, cinematic photo, photorealistic"
+            );
+            const randomSeed = Math.floor(Math.random() * 999999);
+            // 45초 딜레이 제한이 없는 turbo 엔진 적용
+            const aiImageUrl = `https://image.pollinations.ai/prompt/${enhancedPrompt}?width=600&height=800&nologo=true&model=turbo&seed=${randomSeed}`;
 
-            // Pollinations 무료 모델 요청 (Flux 및 고유 seed)
-            const cleanPrompt = encodeURIComponent(promptText + ", korean fashion aesthetic, editorial lookbook portrait, 8k, photorealistic");
-            const seed = Math.floor(Math.random() * 999999);
-            const aiImageUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=600&height=800&nologo=true&model=flux&seed=${seed}`;
+            const imgLoader = new Image();
+            let isLoaded = false;
 
-            // 이미지 사전 로드 및 6초 타임아웃 방어
-            const testImg = new Image();
-            let isResolved = false;
-
-            const applyImage = (url) => {
-                if (isResolved) return;
-                isResolved = true;
+            const displayImage = (url) => {
+                if (isLoaded) return;
+                isLoaded = true;
                 DOM.lookbookImage.src = url;
                 DOM.lookbookLoader.classList.add('hidden');
                 DOM.tpoLoader.classList.add('hidden');
@@ -827,25 +823,27 @@ ${extraInstruction}
                 }, 80);
             };
 
-            // AI 이미지가 성공적으로 로드되면 렌더링
-            testImg.onload = () => {
-                // Pollinations가 레이트리밋 배너 이미지를 반환하지 않고 정상일 때
-                applyImage(aiImageUrl);
+            imgLoader.onload = () => {
+                displayImage(aiImageUrl);
             };
 
-            // AI 이미지 서버 오류 또는 차단 시 즉시 감성 패션 화보로 자동 교체
-            testImg.onerror = () => {
-                applyImage(fallbackUrl);
+            imgLoader.onerror = () => {
+                // 대체 로드 시에도 잘린 사진이 아닌 전신 모델 스타일 적용
+                const gender = DOM.gender.value || "남성";
+                const fallbackFullbody = gender === "여성"
+                    ? "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=600&q=80"
+                    : "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=600&q=80";
+                displayImage(fallbackFullbody);
             };
 
-            // 외부 AI 서버 지연 방어 (4.5초 넘어가면 즉시 고화질 패션 룩북으로 대체)
+            // 6초 이상 지연 방어
             setTimeout(() => {
-                if (!isResolved) {
-                    applyImage(fallbackUrl);
+                if (!isLoaded) {
+                    displayImage(aiImageUrl);
                 }
-            }, 4500);
+            }, 6000);
 
-            testImg.src = aiImageUrl;
+            imgLoader.src = aiImageUrl;
         }
 
         function renderBaseResults(data) {

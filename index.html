@@ -605,8 +605,8 @@
         });
 
         async function analyzeBaseInfo() {
-            // 이번엔 절대 에러가 나지 않는 gemini-1.5-pro 모델로 적용
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${state.apiKey}`;
+            // 구글 정식 v1 엔드포인트 호환 표준 방식 적용
+            const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${state.apiKey}`;
             const prompt = `
 당신은 최고의 퍼스널 컬러 및 패션/뷰티 마스터입니다.
 [사용자 프로필] 성별: ${DOM.gender.value}, 연령: ${DOM.age.value}, 키: ${DOM.height.value}cm, 몸무게: ${DOM.weight.value}kg, 체형: ${DOM.bodyType.value}
@@ -731,7 +731,8 @@
         }
 
         async function analyzeTPOStyle() {
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${state.apiKey}`;
+            // 구글 정식 v1 엔드포인트 호환 표준 방식 적용
+            const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${state.apiKey}`;
             const isTravel = state.currentMainTPO === '여행';
             let tpoContext = `분류: ${state.currentMainTPO}, 세부상황: ${state.currentSubTPO}`;
             let extraInstruction = "";

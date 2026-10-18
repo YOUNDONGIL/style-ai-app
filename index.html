@@ -90,6 +90,7 @@
         }
         #toast.show { bottom: 40px; }
 
+        /* 법적 고지 팝업 모달 */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.5); backdrop-filter: blur(6px);
@@ -286,7 +287,6 @@
                         <button class="main-tab snap-start flex-shrink-0 px-5 py-2.5 rounded-full text-[14px] font-bold bg-gray-900 text-white transition-all shadow-md" data-tpo="데일리">👕 데일리</button>
                         <button class="main-tab snap-start flex-shrink-0 px-5 py-2.5 rounded-full text-[14px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="출근">💼 출근/오피스</button>
                         <button class="main-tab snap-start flex-shrink-0 px-5 py-2.5 rounded-full text-[14px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="데이트">🌹 데이트</button>
-                        <button class="main-tab snap-start flex-shrink-0 px-5 py-2.5 rounded-full text-[14px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="경조사">👔 경조사</button>
                         <button class="main-tab snap-start flex-shrink-0 px-5 py-2.5 rounded-full text-[14px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="여행">✈️ 여행</button>
                     </div>
                     <div class="absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-white/80 to-transparent pointer-events-none rounded-r-lg"></div>
@@ -322,12 +322,14 @@
                     </div>
 
                     <div class="flex flex-col md:flex-row gap-6 md:gap-8">
+                        <!-- AI 룩북 가상 피팅 이미지 영역 복구 및 연동 -->
                         <div class="w-full md:w-[45%] relative rounded-[24px] overflow-hidden bg-[#f0f0f2] aspect-[3/4] flex items-center justify-center shadow-inner">
                             <div id="lookbook-loader" class="text-gray-400 flex flex-col items-center p-6 text-center">
-                                <i class="fa-solid fa-wand-magic-sparkles text-3xl mb-3 text-gray-300 animate-pulse"></i>
-                                <span class="text-xs font-medium leading-relaxed">사진을 바탕으로<br>AI 가상 피팅 중...</span>
+                                <i class="fa-solid fa-wand-magic-sparkles text-3xl mb-3 text-blue-400 animate-pulse"></i>
+                                <span class="text-xs font-bold leading-relaxed text-gray-600">AI가 회원님의 분위기와 체형에 맞는<br>가상 피팅 이미지를 그리고 있습니다...</span>
                             </div>
-                            <img id="lookbook-image" class="hidden w-full h-full object-cover transition-opacity duration-700 opacity-0" alt="AI 룩북" onload="this.classList.remove('opacity-0')" />
+                            <!-- AI가 생성한 이미지가 이곳에 뜹니다 -->
+                            <img id="lookbook-image" class="hidden w-full h-full object-cover transition-opacity duration-700 opacity-0" alt="AI 룩북" />
                         </div>
                         
                         <div class="w-full md:w-[55%] flex flex-col">
@@ -370,68 +372,32 @@
     </main>
 
     <footer class="text-center py-6 text-[11px] text-gray-400">
-        <p>StyleAI는 추천 상품에 대한 제휴 수수료를 제공받을 수 있습니다.</p>
+        <p>StyleAI는 파트너스 활동을 통해 일정액의 수수료를 제공받을 수 있습니다.</p>
     </footer>
 
     <script>
-        // ★ 1. 회원님의 구글 AI Studio API 키를 입력하세요.
-        const ADMIN_API_KEY = "AQ.Ab8RN6JH1uNitwHFFz_WbzUp1QmgzWRjnBvf2ZyGYCs86ZyyoQ";
+        // ★ 1. 회원님의 구글 AI API 키를 입력하세요.
+        const ADMIN_API_KEY = "여기에_회원님의_구글_API_키를_넣으세요";
 
         // ★ 2. 회원님의 쿠팡 파트너스 트래킹 코드가 영구 등록되었습니다.
         const COUPANG_TRACKING_CODE = "AF4531799";
 
         // ★ 3. 3대 핵심 쇼핑몰 설정 (쿠팡, 무신사, 올리브영)
+        // 링크프라이스 승인 시 무신사, 올리브영 url도 교체 가능
         const AFFILIATE_MALLS = {
             'coupang': { 
-                name: '쿠팡', 
-                color: 'bg-[#ea1d2c] text-white', 
-                icon: 'fa-c',
+                name: '쿠팡', color: 'bg-[#ea1d2c] text-white', icon: 'fa-c',
                 buildUrl: (keyword) => `https://www.coupang.com/np/search?q=${encodeURIComponent(keyword)}&channel=user&lptag=${COUPANG_TRACKING_CODE}`
             },
             'musinsa': { 
-                name: '무신사', 
-                color: 'bg-black text-white', 
-                icon: 'fa-bag-shopping',
+                name: '무신사', color: 'bg-black text-white', icon: 'fa-bag-shopping',
                 buildUrl: (keyword) => `https://www.musinsa.com/search/musinsa/integration?q=${encodeURIComponent(keyword)}`
             },
             'oliveyoung': { 
-                name: '올리브영', 
-                color: 'bg-[#9fb46c] text-white', 
-                icon: 'fa-leaf',
+                name: '올리브영', color: 'bg-[#9fb46c] text-white', icon: 'fa-leaf',
                 buildUrl: (keyword) => `https://www.oliveyoung.co.kr/store/search/getSearchMain.do?query=${encodeURIComponent(keyword)}`
             }
         };
-
-        function setupPWA() {
-            const manifest = {
-                "name": "StyleAI 마스터",
-                "short_name": "StyleAI",
-                "description": "나만의 AI 뷰티 패션 컨설턴트",
-                "start_url": "./",
-                "display": "standalone",
-                "background_color": "#f5f5f7",
-                "theme_color": "#ffffff",
-                "icons": [
-                    {
-                        "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzAwNzFlMyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgZm9udC1zaXplPSIyMDAiPio8L3RleHQ+PC9zdmc+",
-                        "sizes": "512x512",
-                        "type": "image/svg+xml"
-                    }
-                ]
-            };
-            const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/manifest+json'});
-            document.head.appendChild(Object.assign(document.createElement('link'), {rel: 'manifest', href: URL.createObjectURL(manifestBlob)}));
-
-            if ('serviceWorker' in navigator) {
-                const swCode = `
-                    self.addEventListener('install', (e) => self.skipWaiting());
-                    self.addEventListener('activate', (e) => e.waitUntil(clients.claim()));
-                    self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
-                `;
-                navigator.serviceWorker.register(URL.createObjectURL(new Blob([swCode], {type: 'application/javascript'})));
-            }
-        }
-        setupPWA();
 
         function showToast(message) {
             const toast = document.getElementById('toast');
@@ -440,23 +406,21 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        // 쇼핑몰 바로가기 & 공정위 안내 팝업
+        // 쇼핑몰 팝업 제어
         function triggerAffiliateModal(mallKey, itemName, keyword) {
             const mall = AFFILIATE_MALLS[mallKey] || AFFILIATE_MALLS['coupang'];
             const targetUrl = mall.buildUrl(keyword);
 
-            document.getElementById('modal-mall-name').textContent = `${mall.name} 이동 안내`;
+            document.getElementById('modal-mall-name').textContent = `${mall.name} 쇼핑몰 연결`;
             document.getElementById('modal-item-name').textContent = `선택 아이템: ${itemName}`;
             document.getElementById('modal-redirect-btn').href = targetUrl;
 
-            // 쿠팡일 때만 공정위 문구 노출
             const disclaimerBox = document.getElementById('modal-disclaimer-box');
             if (mallKey === 'coupang') {
                 disclaimerBox.classList.remove('hidden');
             } else {
                 disclaimerBox.classList.add('hidden');
             }
-
             document.getElementById('affiliate-modal').classList.add('active');
         }
 
@@ -475,24 +439,20 @@
             resultArea: document.getElementById('result-area'),
             errorMsg: document.getElementById('error-message'),
             errorText: document.getElementById('error-text'),
-            
             gender: document.getElementById('gender-input'),
             age: document.getElementById('age-input'),
             height: document.getElementById('height-input'),
             weight: document.getElementById('weight-input'),
             bodyType: document.getElementById('body-type-input'),
-            
             mainTabs: document.querySelectorAll('.main-tab'),
             subTabsArea: document.getElementById('sub-tabs-area'),
             locationInputArea: document.getElementById('location-input-area'),
             locationInput: document.getElementById('location-input'),
             applyLocationBtn: document.getElementById('apply-location-btn'),
-            
             tpoContentArea: document.getElementById('tpo-content-area'),
             tpoLoader: document.getElementById('tpo-loader'),
             lookbookLoader: document.getElementById('lookbook-loader'),
             lookbookImage: document.getElementById('lookbook-image'),
-            
             weatherInfoBox: document.getElementById('weather-info-box'),
             weatherSummary: document.getElementById('res-weather-summary'),
             standardTipArea: document.getElementById('standard-tip-area'),
@@ -512,8 +472,7 @@
         const TPO_DATA = {
             '데일리': ['편안한 동네/카페', '쇼핑/핫플 방문', '가벼운 산책/운동'],
             '출근': ['비즈니스 캐주얼', '격식 있는 정장', '자유로운 IT/디자인'],
-            '데이트': ['놀이공원/야외 액티비티', '고급 레스토랑/전시회', '아쿠아리움/실내 쇼핑몰'],
-            '경조사': ['결혼식 하객', '장례식 조문', '상견례 등 격식있는 모임'],
+            '데이트': ['야외 액티비티', '고급 레스토랑/전시회', '실내 쇼핑몰/카페'],
             '여행': []
         };
 
@@ -526,7 +485,7 @@
                     let errMsg = `오류 코드: ${res.status}`;
                     try { errMsg = JSON.parse(errText).error.message; } catch(e){}
                     if (res.status === 400 && errMsg.includes("API key not valid")) {
-                        throw new Error("코드 상단에 입력된 관리자 API 키가 올바르지 않습니다.");
+                        throw new Error("코드 내부에 입력된 API 키가 유효하지 않습니다.");
                     }
                     if (res.status !== 429 && res.status < 500) throw new Error(errMsg);
                 } catch (e) {
@@ -540,20 +499,12 @@
             try {
                 if (apiResult.error) throw new Error(apiResult.error.message);
                 let text = apiResult.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (!text) throw new Error("분석 결과를 받지 못했습니다. 사진을 다시 선택해 보세요.");
+                if (!text) throw new Error("결과를 받지 못했습니다. 사진을 다시 선택해 보세요.");
                 text = text.replace(/```json/gi, '').replace(/```/gi, '').trim();
                 return JSON.parse(text);
             } catch (e) {
-                console.error("JSON 파싱 에러:", e);
-                throw new Error("분석 중 데이터 형식이 어긋났습니다. 잠시 후 다시 시도해주세요.");
+                throw new Error("데이터 분석 중 오류가 발생했습니다.");
             }
-        }
-
-        async function shareResult() {
-            if (navigator.share) {
-                try { await navigator.share({ title: '나의 AI 스타일 분석 결과', text: `내 퍼스널 컬러는 [${state.baseAnalysisCache?.color.season}] 이에요! AI가 추천해주는 코디 구경해보세요.`, url: window.location.href }); } 
-                catch (err) { console.log('공유 취소됨'); }
-            } else { showToast("현재 브라우저에서는 공유 기능을 지원하지 않습니다."); }
         }
 
         DOM.imageInput.addEventListener('change', (e) => {
@@ -572,12 +523,10 @@
         });
 
         DOM.analyzeBtn.addEventListener('click', async () => {
-            if (!state.apiKey || state.apiKey === "여기에_회원님의_구글_API_키를_넣으세요") { 
-                showToast("개발자 설정 오류: 코드 상단에 관리자 API 키를 입력해주세요!"); 
-                return; 
+            if (!state.apiKey || state.apiKey === "AQ.Ab8RN6JH1uNitwHFFz_WbzUp1QmgzWRjnBvf2ZyGYCs86ZyyoQ") { 
+                showToast("개발자 설정 오류: 코드 상단에 API 키를 입력해주세요!"); return; 
             }
             if (!state.base64Image) { showToast("사진을 먼저 업로드해주세요."); return; }
-            if (!DOM.height.value || !DOM.weight.value) { showToast("사이즈 추천을 위해 키와 체중을 입력해주세요."); return; }
             
             DOM.inputSection.classList.add('hidden');
             DOM.errorMsg.classList.add('hidden');
@@ -595,19 +544,17 @@
                 DOM.resultArea.classList.remove('hidden');
                 
                 renderSubTabs('데일리');
-
             } catch (error) {
                 DOM.loadingArea.classList.add('hidden');
                 DOM.loadingArea.classList.remove('flex');
                 DOM.inputSection.classList.remove('hidden');
-                DOM.errorText.textContent = error.message || "알 수 없는 오류가 발생했습니다.";
+                DOM.errorText.textContent = error.message;
                 DOM.errorMsg.classList.remove('hidden');
             }
         });
 
         async function analyzeBaseInfo() {
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${state.apiKey}`;
-
             const prompt = `
 당신은 최고의 퍼스널 컬러 및 뷰티 마스터입니다.
 [사용자] 성별: ${DOM.gender.value}, 연령: ${DOM.age.value}, 키: ${DOM.height.value}cm, 몸무게: ${DOM.weight.value}kg, 체형: ${DOM.bodyType.value}
@@ -615,29 +562,28 @@
 * 필수 지시사항:
 1. 퍼스널 컬러의 밝은 톤(bestLight) 3개, 어두운 톤(bestDark) 3개를 정확한 HEX 코드로 응답.
 2. 피부 진단: 이미지 속 얼굴 피부 결/상태를 분석하여 구체적인 피부 타입 진단.
-3. 뷰티 아이템 추천: 올리브영 랭킹 및 쿠팡 기준 실제 시판 중인 구체적인 브랜드와 정확한 제품명을 적을 것 (예: 롬앤 쥬시래스팅 틴트 피그피그, 라운드랩 독도 토너 등).
-4. 쇼핑몰 mall 키는 무조건 'oliveyoung' 또는 'coupang' 중 하나로만 지정할 것.
+3. 뷰티 추천: 올리브영/쿠팡 인기순위 기준 구체적 브랜드와 제품명을 콕 집어서 추천.
 
-반드시 아래 JSON 형식으로만 응답:
+반드시 아래 JSON 형식으로 응답:
 {
   "color": {
-    "season": "예: 여름 쿨톤 뮤트",
+    "season": "예: 가을 웜 뮤트",
     "description": "피부톤과 이미지 특징 요약 (2-3문장)",
     "bestLight": ["#HEX", "#HEX", "#HEX"],
     "bestDark": ["#HEX", "#HEX", "#HEX"]
   },
   "skin": {
-    "type": "예상 피부타입 (예: 수부지 복합성)",
-    "makeupTip": "피부 타입에 맞는 스킨케어/메이크업 꿀팁"
+    "type": "예상 피부타입",
+    "makeupTip": "피부 타입에 맞는 스킨케어 꿀팁"
   },
   "body": {
-    "size": "추천 상의/하의 사이즈 (예: 상의 105(XL), 하의 32)",
-    "fitTip": "입력된 체형을 보완하는 세련된 핏 추천"
+    "size": "추천 상의/하의 사이즈",
+    "fitTip": "체형 보완 핏 추천"
   },
   "beautyShopping": [
-    { "category": "스킨/토너", "mall": "oliveyoung", "itemName": "구체적 브랜드 인기 제품명 1", "keyword": "쇼핑몰 검색 키워드" },
-    { "category": "로션/크림", "mall": "oliveyoung", "itemName": "구체적 브랜드 인기 제품명 2", "keyword": "쇼핑몰 검색 키워드" },
-    { "category": "포인트 뷰티", "mall": "coupang", "itemName": "구체적 브랜드 톤 맞춤 제품명", "keyword": "쇼핑몰 검색 키워드" }
+    { "category": "스킨/토너", "mall": "oliveyoung", "itemName": "구체적 브랜드 제품명", "keyword": "쇼핑몰 검색 키워드" },
+    { "category": "로션/크림", "mall": "oliveyoung", "itemName": "구체적 브랜드 제품명", "keyword": "쇼핑몰 검색 키워드" },
+    { "category": "포인트 뷰티", "mall": "coupang", "itemName": "구체적 브랜드 제품명", "keyword": "쇼핑몰 검색 키워드" }
   ]
 }`;
             const payload = {
@@ -669,7 +615,7 @@
             
             if (mainTPO === '여행' || mainTPO === '데일리') {
                 DOM.locationInputArea.classList.remove('hidden');
-                DOM.locationInput.placeholder = mainTPO === '여행' ? "여행 도시 입력 (예: 삿포로, 다낭)" : "현재 지역 입력 (예: 서울 강남구)";
+                DOM.locationInput.placeholder = mainTPO === '여행' ? "여행 도시 입력 (예: 삿포로)" : "현재 지역 입력 (예: 강남구)";
                 state.currentSubTPO = mainTPO === '여행' ? "여행 패션" : "데일리 룩";
                 
                 if (mainTPO === '데일리') {
@@ -705,7 +651,7 @@
         }
 
         DOM.applyLocationBtn.addEventListener('click', () => {
-            if (!DOM.locationInput.value.trim()) { showToast("지역/도시 이름을 입력해주세요."); return; }
+            if (!DOM.locationInput.value.trim()) { showToast("지역/도시를 입력해주세요."); return; }
             state.location = DOM.locationInput.value.trim();
             DOM.tpoContentArea.style.opacity = '1';
             triggerTPOAnalysis();
@@ -719,7 +665,10 @@
             try {
                 const fashionResult = await analyzeTPOStyle();
                 renderTPOResults(fashionResult);
+                
+                // ★ 대망의 무료 AI 룩북 가상 피팅 이미지 생성! (Pollinations API)
                 generateAILookbook(fashionResult.lookbookPrompt);
+                
             } catch (err) {
                 showToast("코디 정보를 가져오는데 문제가 발생했습니다.");
                 DOM.tpoLoader.classList.add('hidden');
@@ -735,54 +684,74 @@
 
             if (state.location && (isTravel || state.currentMainTPO === '데일리')) {
                 tpoContext += `, 위치: ${state.location}`;
-                extraInstruction = `
-* 중요: 지정된 위치(${state.location})의 계절감과 일교차를 고려하세요.
-${isTravel ? "여행지의 경우 '낮과 밤의 일교차'가 크다면 낮 코디와 밤 코디(아우터 등)를 명확히 구분하여 제안하세요." : "현재 날씨에 어울리는 현실적인 옷 두께와 스타일을 추천하세요."}`;
+                extraInstruction = `* 중요: 지정된 위치(${state.location})의 계절감과 날씨를 반영하세요.`;
             }
 
             const prompt = `
-[사용자] 성별: ${DOM.gender.value}, 퍼스널컬러: ${state.baseAnalysisCache?.color.season}
+[사용자] 성별: ${DOM.gender.value}, 나이: ${DOM.age.value}, 퍼스널컬러: ${state.baseAnalysisCache?.color.season}
 [상황정보] ${tpoContext}
 ${extraInstruction}
 
 지시사항:
-1. 해당 TPO 상황에 맞는 세련된 코디 제안.
-2. 쇼핑 추천 시 두루뭉술한 표현 금지. 실제 시판 중인 구체적인 브랜드와 제품명(예: 무신사 스탠다드 와이드 슬랙스 블랙, 나이키 에어포스 1, 아디다스 삼바 등) 명시.
-3. 쇼핑몰 키(mall) 지정 규칙:
-   - 상의/아우터/하의 등 패션 의류: 'musinsa'
-   - 신발/가방/패션잡화: 'coupang'
+1. 해당 상황에 맞는 코디 제안. 구체적인 브랜드/제품명 명시 (예: 무신사 스탠다드 와이드 슬랙스, 나이키 에어포스).
+2. 쇼핑몰 키(mall): 상의/아우터/하의는 'musinsa', 신발/잡화는 'coupang'으로 지정.
+3. lookbookPrompt 작성법 (매우 중요): 영어로 작성. 사용자의 성별(${DOM.gender.value})과 나이(${DOM.age.value})의 한국인 얼굴 특징을 살려, 추천된 코디를 입고 있는 자연스러운 일상 스냅샷을 묘사할 것. (예: "A handsome 20-year-old Korean man wearing an oversized black blazer and wide slacks, standing in a sunny cafe, realistic face, highly detailed --ar 3:4")
 
 반드시 아래 JSON 형식으로 응답:
 {
-  "weatherSummary": "날씨 요약 (예: 도쿄 (맑음, 16도) - 입력 위치가 없으면 빈 문자열)",
-  "styleTip": "일반적인 상세 코디 제안 (여행 탭이 아닐 경우 사용)",
-  "styleTipDay": "낮을 위한 상세 코디 제안 (여행 탭일 경우에만 작성, 아니면 빈 문자열)",
-  "styleTipNight": "밤을 위한 상세 코디 제안 (여행 탭일 경우에만 작성, 아니면 빈 문자열)",
-  "lookbookPrompt": "A highly detailed fashion editorial full body portrait...",
+  "weatherSummary": "날씨 요약 (위치 입력 없으면 빈 문자열)",
+  "styleTip": "상세 코디 제안 (여행 탭 아닐 때)",
+  "styleTipDay": "낮 코디 제안 (여행 탭일 때만)",
+  "styleTipNight": "밤 코디 제안 (여행 탭일 때만)",
+  "lookbookPrompt": "영어 이미지 생성 프롬프트",
   "fashionShopping": [
-    { "category": "상의/아우터", "mall": "musinsa", "itemName": "구체적인 브랜드와 제품명", "keyword": "쇼핑몰 검색 키워드" },
-    { "category": "하의", "mall": "musinsa", "itemName": "구체적인 브랜드와 제품명", "keyword": "쇼핑몰 검색 키워드" },
-    { "category": "신발/잡화", "mall": "coupang", "itemName": "구체적인 브랜드와 제품명", "keyword": "쇼핑몰 검색 키워드" }
+    { "category": "상의/아우터", "mall": "musinsa", "itemName": "구체적인 브랜드와 제품명", "keyword": "검색 키워드" },
+    { "category": "하의", "mall": "musinsa", "itemName": "구체적인 브랜드와 제품명", "keyword": "검색 키워드" },
+    { "category": "신발/잡화", "mall": "coupang", "itemName": "구체적인 브랜드와 제품명", "keyword": "검색 키워드" }
   ]
 }`;
             const payload = {
                 contents: [{ role: "user", parts: [{ text: prompt }] }],
                 generationConfig: { responseMimeType: "application/json" }
             };
-
             const res = await fetchWithRetry(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             return parseCleanJSON(await res.json());
         }
 
-        async function generateAILookbook(promptText) {
+        // ★ AI 룩북 이미지 생성 함수 (Pollinations 무료 API 연동)
+        function generateAILookbook(promptText) {
             DOM.lookbookImage.classList.add('hidden');
+            DOM.lookbookImage.classList.add('opacity-0');
             DOM.lookbookLoader.classList.remove('hidden');
 
-            setTimeout(() => {
-               DOM.lookbookLoader.innerHTML = `<div class="p-6 text-center text-gray-500"><i class="fa-solid fa-shirt text-3xl mb-3"></i><p class="text-xs font-bold leading-relaxed">회원님만의 맞춤 스타일이<br>제안되었습니다.</p></div>`;
-               DOM.tpoLoader.classList.add('hidden');
-               DOM.tpoLoader.classList.remove('flex');
-            }, 1200);
+            // 프롬프트를 고품질 화보 스타일로 보강
+            const finalPrompt = promptText + ", korean fashion style, instagram aesthetic, hyper-realistic face, perfect lighting, ultra detailed, 8k resolution, photorealistic";
+            
+            // 캐시 방지를 위한 랜덤 시드 추가
+            const seed = Math.floor(Math.random() * 100000);
+            
+            // 무료 이미지 생성 API 호출
+            const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(finalPrompt)}?width=600&height=800&nologo=true&seed=${seed}`;
+
+            DOM.lookbookImage.onload = () => {
+                DOM.lookbookLoader.classList.add('hidden');
+                DOM.tpoLoader.classList.add('hidden');
+                DOM.tpoLoader.classList.remove('flex');
+                
+                DOM.lookbookImage.classList.remove('hidden');
+                // 부드러운 페이드인 효과
+                setTimeout(() => {
+                    DOM.lookbookImage.classList.remove('opacity-0');
+                }, 100);
+            };
+
+            DOM.lookbookImage.onerror = () => {
+                DOM.lookbookLoader.innerHTML = `<div class="p-6 text-center text-red-500"><i class="fa-solid fa-triangle-exclamation text-3xl mb-3"></i><p class="text-xs font-bold leading-relaxed">이미지를 불러오지 못했습니다.</p></div>`;
+                DOM.tpoLoader.classList.add('hidden');
+                DOM.tpoLoader.classList.remove('flex');
+            };
+
+            DOM.lookbookImage.src = imageUrl;
         }
 
         function renderBaseResults(data) {
@@ -853,7 +822,7 @@ ${extraInstruction}
                             </span>
                         </div>
                         <p class="font-bold text-gray-900 text-[14px] truncate mb-0.5">${item.itemName}</p>
-                        <p class="text-[11px] text-blue-500 truncate group-hover:underline"><i class="fa-solid fa-search mr-1"></i>"${item.keyword}" 최저가 검색</p>
+                        <p class="text-[11px] text-blue-500 truncate group-hover:underline"><i class="fa-solid fa-search mr-1"></i>"${item.keyword}" 살펴보기</p>
                     </div>
                     <div class="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400 group-hover:text-blue-500 group-hover:scale-110 transition-all flex-shrink-0">
                         <i class="fa-solid fa-arrow-right -rotate-45 text-sm"></i>

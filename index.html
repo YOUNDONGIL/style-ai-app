@@ -119,6 +119,7 @@
 
     <div id="toast">알림</div>
 
+    <!-- 히든 관리자 모달 -->
     <div id="admin-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
@@ -519,6 +520,25 @@
             '면접': ['대기업/공기업 정석 면접', '트렌디 직무 면접', '1:1 중요 비즈니스 미팅']
         };
 
+        async function fetchWithRetry(url, options, maxRetries = 2) {
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const res = await fetch(url, options);
+                    if (res.ok) return res;
+                    const errText = await res.text();
+                    let errMsg = `오류 코드: ${res.status}`;
+                    try { errMsg = JSON.parse(errText).error.message; } catch(e){}
+                    if (res.status === 400 && errMsg.includes("API key not valid")) {
+                        throw new Error("입력된 구글 API 키가 유효하지 않습니다. 키를 다시 확인해주세요.");
+                    }
+                    if (res.status !== 429 && res.status < 500) throw new Error(errMsg);
+                } catch (e) {
+                    if (i === maxRetries - 1) throw e;
+                    await new Promise(r => setTimeout(r, 1500));
+                }
+            }
+        }
+
         function parseCleanJSON(apiResult) {
             try {
                 if (apiResult.error) throw new Error(apiResult.error.message);
@@ -529,59 +549,6 @@
             } catch (e) {
                 throw new Error("데이터 분석 중 오류가 발생했습니다.");
             }
-        }
-
-        // 다중 우회 접속을 위한 커스텀 API 호출 함수
-        async function callGeminiAPI(prompt, imageData = null) {
-            const isImage = !!imageData;
-            // 1순위 1.5 플래시 -> 2순위 1.5 프로 -> 3순위 (이미지는 1.0 프로 비전, 텍스트는 1.0 프로)
-            const models = isImage 
-                ? ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-1.0-pro-vision-latest'] 
-                : ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-1.0-pro-latest'];
-
-            let lastErrorMsg = "";
-
-            for (let i = 0; i < models.length; i++) {
-                const model = models[i];
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${state.apiKey}`;
-                
-                const parts = [{ text: prompt }];
-                if (isImage) {
-                    parts.push({ inlineData: { mimeType: state.mimeType, data: imageData } });
-                }
-
-                const payload = { contents: [{ role: "user", parts: parts }] };
-                
-                // 구형 모델(1.0)은 JSON 강제 설정 포맷(responseMimeType)을 지원하지 않아 에러를 뿜으므로, 1.5 버전에만 적용
-                if (model.includes('1.5')) {
-                    payload.generationConfig = { responseMimeType: "application/json" };
-                }
-
-                try {
-                    const res = await fetch(apiUrl, { 
-                        method: 'POST', 
-                        headers: { 'Content-Type': 'application/json' }, 
-                        body: JSON.stringify(payload) 
-                    });
-                    
-                    if (res.ok) {
-                        const data = await res.json();
-                        return parseCleanJSON(data);
-                    }
-                    
-                    const errText = await res.text();
-                    lastErrorMsg = errText;
-
-                    if (res.status === 400 && errText.includes("API key not valid")) {
-                        throw new Error("구글 API 키가 유효하지 않습니다. 우측 상단 뱃지를 눌러 키를 다시 확인해주세요.");
-                    }
-                    // 모델 접근 권한이 없거나 (404 Not Found), 기타 일시적 서버 에러인 경우 루프를 돌며 다음 모델을 자동으로 시도합니다.
-                } catch (e) {
-                    if (e.message.includes("구글 API 키")) throw e;
-                    lastErrorMsg = e.message;
-                }
-            }
-            throw new Error("보유하신 구글 API 키의 AI 접근이 완전히 제한되어 있습니다. 구글 AI Studio에서 'Create API Key'를 눌러 완전히 새로운 키를 발급받아 교체해주세요.");
         }
 
         DOM.imageInput.addEventListener('change', (e) => {
@@ -622,6 +589,8 @@
 
             try {
                 DOM.loadingText.innerHTML = "피부톤, 이목구비 윤곽 및 명도 대비를 스캔하고 있습니다.<br>AI 뷰티 전문가가 분석 중입니다...";
+                
+                // ★ 가장 안정적으로 작동했던 오리지널 호출 방식
                 state.baseAnalysisCache = await analyzeBaseInfo();
                 renderBaseResults(state.baseAnalysisCache);
                 
@@ -640,6 +609,8 @@
         });
 
         async function analyzeBaseInfo() {
+            // ★ 오류가 없었던 오리지널 API 식별자(gemini-1.5-flash-latest)로 완벽 복구
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${state.apiKey}`;
             const prompt = `
 당신은 최고의 퍼스널 컬러 및 패션/뷰티 마스터입니다.
 [사용자 프로필] 성별: ${DOM.gender.value}, 연령: ${DOM.age.value}, 키: ${DOM.height.value}cm, 몸무게: ${DOM.weight.value}kg, 체형: ${DOM.bodyType.value}
@@ -651,7 +622,7 @@
 4. 쇼핑몰 키(mall)는 100% 'coupang'으로 지정할 것.
 5. facialFeatures (매우 중요): 사진 속 인물의 이목구비, 헤어스타일, 인상을 실사 사진 생성을 위해 매우 정밀하게 영어로 묘사하세요. (예: "A real Korean 20s young adult, natural black hair, clear skin, realistic human face, authentic facial shape").
 
-반드시 아래 JSON 형식으로 응답:
+반드시 아래 JSON 형식으로만 응답:
 {
   "color": {
     "season": "예: 가을 웜 뮤트",
@@ -674,8 +645,12 @@
     { "category": "포인트 뷰티", "mall": "coupang", "itemName": "톤 맞춤 제품명", "keyword": "쇼핑 검색 키워드" }
   ]
 }`;
-            // 다중 우회 접속 함수 호출 (이미지 포함)
-            return await callGeminiAPI(prompt, state.base64Image);
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: prompt }, { inlineData: { mimeType: state.mimeType, data: state.base64Image } }] }],
+                generationConfig: { responseMimeType: "application/json" }
+            };
+            const res = await fetchWithRetry(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            return parseCleanJSON(await res.json());
         }
 
         DOM.mainTabs.forEach(tab => {
@@ -760,6 +735,7 @@
         }
 
         async function analyzeTPOStyle() {
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${state.apiKey}`;
             const isTravel = state.currentMainTPO === '여행';
             let tpoContext = `분류: ${state.currentMainTPO}, 세부상황: ${state.currentSubTPO}`;
             let extraInstruction = "";
@@ -796,8 +772,12 @@ ${extraInstruction}
     { "category": "신발/잡화", "mall": "coupang", "itemName": "구체적 브랜드 제품명", "keyword": "쇼핑 검색어" }
   ]
 }`;
-            // 다중 우회 접속 함수 호출 (이미지 미포함 텍스트 분석)
-            return await callGeminiAPI(prompt, null);
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: prompt }] }],
+                generationConfig: { responseMimeType: "application/json" }
+            };
+            const res = await fetchWithRetry(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            return parseCleanJSON(await res.json());
         }
 
         function generatePhotorealisticLookbook(promptText) {
@@ -805,8 +785,8 @@ ${extraInstruction}
             DOM.lookbookImage.classList.add('opacity-0');
             DOM.lookbookLoader.classList.remove('hidden');
 
-            const realisticTokens = "RAW photo, hyper-realistic everyday photography, natural skin texture, realistic authentic Korean face, candid street snap, shot on 85mm lens, photorealistic";
-            const negativeFilter = "anime, cartoon, 3d render, plastic, doll, illustration, ugly, deformed";
+            const realisticTokens = "amateur smartphone photo, iPhone 14 Pro camera, raw unedited, visible skin pores, natural everyday lighting, real life authentic photograph, casual pose, messy background";
+            const negativeFilter = "anime, cartoon, 3d render, CGI, plastic skin, smooth skin, doll face, professional studio lighting, heavily edited, airbrushed, digital art";
             
             const finalPrompt = encodeURIComponent(`${promptText}, ${realisticTokens}, ${negativeFilter}`);
             const randomSeed = Math.floor(Math.random() * 999999);

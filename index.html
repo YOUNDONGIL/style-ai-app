@@ -185,7 +185,7 @@
                 </div>
             </div>
 
-            <!-- 프로필 정보 (기본값 없는 빈칸 설정) -->
+            <!-- 프로필 정보 -->
             <div class="apple-card p-6 md:p-8">
                 <h3 class="text-lg font-bold mb-5 flex items-center text-gray-800"><i class="fa-solid fa-sliders mr-2 text-blue-500"></i>프로필 정보</h3>
                 <div class="grid grid-cols-2 gap-4 mb-4">
@@ -332,10 +332,11 @@
                     </div>
                 </div>
 
+                <!-- 레이아웃 비율 깨짐 방지: items-start 적용 -->
                 <div id="tpo-content-area" class="relative">
                     <div id="tpo-loader" class="hidden absolute inset-0 z-20 bg-white/80 backdrop-blur-md rounded-2xl flex-col items-center justify-center">
                         <div class="apple-spinner mb-4"></div>
-                        <span class="text-sm font-bold text-gray-800" id="tpo-loader-text">얼굴 톤 대비 가상 룩북 기획 중...</span>
+                        <span class="text-sm font-bold text-gray-800" id="tpo-loader-text">얼굴 톤 대비 실사 가상 룩북 기획 중...</span>
                     </div>
 
                     <div id="weather-info-box" class="hidden mb-5 bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-center">
@@ -346,14 +347,14 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-col md:flex-row gap-6 md:gap-8">
-                        <!-- AI 룩북 가상 피팅 캔버스 -->
-                        <div class="w-full md:w-[45%] relative rounded-[24px] overflow-hidden bg-[#f0f0f2] aspect-[3/4] flex items-center justify-center shadow-inner">
+                    <div class="flex flex-col md:flex-row items-start gap-6 md:gap-8">
+                        <!-- AI 룩북 가상 피팅 캔버스 (늘어남 방지: self-start 및 비율 고정) -->
+                        <div class="w-full md:w-[45%] self-start relative rounded-[24px] overflow-hidden bg-[#f0f0f2] aspect-[3/4] flex items-center justify-center shadow-md border border-gray-100">
                             <div id="lookbook-loader" class="text-gray-400 flex flex-col items-center p-6 text-center">
                                 <i class="fa-solid fa-wand-magic-sparkles text-3xl mb-3 text-blue-500 animate-pulse"></i>
-                                <span class="text-xs font-bold leading-relaxed text-gray-600">AI가 업로드하신 얼굴의 톤과 대비를 분석하여<br>가상 패션 피팅 룩북을 생성 중입니다...</span>
+                                <span class="text-xs font-bold leading-relaxed text-gray-600">업로드하신 얼굴의 이목구비와 비율을 분석하여<br>실사 패션 룩북을 피팅 중입니다...</span>
                             </div>
-                            <img id="lookbook-image" class="hidden w-full h-full object-cover transition-opacity duration-700 opacity-0" alt="AI 가상 피팅 룩북" />
+                            <img id="lookbook-image" class="hidden w-full h-full object-cover transition-opacity duration-700 opacity-0" alt="AI 실사 가상 피팅 룩북" />
                         </div>
                         
                         <div class="w-full md:w-[55%] flex flex-col">
@@ -400,13 +401,9 @@
     </footer>
 
     <script>
-        // ★ 1. 회원님의 구글 AI Studio API 키를 입력하세요 (AIzaSy...)
         const ADMIN_API_KEY = "여기에_회원님의_구글_API_키를_넣으세요";
-
-        // ★ 2. 회원님의 쿠팡 파트너스 트래킹 코드가 영구 적용되어 있습니다.
         const COUPANG_TRACKING_CODE = "AF4531799";
 
-        // 쇼핑몰 링크 빌더 (모든 상품을 쿠팡 파트너스로 우선 연결)
         const AFFILIATE_MALLS = {
             'coupang': { 
                 name: '쿠팡', color: 'bg-[#ea1d2c] text-white', icon: 'fa-c',
@@ -429,7 +426,6 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        // 히든 관리자 모달 제어 (우측 상단 뱃지 3회 탭)
         let badgeClickCount = 0;
         let badgeClickTimer = null;
         document.getElementById('admin-badge').addEventListener('click', () => {
@@ -522,7 +518,6 @@
             baseAnalysisCache: null
         };
 
-        // 8대 주요 상황별 세부 TPO 데이터베이스
         const TPO_DATA = {
             '데일리': ['편안한 동네/카페', '쇼핑/핫플 방문', '가벼운 산책/마실'],
             '출근': ['비즈니스 캐주얼', '격식 있는 정장', '자유로운 IT/스타트업'],
@@ -627,21 +622,21 @@
 [사용자 프로필] 성별: ${DOM.gender.value}, 연령: ${DOM.age.value}, 키: ${DOM.height.value}cm, 몸무게: ${DOM.weight.value}kg, 체형: ${DOM.bodyType.value}
 
 * 필수 지시사항:
-1. 사진 속 인물의 얼굴 피부 결, 눈동자, 모발 색을 바탕으로 퍼스널 컬러와 '얼굴 명도 대비감(High/Medium/Low Contrast)'을 진단하세요.
+1. 사진 속 실제 인물의 얼굴 피부 톤, 얼굴형, 눈매, 헤어스타일(가르마, 길이, 컬러)을 매우 사실적으로 분석하세요.
 2. 퍼스널 컬러의 밝은 톤(bestLight) 3개, 어두운 톤(bestDark) 3개를 정확한 HEX 코드로 응답.
-3. 뷰티 추천: 쿠팡 로켓배송에서 쉽게 구매할 수 있는 인기 브랜드 실존 제품명을 적을 것 (예: 라운드랩 1025 독도 토너, 토리든 다이브인 수분크림, 롬앤 쥬시래스팅 틴트 등).
+3. 뷰티 추천: 쿠팡 로켓배송에서 쉽게 구매할 수 있는 인기 브랜드 실존 제품명을 적을 것.
 4. 쇼핑몰 키(mall)는 100% 'coupang'으로 지정할 것.
-5. facialFeatures: 사진 속 인물의 인상과 헤어스타일 요약(영문 15단어 내외, 예: "A Korean young man with neat black parted hair, sharp jawline, clear pale skin").
+5. facialFeatures (매우 중요): 사진 속 실제 인물의 얼굴 특징을 실사 사진 생성을 위해 영문으로 정밀 기술하세요. (예: "A real Korean 20s man, neat black parted curtain hair, clear light warm skin tone, clean monolid eyes, defined jawline, gentle expression").
 
 반드시 아래 JSON 형식으로만 응답:
 {
   "color": {
-    "season": "예: 겨울 쿨 트루 딥",
+    "season": "예: 가을 웜 뮤트",
     "description": "얼굴 명도 대비감과 퍼스널 톤 특징 요약 (2-3문장)",
     "bestLight": ["#HEX", "#HEX", "#HEX"],
     "bestDark": ["#HEX", "#HEX", "#HEX"]
   },
-  "facialFeatures": "영문 인상 묘사",
+  "facialFeatures": "영문 실사 인상 묘사",
   "skin": {
     "type": "예상 피부타입",
     "makeupTip": "피부 타입에 맞는 스킨케어/메이크업 꿀팁"
@@ -721,208 +716,4 @@
         }
 
         DOM.applyLocationBtn.addEventListener('click', () => {
-            if (!DOM.locationInput.value.trim()) { showToast("지역/도시를 입력해주세요."); return; }
-            state.location = DOM.locationInput.value.trim();
-            DOM.tpoContentArea.style.opacity = '1';
-            triggerTPOAnalysis();
-        });
-
-        async function triggerTPOAnalysis() {
-            DOM.tpoLoader.classList.remove('hidden');
-            DOM.tpoLoader.classList.add('flex');
-            DOM.weatherInfoBox.classList.add('hidden');
-            
-            try {
-                const fashionResult = await analyzeTPOStyle();
-                renderTPOResults(fashionResult);
-                
-                // 가상 피팅 룩북 렌더링 호출
-                generateVirtualTryOnLookbook(fashionResult.lookbookPrompt);
-                
-            } catch (err) {
-                showToast("코디 정보를 가져오는데 문제가 발생했습니다.");
-                DOM.tpoLoader.classList.add('hidden');
-                DOM.tpoLoader.classList.remove('flex');
-            }
-        }
-
-        async function analyzeTPOStyle() {
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${state.apiKey}`;
-            const isTravel = state.currentMainTPO === '여행';
-            let tpoContext = `분류: ${state.currentMainTPO}, 세부상황: ${state.currentSubTPO}`;
-            let extraInstruction = "";
-
-            if (state.location && (isTravel || state.currentMainTPO === '데일리')) {
-                tpoContext += `, 위치: ${state.location}`;
-                extraInstruction = `* 중요: 지정된 위치(${state.location})의 계절감과 날씨를 반영하세요.`;
-            }
-
-            const prompt = `
-[사용자] 성별: ${DOM.gender.value}, 나이: ${DOM.age.value}, 퍼스널컬러: ${state.baseAnalysisCache?.color.season}
-[얼굴/인상 특징]: ${state.baseAnalysisCache?.facialFeatures || "Korean model"}
-[상황정보] ${tpoContext}
-${extraInstruction}
-
-지시사항:
-1. 사용자의 퍼스널 컬러 및 얼굴 명도 대비감에 최적화된 착장을 추천하세요.
-2. 쇼핑 아이템은 쿠팡 로켓배송에서 쉽게 찾을 수 있는 실제 브랜드와 구체적 상품명을 명시할 것.
-3. 쇼핑몰 키(mall)는 100% 'coupang'으로 지정할 것.
-4. lookbookPrompt (영문 필수):
-   - 잘린 사진이나 정물 사진 금지. 반드시 머리부터 발끝까지 나오는 전신 패션 화보(Full-body fashion editorial lookbook portrait).
-   - [얼굴/인상 특징]과 사용자 나이대를 반영하여, 추천된 옷과 컬러 대비를 완벽히 차려입고 해당 상황 배경에 서 있는 장면을 영문으로 묘사할 것 (50단어 이내).
-
-반드시 아래 JSON 형식으로 응답:
-{
-  "weatherSummary": "날씨 요약 (위치 입력 없으면 빈 문자열)",
-  "styleTip": "상세 코디 제안 (여행 탭 아닐 때)",
-  "styleTipDay": "낮 코디 제안 (여행 탭일 때만)",
-  "styleTipNight": "밤 코디 제안 (여행 탭일 때만)",
-  "lookbookPrompt": "영어 가상 피팅 룩북 프롬프트",
-  "fashionShopping": [
-    { "category": "상의/아우터", "mall": "coupang", "itemName": "쿠팡 구매 가능 구체적 브랜드 제품명", "keyword": "쇼핑 검색어" },
-    { "category": "하의", "mall": "coupang", "itemName": "쿠팡 구매 가능 구체적 브랜드 제품명", "keyword": "쇼핑 검색어" },
-    { "category": "신발/잡화", "mall": "coupang", "itemName": "쿠팡 구매 가능 구체적 브랜드 제품명", "keyword": "쇼핑 검색어" }
-  ]
-}`;
-            const payload = {
-                contents: [{ role: "user", parts: [{ text: prompt }] }],
-                generationConfig: { responseMimeType: "application/json" }
-            };
-            const res = await fetchWithRetry(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            return parseCleanJSON(await res.json());
-        }
-
-        // 레이트 리밋 없는 가상 AI 룩북 모델 엔진
-        function generateVirtualTryOnLookbook(promptText) {
-            DOM.lookbookImage.classList.add('hidden');
-            DOM.lookbookImage.classList.add('opacity-0');
-            DOM.lookbookLoader.classList.remove('hidden');
-
-            // 트래픽 차단 없는 최적화 렌더링 파라미터 구성
-            const enhancedPrompt = encodeURIComponent(
-                promptText + ", full body portrait, modern korean fashion aesthetic, 8k resolution, perfect studio lighting, hyperrealistic, cinematic photo, photorealistic"
-            );
-            const randomSeed = Math.floor(Math.random() * 999999);
-            // 45초 딜레이 제한이 없는 turbo 엔진 적용
-            const aiImageUrl = `https://image.pollinations.ai/prompt/${enhancedPrompt}?width=600&height=800&nologo=true&model=turbo&seed=${randomSeed}`;
-
-            const imgLoader = new Image();
-            let isLoaded = false;
-
-            const displayImage = (url) => {
-                if (isLoaded) return;
-                isLoaded = true;
-                DOM.lookbookImage.src = url;
-                DOM.lookbookLoader.classList.add('hidden');
-                DOM.tpoLoader.classList.add('hidden');
-                DOM.tpoLoader.classList.remove('flex');
-                
-                DOM.lookbookImage.classList.remove('hidden');
-                setTimeout(() => {
-                    DOM.lookbookImage.classList.remove('opacity-0');
-                }, 80);
-            };
-
-            imgLoader.onload = () => {
-                displayImage(aiImageUrl);
-            };
-
-            imgLoader.onerror = () => {
-                // 대체 로드 시에도 잘린 사진이 아닌 전신 모델 스타일 적용
-                const gender = DOM.gender.value || "남성";
-                const fallbackFullbody = gender === "여성"
-                    ? "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=600&q=80"
-                    : "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=600&q=80";
-                displayImage(fallbackFullbody);
-            };
-
-            // 6초 이상 지연 방어
-            setTimeout(() => {
-                if (!isLoaded) {
-                    displayImage(aiImageUrl);
-                }
-            }, 6000);
-
-            imgLoader.src = aiImageUrl;
-        }
-
-        function renderBaseResults(data) {
-            document.getElementById('res-season').textContent = data.color.season;
-            document.getElementById('res-color-desc').textContent = data.color.description;
-            
-            const renderColors = (colors, id) => {
-                const container = document.getElementById(id);
-                container.innerHTML = '';
-                (colors || []).forEach(hex => {
-                    const el = document.createElement('div');
-                    el.className = 'color-swatch';
-                    el.style.backgroundColor = hex;
-                    container.appendChild(el);
-                });
-            };
-            renderColors(data.color.bestLight, 'res-best-light');
-            renderColors(data.color.bestDark, 'res-best-dark');
-
-            document.getElementById('res-skin-type').textContent = data.skin.type;
-            document.getElementById('res-makeup-tip').textContent = data.skin.makeupTip;
-            document.getElementById('res-size-recommend').textContent = data.body.size;
-            document.getElementById('res-fit-tip').textContent = data.body.fitTip;
-
-            renderShoppingList(data.beautyShopping, 'beauty-shopping-list');
-        }
-
-        function renderTPOResults(data) {
-            document.getElementById('res-tpo-title').innerHTML = `스타일링 포인트`;
-            
-            if (data.weatherSummary) {
-                DOM.weatherSummary.textContent = data.weatherSummary;
-                DOM.weatherInfoBox.classList.remove('hidden');
-            }
-
-            if (state.currentMainTPO === '여행' && data.styleTipDay && data.styleTipNight) {
-                DOM.standardTipArea.classList.add('hidden');
-                DOM.travelTipArea.classList.remove('hidden');
-                document.getElementById('res-style-tip-day').textContent = data.styleTipDay;
-                document.getElementById('res-style-tip-night').textContent = data.styleTipNight;
-            } else {
-                DOM.standardTipArea.classList.remove('hidden');
-                DOM.travelTipArea.classList.add('hidden');
-                document.getElementById('res-style-tip').textContent = data.styleTip;
-            }
-
-            renderShoppingList(data.fashionShopping, 'fashion-shopping-list');
-        }
-
-        function renderShoppingList(items, containerId) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-
-            items.forEach(item => {
-                const mallId = item.mall.toLowerCase();
-                const mallInfo = AFFILIATE_MALLS[mallId] || AFFILIATE_MALLS['coupang'];
-
-                const card = document.createElement('div');
-                card.onclick = () => triggerAffiliateModal(mallId, item.itemName, item.keyword);
-                card.className = 'flex items-center justify-between bg-[#f8f9fa] p-3.5 rounded-[16px] hover:bg-white transition-all shadow-sm border border-transparent hover:border-blue-200 group cursor-pointer active:scale-98';
-                
-                card.innerHTML = `
-                    <div class="flex-1 min-w-0 pr-3">
-                        <div class="flex items-center gap-2 mb-1.5">
-                            <span class="text-[10px] text-gray-500 font-bold whitespace-nowrap bg-gray-100 px-1.5 py-0.5 rounded">${item.category}</span>
-                            <span class="${mallInfo.color} text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider flex items-center gap-1">
-                                <i class="fa-solid ${mallInfo.icon}"></i>${mallInfo.name}
-                            </span>
-                        </div>
-                        <p class="font-bold text-gray-900 text-[14px] truncate mb-0.5">${item.itemName}</p>
-                        <p class="text-[11px] text-blue-500 truncate group-hover:underline"><i class="fa-solid fa-search mr-1"></i>"${item.keyword}" 최저가 검색</p>
-                    </div>
-                    <div class="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400 group-hover:text-blue-500 group-hover:scale-110 transition-all flex-shrink-0">
-                        <i class="fa-solid fa-arrow-right -rotate-45 text-sm"></i>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-    </script>
-</body>
-</html>
+            if (!DOM.locationInput.value

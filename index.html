@@ -25,7 +25,7 @@
     
     <div class="flex justify-between items-center mb-8 px-2 mt-2">
         <h1 class="text-3xl font-extrabold tracking-tight" style="color: #1c1c1e;">StyleAI</h1>
-        <!-- 설정(톱니바퀴) 버튼을 완전히 삭제했습니다. 일반 사용자는 API를 볼 수 없습니다. -->
+        <!-- 설정 버튼을 없애서 사용자는 API를 볼 수 없습니다. -->
     </div>
 
     <!-- 입력 영역 -->
@@ -105,7 +105,6 @@
 
     <script>
         // ★★★ 여기에 회원님의 실제 구글 API 키를 따옴표 안에 넣어주세요! ★★★
-        // 예시: const GEMINI_API_KEY = "AIzaSyB-xxxxxx-xxxxxx";
         const GEMINI_API_KEY = "AQ.Ab8RN6JH1uNitwHFFz_WbzUp1QmgzWRjnBvf2ZyGYCs86ZyyoQ";
 
         let base64Image = "";
@@ -145,8 +144,8 @@
             const height = document.getElementById('height').value;
             const weight = document.getElementById('weight').value;
 
-            // 안정적이고 가장 빠른 1.5-flash 모델 적용
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+            // ★ 오류가 없었던 최신 모델 gemini-3.8-flash로 완벽하게 고정!
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${GEMINI_API_KEY}`;
 
             // 프롬프트 강화: 무조건 '구체적인 브랜드와 제품명'을 뽑아내도록 명령
             const prompt = `너는 대한민국 최고의 패션/뷰티 컨설턴트야. 사용자 정보: ${age} ${gender}, 키 ${height}cm, 체중 ${weight}kg.
@@ -181,15 +180,16 @@
                             ]
                         }],
                         generationConfig: {
-                            responseMimeType: "application/json" // AI가 무조건 순수 JSON만 뱉도록 강제 (오류 방지)
+                            responseMimeType: "application/json" 
                         }
                     })
                 });
 
                 const data = await response.json();
 
+                // ★ 에러 발생 시, 구글에서 보내주는 진짜 에러 메시지를 화면에 띄우도록 수정
                 if (data.error) {
-                    alert("통신 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+                    alert("구글 API 통신 오류:\n" + (data.error.message || JSON.stringify(data.error)));
                     return;
                 }
 
@@ -198,7 +198,7 @@
                 renderResults();
 
             } catch (error) {
-                alert("결과를 분석하는 도중 문제가 발생했습니다. 사진을 바꿔서 다시 시도해주세요.");
+                alert("결과를 분석하는 도중 문제가 발생했습니다:\n" + error.message);
             } finally {
                 btn.disabled = false;
                 btn.innerText = "AI 컨설팅 시작하기";
@@ -233,17 +233,15 @@
                 </a>
             `;
 
-            changeTPO('daily'); // 기본 탭 열기
+            changeTPO('daily'); 
         }
 
         function changeTPO(type) {
-            // 탭 디자인 리셋
             document.querySelectorAll('.tpo-tab').forEach(tab => {
                 tab.classList.remove('bg-blue-500', 'text-white', 'shadow-md');
                 tab.classList.add('bg-white', 'text-gray-500', 'shadow-sm', 'border', 'border-gray-100');
             });
             
-            // 선택한 탭 활성화
             const activeTab = document.getElementById('tab-' + type);
             if(activeTab) {
                 activeTab.classList.remove('bg-white', 'text-gray-500', 'shadow-sm', 'border', 'border-gray-100');
@@ -254,7 +252,6 @@
             const titles = { daily: "데일리 룩 추천", office: "오피스 룩 추천", date: "데이트 룩 추천", travel: "여행 코디 추천 (낮/밤)" };
             
             document.getElementById('resTpoTitle').innerText = titles[type];
-            // 상세 추천 내용을 돋보이게 렌더링
             document.getElementById('resTpoDesc').innerHTML = `<div class="text-blue-800 font-bold bg-blue-50 p-4 rounded-xl mb-4 border border-blue-100">${tpoData.desc}</div>`;
 
             const keyword = encodeURIComponent(tpoData.keyword);
@@ -275,7 +272,6 @@
             `;
         }
         
-        // PWA 설정 유지
         if ('serviceWorker' in navigator) {
             const swCode = `
                 self.addEventListener('install', (e) => { e.waitUntil(caches.open('style-ai-v3').then((cache) => { return cache.addAll(['/']); })); });

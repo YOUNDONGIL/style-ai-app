@@ -113,7 +113,6 @@
             <h1 class="text-xl font-bold tracking-tight text-gray-900 flex items-center">
                 <i class="fa-solid fa-sparkles text-blue-500 mr-2"></i>StyleAI
             </h1>
-            <span class="text-[10px] font-bold text-gray-400">Fal.ai Flux 8K</span>
         </div>
     </header>
 
@@ -151,14 +150,14 @@
         <section id="input-section" class="space-y-6 fade-in">
             <div class="text-center mb-8 mt-4">
                 <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-3 leading-tight">당신만의 고유한 톤,<br>완벽한 스타일.</h2>
-                <p class="text-gray-500 font-medium text-sm md:text-base">사진 한 장으로 피부톤, 맞춤 코디 세트, 최저가 쇼핑까지.</p>
+                <p class="text-gray-500 font-medium text-sm md:text-base">사진 한 장으로 피부톤, 맞춤 코디, 최저가 쇼핑까지.</p>
             </div>
 
+            <!-- 사진 업로드 영역 -->
             <div class="apple-card p-6 md:p-8">
                 <h3 class="text-lg font-bold mb-4 flex items-center text-gray-800"><i class="fa-solid fa-camera mr-2 text-blue-500"></i>정면 사진 업로드</h3>
-                
-                <!-- 가장 완벽하게 작동했던 원본 100% 복구 구조 -->
                 <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-[20px] p-8 md:p-12 text-center cursor-pointer hover:bg-gray-50/80 transition-colors relative overflow-hidden bg-gray-50/30 group">
+                    <!-- 투명 input으로 100% 작동 보장 -->
                     <input type="file" id="image-input" accept="image/jpeg, image/png, image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
                     <img id="image-preview" class="hidden w-auto h-auto max-h-64 mx-auto rounded-2xl shadow-lg mb-4 object-cover relative z-0" alt="미리보기" />
                     <div id="upload-placeholder" class="relative z-0 group-hover:scale-105 transition-transform duration-300">
@@ -221,14 +220,12 @@
             </button>
         </section>
 
-        <!-- 로딩 인디케이터 -->
         <div id="loading-area" class="hidden flex-col items-center justify-center py-32 fade-in">
             <div class="apple-spinner mb-8"></div>
             <h3 class="text-2xl font-bold text-gray-900 mb-3 tracking-tight">AI가 분석을 진행 중입니다</h3>
             <p class="text-gray-500 text-center text-sm leading-relaxed" id="loading-text">피부톤과 윤곽을 스캔하고 있습니다.<br>잠시만 기다려주세요.</p>
         </div>
 
-        <!-- 에러 메시지 -->
         <div id="error-message" class="hidden bg-red-50 text-red-600 p-6 rounded-[24px] text-center my-8 border border-red-100 flex-col items-center fade-in">
             <i class="fa-solid fa-triangle-exclamation text-3xl mb-3 text-red-500"></i>
             <h4 class="font-bold mb-2 text-lg">앗, 문제가 발생했어요</h4>
@@ -236,7 +233,6 @@
             <button onclick="location.reload()" class="mt-4 px-5 py-2 bg-white text-red-600 rounded-full text-sm font-bold shadow-sm border border-red-100 hover:bg-red-50">다시 시도하기</button>
         </div>
 
-        <!-- 분석 결과 영역 -->
         <section id="result-area" class="hidden space-y-6 pb-12">
             <div class="flex justify-end gap-2 fade-in">
                 <button onclick="shareResult()" class="px-4 py-2 bg-white rounded-full text-sm font-bold text-gray-700 shadow-sm border border-gray-200 hover:bg-gray-50 flex items-center">
@@ -269,7 +265,6 @@
                     </div>
                 </div>
 
-                <!-- 체형 & 사이즈 추천 박스 -->
                 <div class="bg-white border border-gray-200 p-5 rounded-2xl mb-6 flex items-start gap-3 shadow-sm">
                     <div class="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0 mt-0.5">
                         <i class="fa-solid fa-ruler-combined text-base"></i>
@@ -280,7 +275,6 @@
                     </div>
                 </div>
 
-                <!-- AI 스킨케어 & 뷰티 -->
                 <div class="bg-[#f8f9fa] p-6 rounded-3xl border border-gray-100">
                     <div class="flex items-center mb-4">
                         <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
@@ -298,7 +292,7 @@
                 </div>
             </div>
 
-            <!-- 2. [Fal.ai 초고화질 전신 룩북] 얼굴 컷오프 + 스튜디오 착장 화보 (1컷 고정) -->
+            <!-- 2. Fal.ai 초고화질 전신 룩북 -->
             <div class="apple-card p-6 md:p-8 fade-in">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="font-bold text-xl tracking-tight flex items-center text-gray-900">
@@ -313,20 +307,18 @@
                 <div class="w-full relative rounded-[24px] overflow-hidden bg-[#f0f0f2] aspect-[3/4] flex items-center justify-center shadow-md border border-gray-100 max-w-md mx-auto">
                     <div id="lookbook-loader" class="text-gray-400 flex flex-col items-center p-6 text-center">
                         <div class="apple-spinner mb-4"></div>
-                        <span class="text-xs font-bold leading-relaxed text-gray-600">Fal.ai Flux 엔진으로 초고화질 시그니처 착장 룩북을<br>렌더링 중입니다... (약 1.5초)</span>
+                        <span class="text-xs font-bold leading-relaxed text-gray-600">Fal.ai Flux 엔진으로 초고화질 룩북을<br>렌더링 중입니다... (약 1.5초)</span>
                     </div>
-                    <!-- ★ 물리적 컷오프 (비율과 정렬 수정) -->
                     <img id="lookbook-image" class="hidden w-full h-full object-cover object-bottom scale-110 origin-bottom transition-opacity duration-700 opacity-0" alt="시그니처 착장 룩북" />
                 </div>
             </div>
 
-            <!-- 3. 테마별 상황별 맞춤 세트 코디 (밝은 톤 선호 vs 어두운 톤 선호 세트 분리) -->
+            <!-- 3. 테마별 상황별 맞춤 세트 코디 -->
             <div class="apple-card p-6 md:p-8 fade-in">
                 <h3 class="font-bold text-xl mb-5 tracking-tight flex items-center text-gray-900">
                     <i class="fa-solid fa-layer-group mr-2 text-gray-800"></i>상황별 맞춤 코디 세트
                 </h3>
                 
-                <!-- TPO 탭 -->
                 <div class="relative mb-5">
                     <div id="main-tpo-tabs" class="flex overflow-x-auto gap-2 pb-2 hide-scroll snap-x">
                         <button class="main-tab snap-start flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-bold bg-gray-900 text-white transition-all shadow-md" data-tpo="데일리">👕 데일리/마실</button>
@@ -340,7 +332,6 @@
                     </div>
                 </div>
 
-                <!-- 세부 서브 탭 & 위치 입력 -->
                 <div id="sub-tpo-container" class="bg-[#f8f9fa] rounded-2xl p-5 mb-6 border border-gray-100">
                     <div id="sub-tabs-area" class="flex flex-wrap gap-2"></div>
                     
@@ -356,7 +347,6 @@
                     </div>
                 </div>
 
-                <!-- TPO 로더 및 결과 영역 -->
                 <div id="tpo-content-area" class="relative">
                     <div id="tpo-loader" class="hidden absolute inset-0 z-20 bg-white/80 backdrop-blur-md rounded-2xl flex-col items-center justify-center">
                         <div class="apple-spinner mb-4"></div>
@@ -371,7 +361,6 @@
                         </div>
                     </div>
 
-                    <!-- 스타일링 설명 -->
                     <div class="mb-6 bg-white border border-gray-100 p-5 rounded-2xl shadow-sm">
                         <h4 class="text-lg font-extrabold mb-2 text-gray-900" id="res-tpo-title">코디 포인트</h4>
                         <div id="standard-tip-area">
@@ -389,7 +378,6 @@
                         </div>
                     </div>
 
-                    <!-- 밝은 톤 vs 어두운 톤 코디 세트 렌더링 컨테이너 -->
                     <div id="coord-sets-container" class="space-y-6"></div>
                 </div>
             </div>
@@ -402,7 +390,7 @@
 
     <script>
         // ========================================================
-        // 💡 아래 두 곳에 발급받은 API 키를 입력하세요. (따옴표 유지)
+        // 💡 아래 두 곳의 큰따옴표 안에 발급받으신 API 키를 넣으세요!
         // ========================================================
         const GOOGLE_API_KEY = "AQ.Ab8RN6LR9bVvqNLLLulzF54CiyXwPZkGl04ukue2gZrbmjFUPQ";
         const FAL_API_KEY = "fal_sk_754f115a1ffe400b90920ca3
@@ -411,70 +399,21 @@ d4d4cead";
 
         const COUPANG_TRACKING_CODE = "AF4531799";
 
-        // 카테고리별 실물 패션 제품 썸네일 고화질 이미지 풀
-        const FASHION_THUMBNAILS = {
-            '상의': {
-                'light': [
-                    'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=150&q=80',
-                    'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=150&q=80',
-                    'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=150&q=80'
-                ],
-                'dark': [
-                    'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=150&q=80',
-                    'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=150&q=80',
-                    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=150&q=80'
-                ]
-            },
-            '하의': {
-                'light': [
-                    'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=150&q=80',
-                    'https://images.unsplash.com/photo-1584370848010-d7fe6bc767ec?auto=format&fit=crop&w=150&q=80'
-                ],
-                'dark': [
-                    'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=150&q=80',
-                    'https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=150&q=80'
-                ]
-            },
-            '신발': {
-                'light': [
-                    'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=150&q=80',
-                    'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=150&q=80'
-                ],
-                'dark': [
-                    'https://images.unsplash.com/photo-1614252369475-531eba835eb1?auto=format&fit=crop&w=150&q=80',
-                    'https://images.unsplash.com/photo-1533867617858-e7b97e060509?auto=format&fit=crop&w=150&q=80'
-                ]
-            },
-            '악세사리': {
-                'light': [
-                    'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=150&q=80',
-                    'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=150&q=80'
-                ],
-                'dark': [
-                    'https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=150&q=80',
-                    'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=150&q=80'
-                ]
-            },
-            '뷰티': [
-                'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=150&q=80',
-                'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=150&q=80',
-                'https://images.unsplash.com/photo-1608248597359-53600f95213d?auto=format&fit=crop&w=150&q=80'
-            ]
+        // 카테고리별 세련된 패션 비주얼 아이콘 및 컬러 테마 맵
+        const CATEGORY_THEMES = {
+            '상의': { icon: 'fa-shirt', lightBg: 'bg-blue-50 text-blue-600', darkBg: 'bg-indigo-950/60 text-blue-400' },
+            '하의': { icon: 'fa-socks', lightBg: 'bg-emerald-50 text-emerald-600', darkBg: 'bg-emerald-950/60 text-emerald-400' },
+            '신발': { icon: 'fa-shoe-prints', lightBg: 'bg-orange-50 text-orange-600', darkBg: 'bg-orange-950/60 text-orange-400' },
+            '악세사리': { icon: 'fa-gem', lightBg: 'bg-purple-50 text-purple-600', darkBg: 'bg-purple-950/60 text-purple-400' },
+            '기타': { icon: 'fa-bag-shopping', lightBg: 'bg-gray-100 text-gray-600', darkBg: 'bg-gray-800 text-gray-300' }
         };
 
-        function getThumbnailUrl(category, toneType = 'light', index = 0) {
-            let catKey = '상의';
-            if (category.includes('하의') || category.includes('바지') || category.includes('스커트') || category.includes('슬랙스')) catKey = '하의';
-            else if (category.includes('신발') || category.includes('스니커즈') || category.includes('로퍼') || category.includes('구두')) catKey = '신발';
-            else if (category.includes('악세사리') || category.includes('잡화') || category.includes('가방') || category.includes('모자')) catKey = '악세사리';
-            else if (category.includes('토너') || category.includes('크림') || category.includes('뷰티') || category.includes('스킨')) {
-                const bList = FASHION_THUMBNAILS['뷰티'];
-                return bList[index % bList.length];
-            }
-
-            const tone = toneType === 'dark' ? 'dark' : 'light';
-            const list = FASHION_THUMBNAILS[catKey][tone];
-            return list[index % list.length];
+        function getCategoryTheme(categoryName) {
+            if (categoryName.includes('상의') || categoryName.includes('셔츠') || categoryName.includes('아우터') || categoryName.includes('니트')) return CATEGORY_THEMES['상의'];
+            if (categoryName.includes('하의') || categoryName.includes('바지') || categoryName.includes('슬랙스') || categoryName.includes('팬츠')) return CATEGORY_THEMES['하의'];
+            if (categoryName.includes('신발') || categoryName.includes('스니커즈') || categoryName.includes('로퍼') || categoryName.includes('구두')) return CATEGORY_THEMES['신발'];
+            if (categoryName.includes('악세사리') || categoryName.includes('잡화') || categoryName.includes('가방') || categoryName.includes('모자')) return CATEGORY_THEMES['악세사리'];
+            return CATEGORY_THEMES['기타'];
         }
 
         const AFFILIATE_MALLS = {
@@ -585,7 +524,7 @@ d4d4cead";
             '면접': ['대기업/공기업 정석 면접', '트렌디 직무 면접', '1:1 중요 비즈니스 미팅']
         };
 
-        // 100% 정상 작동하는 원본 사진 등록 리스너
+        // 회원님께서 확인하셨던 가장 안정적인 원본 사진 등록 리스너
         DOM.imageInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -610,7 +549,7 @@ d4d4cead";
                     let errMsg = `오류 코드: ${res.status}`;
                     try { errMsg = JSON.parse(errText).error.message; } catch(e){}
                     if (res.status === 400 && errMsg.includes("API key not valid")) {
-                        throw new Error("코드 상단에 입력된 구글 API 키가 유효하지 않습니다.");
+                        throw new Error("코드 하단에 입력된 구글 API 키가 유효하지 않습니다.");
                     }
                     if (res.status !== 429 && res.status < 500) throw new Error(errMsg);
                 } catch (e) {
@@ -634,11 +573,11 @@ d4d4cead";
 
         DOM.analyzeBtn.addEventListener('click', async () => {
             if (!GOOGLE_API_KEY || GOOGLE_API_KEY.includes("여기에_구글")) { 
-                showToast("코드 상단(GOOGLE_API_KEY)에 구글 API 키를 먼저 입력해주세요!"); 
+                showToast("코드 맨 아래(GOOGLE_API_KEY)에 구글 API 키를 먼저 입력해주세요!"); 
                 return; 
             }
             if (!FAL_API_KEY || FAL_API_KEY.includes("여기에_FAL")) { 
-                showToast("코드 상단(FAL_API_KEY)에 Fal.ai API 키를 먼저 입력해주세요!"); 
+                showToast("코드 맨 아래(FAL_API_KEY)에 Fal.ai API 키를 먼저 입력해주세요!"); 
                 return; 
             }
 
@@ -661,7 +600,7 @@ d4d4cead";
                 state.baseAnalysisCache = await analyzeBaseInfo();
                 renderBaseResults(state.baseAnalysisCache);
                 
-                // Fal.ai Flux.1 초고화질 전신 룩북 1컷 생성
+                // Fal.ai 초고화질 전신 룩북 생성
                 generateSignatureFullbodyLookbookWithFal();
 
                 DOM.loadingArea.classList.add('hidden');
@@ -679,7 +618,6 @@ d4d4cead";
         });
 
         async function analyzeBaseInfo() {
-            // 회원님께서 확인하셨던 안정적인 모델명 복구
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GOOGLE_API_KEY}`;
             const prompt = `
 당신은 최고의 퍼스널 컬러 및 패션/뷰티 마스터입니다.
@@ -865,7 +803,7 @@ ${extraInstruction}
             return parseCleanJSON(await res.json());
         }
 
-        // ★ [Fal.ai Flux.1 유료 연동] 얼굴 100% 배제 + 초고화질 전신 룩북 생성
+        // ★ [Fal.ai 유료 연동] 얼굴 배제 + 초고화질 전신 룩북 생성
         async function generateSignatureFullbodyLookbookWithFal() {
             if (state.isHeroImageGenerated) return;
             state.isHeroImageGenerated = true;
@@ -877,7 +815,6 @@ ${extraInstruction}
             const gender = DOM.gender.value || "남성";
             const season = state.baseAnalysisCache?.color?.season || "personal color tone";
             
-            // Fal.ai Flux 전용: 목 아래 전신 카탈로그 룩북 프롬프트
             const promptText = `High-end commercial catalog fashion photography, complete full-body outfit on invisible ghost mannequin, strictly cropped below the neck, no human head, no face, outfit perfectly coordinated for ${season}, stylish layered jacket, tailored trousers, luxury shoes, elegant studio lighting, ultra-realistic fabric wrinkles and cloth textures, photorealistic 8k`;
 
             try {
@@ -996,16 +933,17 @@ ${extraInstruction}
                     <div class="space-y-2.5">
                 `;
 
-                (set.items || []).forEach((item, itemIdx) => {
+                (set.items || []).forEach(item => {
                     const mallId = (item.mall || 'coupang').toLowerCase();
-                    const thumbUrl = getThumbnailUrl(item.category, set.toneType || (isLight ? 'light' : 'dark'), itemIdx);
+                    const theme = getCategoryTheme(item.category);
+                    const iconColorClass = isLight ? theme.lightBg : theme.darkBg;
 
                     setHtml += `
                         <div onclick="triggerAffiliateModal('${mallId}', '${item.itemName.replace(/'/g, "\\'")}', '${item.keyword.replace(/'/g, "\\'")}')" 
                              class="flex items-center justify-between bg-[#f8f9fa] p-3 rounded-2xl hover:bg-blue-50/40 transition-all cursor-pointer group active:scale-98 border border-gray-100 hover:border-blue-200">
                             
-                            <div class="w-14 h-14 rounded-xl overflow-hidden bg-gray-200 flex-shrink-0 mr-3 border border-gray-200/60 shadow-xs">
-                                <img src="${thumbUrl}" alt="${item.itemName}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                            <div class="w-12 h-12 rounded-xl ${iconColorClass} flex items-center justify-center flex-shrink-0 mr-3 shadow-xs text-lg transition-transform group-hover:scale-105">
+                                <i class="fa-solid ${theme.icon}"></i>
                             </div>
 
                             <div class="flex-1 min-w-0 pr-2">
@@ -1033,17 +971,15 @@ ${extraInstruction}
             const container = document.getElementById(containerId);
             container.innerHTML = '';
 
-            items.forEach((item, idx) => {
+            items.forEach(item => {
                 const mallId = item.mall.toLowerCase();
-                const thumbUrl = getThumbnailUrl(item.category, 'light', idx);
-
                 const card = document.createElement('div');
                 card.onclick = () => triggerAffiliateModal(mallId, item.itemName, item.keyword);
                 card.className = 'flex items-center justify-between bg-[#f8f9fa] p-3 rounded-2xl hover:bg-white transition-all shadow-xs border border-transparent hover:border-blue-200 group cursor-pointer active:scale-98';
                 
                 card.innerHTML = `
-                    <div class="w-12 h-12 rounded-xl overflow-hidden bg-gray-200 flex-shrink-0 mr-3 border border-gray-200/60 shadow-xs">
-                        <img src="${thumbUrl}" alt="${item.itemName}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0 mr-3 text-base">
+                        <i class="fa-solid fa-droplet"></i>
                     </div>
                     <div class="flex-1 min-w-0 pr-3">
                         <div class="flex items-center gap-2 mb-1">

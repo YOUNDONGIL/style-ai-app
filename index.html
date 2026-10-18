@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <!-- 앱 구동을 위한 필수 메타 태그 추가 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#f5f5f7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="StyleAI">
+    
+    <title>StyleAI 뷰티 & 패션 마스터</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --apple-bg: #f5f5f7;
+            --apple-text: #1d1d1f;
+            --apple-blue: #0071e3;
+            --apple-blue-hover: #0077ed;
+        }
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            background-color: var(--apple-bg);
+            color: var(--apple-text);
+            -webkit-font-smoothing: antialiased;
+            letter-spacing: -0.02em;
+            /* iOS 터치 하이라이트 제거 */
+            -webkit-tap-highlight-color: transparent; 
+        }
+        
+        /* Apple Style Glassmorphism & Cards */
+        .apple-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 28px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .apple-button-primary {
+            background-color: var(--apple-blue);
+            color: white;
+            border-radius: 980px;
+            font-weight: 600;
+            transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+        .apple-button-primary:active { transform: scale(0.96); }
+        .apple-button-primary:disabled { background-color: #a1a1a6; cursor: not-allowed; transform: none; }
+
+        .apple-input {
+            background-color: rgba(0,0,0,0.03);
+            border: 1px solid transparent;
+            border-radius: 14px;
+            transition: all 0.2s ease;
+        }
+        .apple-input:focus {
+            background-color: white;
+            border-color: var(--apple-blue);
+            box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
+        }
+
+        .color-swatch {
+            width: 2.5rem; height: 2.5rem;
+            border-radius: 50%;
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1), 0 4px 8px rgba(0,0,0,0.06);
+        }
+        
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .fade-in { animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Spinner */
+        .apple-spinner {
+            width: 48px; height: 48px;
+            border: 4px solid rgba(0, 113, 227, 0.15);
+            border-top-color: var(--apple-blue);
+            border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.5, 0.1, 0.15, 1) infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Toast Notification */
+        #toast {
+            position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); color: white;
+            padding: 12px 24px; border-radius: 980px; font-size: 14px; font-weight: 500;
+            transition: bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        #toast.show { bottom: 40px; }
+    </style>
+</head>
+<body class="min-h-screen pb-24 selection:bg-blue-200">
+
+    <header class="sticky top-0 z-50 bg-[#f5f5f7]/80 backdrop-blur-xl border-b border-gray-200/50 supports-[backdrop-filter]:bg-[#f5f5f7]/60">
+        <div class="max-w-2xl mx-auto px-6 py-4 flex items-center justify-center relative pt-safe">
+            <h1 class="text-xl font-bold tracking-tight text-gray-900 flex items-center">
+                <i class="fa-solid fa-sparkles text-blue-500 mr-2"></i>StyleAI
+            </h1>
+        </div>
+    </header>
+
+    <!-- Toast Notification Container -->
+    <div id="toast">메시지</div>
+
+    <main class="max-w-2xl mx-auto px-5 mt-6">
+        
+        <!-- 1. Input Section -->
+        <section id="input-section" class="space-y-6 fade-in">
+            <div class="text-center mb-8 mt-4">
+                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-3 leading-tight">당신만의 고유한 톤,<br>완벽한 스타일.</h2>
+                <p class="text-gray-500 font-medium text-sm md:text-base">사진 한 장으로 피부톤, 맞춤 코디, 최저가 쇼핑까지.</p>
+            </div>
+
+            <!-- Image Upload Card -->
+            <div class="apple-card p-6 md:p-8">
+                <h3 class="text-lg font-bold mb-4 flex items-center text-gray-800"><i class="fa-solid fa-camera mr-2 text-blue-500"></i>정면 사진 업로드</h3>
+                <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-[20px] p-8 md:p-12 text-center cursor-pointer hover:bg-gray-50/80 transition-colors relative overflow-hidden bg-gray-50/30 group">
+                    <input type="file" id="image-input" accept="image/jpeg, image/png, image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                    <img id="image-preview" class="hidden w-auto h-auto max-h-64 mx-auto rounded-2xl shadow-lg mb-4 object-cover relative z-0" alt="미리보기" />
+                    <div id="upload-placeholder" class="relative z-0 group-hover:scale-105 transition-transform duration-300">
+                        <div class="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mx-auto mb-4 text-blue-500 text-2xl">
+                            <i class="fa-solid fa-image"></i>
+                        </div>
+                        <p class="font-bold text-gray-800 text-lg">터치하여 앨범에서 선택</p>
+                        <p class="text-sm text-gray-400 mt-2">자연광에서 마스크 없이 찍은 사진 권장</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Details Card -->
+            <div class="apple-card p-6 md:p-8">
+                <h3 class="text-lg font-bold mb-5 flex items-center text-gray-800"><i class="fa-solid fa-sliders mr-2 text-blue-500"></i>프로필 정보</h3>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-[13px] font-bold text-gray-500 mb-1.5 pl-1">성별</label>
+                        <select id="gender-input" class="apple-input w-full p-3.5 text-gray-800 outline-none">
+                            <option value="여성">여성</option>
+                            <option value="남성">남성</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[13px] font-bold text-gray-500 mb-1.5 pl-1">연령대</label>
+                        <select id="age-input" class="apple-input w-full p-3.5 text-gray-800 outline-none">
+                            <option value="10대">10대</option>
+                            <option value="20대" selected>20대</option>
+                            <option value="30대">30대</option>
+                            <option value="40대 이상">40대 이상</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-[13px] font-bold text-gray-500 mb-1.5 pl-1">키 (cm)</label>
+                        <input type="number" id="height-input" placeholder="165" class="apple-input w-full p-3.5 text-gray-800 outline-none" />
+                    </div>
+                    <div>
+                        <label class="block text-[13px] font-bold text-gray-500 mb-1.5 pl-1">체중 (kg)</label>
+                        <input type="number" id="weight-input" placeholder="50" class="apple-input w-full p-3.5 text-gray-800 outline-none" />
+                    </div>
+                    <div>
+                        <label class="block text-[13px] font-bold text-gray-500 mb-1.5 pl-1">체형</label>
+                        <select id="body-type-input" class="apple-input w-full p-3.5 text-gray-800 outline-none">
+                            <option value="보통 체형">보통</option>
+                            <option value="하체 발달">하체 발달</option>
+                            <option value="상체 발달">상체 발달</option>
+                            <option value="마른 체형">마른 체형</option>
+                            <option value="통통한 편">통통한 편</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <button id="analyze-btn" class="apple-button-primary w-full py-4 text-[17px] shadow-lg shadow-blue-500/20 mt-4">
+                결과 확인하기
+            </button>
+        </section>
+
+        <!-- 2. Loading State -->
+        <div id="loading-area" class="hidden flex-col items-center justify-center py-32 fade-in">
+            <div class="apple-spinner mb-8"></div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-3 tracking-tight">AI가 분석을 진행 중입니다</h3>
+            <p class="text-gray-500 text-center text-sm leading-relaxed" id="loading-text">피부톤과 윤곽을 스캔하고 있습니다.<br>잠시만 기다려주세요.</p>
+        </div>
+
+        <div id="error-message" class="hidden bg-red-50 text-red-600 p-6 rounded-[24px] text-center my-8 border border-red-100 flex-col items-center fade-in">
+            <i class="fa-solid fa-triangle-exclamation text-3xl mb-3 text-red-500"></i>
+            <h4 class="font-bold mb-2 text-lg">앗, 문제가 발생했어요</h4>
+            <p id="error-text" class="text-sm opacity-80 break-all max-w-md"></p>
+            <button onclick="location.reload()" class="mt-4 px-5 py-2 bg-white text-red-600 rounded-full text-sm font-bold shadow-sm border border-red-100 hover:bg-red-50">다시 시도하기</button>
+        </div>
+
+        <!-- 3. Result Section -->
+        <section id="result-area" class="hidden space-y-6 pb-12">
+            
+            <!-- Share & Reset Tools -->
+            <div class="flex justify-end gap-2 fade-in">
+                <button onclick="shareResult()" class="px-4 py-2 bg-white rounded-full text-sm font-bold text-gray-700 shadow-sm border border-gray-200 hover:bg-gray-50 flex items-center">
+                    <i class="fa-solid fa-arrow-up-from-bracket mr-2"></i>공유하기
+                </button>
+                <button onclick="location.reload()" class="px-4 py-2 bg-white rounded-full text-sm font-bold text-gray-700 shadow-sm border border-gray-200 hover:bg-gray-50 flex items-center">
+                    <i class="fa-solid fa-rotate-right mr-2"></i>다시하기
+                </button>
+            </div>
+
+            <!-- Color Analysis Result -->
+            <div class="apple-card p-6 md:p-8 fade-in" style="animation-delay: 0.1s;">
+                <div class="text-center mb-8">
+                    <span class="inline-block px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full text-xs font-bold mb-4 tracking-wider">PERSONAL COLOR</span>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-3 tracking-tight" id="res-season">-</h2>
+                    <p id="res-color-desc" class="text-gray-600 font-medium leading-relaxed"></p>
+                </div>
+
+                <!-- Palette -->
+                <div class="bg-white/50 p-5 rounded-2xl border border-gray-100 mb-6 shadow-sm">
+                    <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                        <div>
+                            <span class="block text-[11px] font-bold text-gray-400 mb-3 tracking-wider text-center">BEST LIGHT TONE</span>
+                            <div id="res-best-light" class="flex gap-2 justify-center"></div>
+                        </div>
+                        <div class="hidden sm:block w-px bg-gray-200"></div>
+                        <div>
+                            <span class="block text-[11px] font-bold text-gray-400 mb-3 tracking-wider text-center">BEST DARK TONE</span>
+                            <div id="res-best-dark" class="flex gap-2 justify-center"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Beauty Clinic -->
+                <div class="bg-[#f8f9fa] p-6 rounded-3xl border border-gray-100">
+                    <div class="flex items-center mb-4">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
+                            <i class="fa-solid fa-droplet text-sm"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-900 text-lg tracking-tight">AI 스킨케어 & 뷰티</h4>
+                    </div>
+                    <p id="res-skin-type" class="text-sm font-bold text-blue-600 mb-2"></p>
+                    <p id="res-makeup-tip" class="text-sm text-gray-600 leading-relaxed mb-6"></p>
+                    
+                    <div class="space-y-3">
+                        <p class="text-[11px] font-bold text-gray-400 tracking-wider">🔥 실시간 인기템 구매하기</p>
+                        <div id="beauty-shopping-list" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TPO Styling Module -->
+            <div class="apple-card p-6 md:p-8 fade-in" style="animation-delay: 0.2s;">
+                <h3 class="font-bold text-xl mb-5 tracking-tight flex items-center">
+                    <i class="fa-solid fa-shirt mr-2 text-gray-800"></i>상황별 맞춤 스타일링
+                </h3>
+                
+                <!-- Main TPO Navigation -->
+                <div class="relative mb-5">
+                    <div id="main-tpo-tabs" class="flex overflow-x-auto gap-2 pb-2 hide-scroll snap-x">
+                        <button class="main-tab snap-start flex-shrink-0 px-5 py-2.5 rounded-full text-[14px] font-bold bg-gray-900 text-white transition-all shadow-md" data-tpo="데일리">👕 데일리</button>
+                        <button class="main-tab snap-start flex-shrink-0 px-5 py-2.5 rounded-full text-[14px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="출근">💼 출근/오피스</button>
+                        <button class="main-tab snap-start flex-shrink-0 px-5 py-2.5 rounded-full text-[14px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="데이트">🌹 데이트</button>
+                        <button class="main-tab snap-start flex-shrink-0 px-5 py-2.5 rounded-full text-[14px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="경조사">👔 경조사</button>
+                        <button class="main-tab snap-start flex-shrink-0 px-5 py-2.5 rounded-full text-[14px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="여행">✈️ 여행</button>
+                    </div>
+                    <!-- Gradient mask for scroll indication -->
+                    <div class="absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-white/80 to-transparent pointer-events-none rounded-r-lg"></div>
+                </div>
+
+                <!-- Contextual Sub-Input Area -->
+                <div id="sub-tpo-container" class="bg-[#f8f9fa] rounded-2xl p-5 mb-6 border border-gray-100">
+                    <div id="sub-tabs-area" class="flex flex-wrap gap-2"></div>
+                    
+                    <div id="location-input-area" class="hidden mt-4">
+                        <label class="block text-[12px] font-bold text-gray-500 mb-2">어디로 가시나요?</label>
+                        <div class="flex gap-2">
+                            <div class="relative flex-1">
+                                <i class="fa-solid fa-location-dot absolute left-3.5 top-3.5 text-blue-500"></i>
+                                <input type="text" id="location-input" class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all shadow-sm" />
+                            </div>
+                            <button id="apply-location-btn" class="bg-gray-900 hover:bg-black text-white font-bold px-5 rounded-xl text-sm transition-colors whitespace-nowrap shadow-sm">날씨 적용</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lookbook & Styling Result -->
+                <div id="tpo-content-area" class="relative">
+                    <div id="tpo-loader" class="hidden absolute inset-0 z-20 bg-white/80 backdrop-blur-md rounded-2xl flex-col items-center justify-center">
+                        <div class="apple-spinner mb-4"></div>
+                        <span class="text-sm font-bold text-gray-800" id="tpo-loader-text">상황에 맞는 스타일 기획 중...</span>
+                    </div>
+
+                    <!-- Weather Info Placeholder -->
+                    <div id="weather-info-box" class="hidden mb-5 bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-center">
+                        <i class="fa-solid fa-cloud-sun text-xl text-blue-500 mr-3"></i>
+                        <div>
+                            <p class="text-xs font-bold text-blue-800 tracking-wider">현지 실시간 날씨 기반</p>
+                            <p id="res-weather-summary" class="text-sm text-gray-700 font-medium"></p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row gap-6 md:gap-8">
+                        <!-- AI Generated Image -->
+                        <div class="w-full md:w-[45%] relative rounded-[24px] overflow-hidden bg-[#f0f0f2] aspect-[3/4] flex items-center justify-center shadow-inner">
+                            <div id="lookbook-loader" class="text-gray-400 flex flex-col items-center p-6 text-center">
+                                <i class="fa-solid fa-wand-magic-sparkles text-3xl mb-3 text-gray-300 animate-pulse"></i>
+                                <span class="text-xs font-medium leading-relaxed">사진을 바탕으로<br>AI 가상 피팅 중...</span>
+                            </div>
+                            <img id="lookbook-image" class="hidden w-full h-full object-cover transition-opacity duration-700 opacity-0" alt="AI 룩북" onload="this.classList.remove('opacity-0')" />
+                        </div>
+                        
+                        <!-- Styling Tips & Shopping -->
+                        <div class="w-full md:w-[55%] flex flex-col">
+                            <h4 class="text-xl font-extrabold mb-3 tracking-tight text-gray-900" id="res-tpo-title">코디 제안</h4>
+                            
+                            <!-- Standard Tip -->
+                            <div id="standard-tip-area" class="mb-5">
+                                <p id="res-style-tip" class="text-[15px] text-gray-600 leading-relaxed"></p>
+                            </div>
+                            
+                            <!-- Travel Day/Night Tips -->
+                            <div id="travel-tip-area" class="hidden mb-5 space-y-4">
+                                <div class="bg-orange-50/50 p-4 rounded-xl border border-orange-100">
+                                    <h5 class="font-bold text-orange-800 text-sm mb-1"><i class="fa-solid fa-sun mr-1.5"></i>낮 코디 제안</h5>
+                                    <p id="res-style-tip-day" class="text-[14px] text-gray-700 leading-relaxed"></p>
+                                </div>
+                                <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
+                                    <h5 class="font-bold text-indigo-800 text-sm mb-1"><i class="fa-solid fa-moon mr-1.5"></i>밤 코디 제안</h5>
+                                    <p id="res-style-tip-night" class="text-[14px] text-gray-700 leading-relaxed"></p>
+                                </div>
+                            </div>
+
+                            <div class="bg-white border border-gray-200 p-4 rounded-2xl mb-6 flex items-start gap-3 shadow-sm">
+                                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <i class="fa-solid fa-ruler-combined text-gray-600 text-sm"></i>
+                                </div>
+                                <div>
+                                    <p id="res-size-recommend" class="font-bold text-gray-900 text-sm mb-1"></p>
+                                    <p id="res-fit-tip" class="text-[13px] text-gray-500 leading-relaxed"></p>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto">
+                                <p class="text-[11px] font-bold text-gray-400 tracking-wider mb-3">🔥 실시간 인기템 최저가 보기</p>
+                                <div id="fashion-shopping-list" class="space-y-2.5"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // ==========================================
+        // 🔥 단일 파일 PWA (Progressive Web App) 세팅 🔥
+        // ==========================================
+        function setupPWA() {
+            // 1. 동적 매니페스트 (앱 이름, 색상, 아이콘 정의)
+            const manifest = {
+                "name": "StyleAI 마스터",
+                "short_name": "StyleAI",
+                "description": "나만의 AI 뷰티 패션 컨설턴트",
+                "start_url": "./",
+                "display": "standalone",
+                "background_color": "#f5f5f7",
+                "theme_color": "#ffffff",
+                "icons": [
+                    {
+                        // 임시 SVG 아이콘을 Data URI로 생성 (나중에 실제 로고로 교체 가능)
+                        "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzAwNzFlMyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgZm9udC1zaXplPSIyMDAiPio8L3RleHQ+PC9zdmc+",
+                        "sizes": "512x512",
+                        "type": "image/svg+xml"
+                    }
+                ]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/manifest+json'});
+            const manifestUrl = URL.createObjectURL(manifestBlob);
+            const link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = manifestUrl;
+            document.head.appendChild(link);
+
+            // 2. 동적 서비스 워커 (오프라인 구동 및 캐시 업데이트 담당)
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    const CACHE_NAME = 'styleai-v5';
+                    self.addEventListener('install', (e) => {
+                        self.skipWaiting(); // 즉시 설치 (빠른 업데이트)
+                    });
+                    self.addEventListener('activate', (e) => {
+                        e.waitUntil(clients.claim()); // 즉시 제어권 확보
+                    });
+                    self.addEventListener('fetch', (e) => {
+                        // 네트워크 우선(Network First) 전략: 항상 최신 코드 유지
+                        e.respondWith(
+                            fetch(e.request).catch(() => caches.match(e.request))
+                        );
+                    });
+                `;
+                const swBlob = new Blob([swCode], {type: 'application/javascript'});
+                const swUrl = URL.createObjectURL(swBlob);
+                navigator.serviceWorker.register(swUrl).then(() => {
+                    console.log('✅ PWA 서비스 워커가 성공적으로 등록되었습니다. (앱 설치 가능)');
+                }).catch(err => {
+                    console.log('❌ PWA 등록 실패:', err);
+                });
+            }
+        }
+        setupPWA(); // 스크립트 로드 시 PWA 즉시 세팅
+        // ==========================================
+
+        // UI Toast Alert
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        const DOM = {
+            imageInput: document.getElementById('image-input'),
+            imagePreview: document.getElementById('image-preview'),
+            uploadPlaceholder: document.getElementById('upload-placeholder'),
+            analyzeBtn: document.getElementById('analyze-btn'),
+            inputSection: document.getElementById('input-section'),
+            loadingArea: document.getElementById('loading-area'),
+            loadingText: document.getElementById('loading-text'),
+            resultArea: document.getElementById('result-area'),
+            errorMsg: document.getElementById('error-message'),
+            errorText: document.getElementById('error-text'),
+            
+            gender: document.getElementById('gender-input'),
+            age: document.getElementById('age-input'),
+            height: document.getElementById('height-input'),
+            weight: document.getElementById('weight-input'),
+            bodyType: document.getElementById('body-type-input'),
+            
+            mainTabs: document.querySelectorAll('.main-tab'),
+            subTabsArea: document.getElementById('sub-tabs-area'),
+            locationInputArea: document.getElementById('location-input-area'),
+            locationInput: document.getElementById('location-input'),
+            applyLocationBtn: document.getElementById('apply-location-btn'),
+            
+            tpoContentArea: document.getElementById('tpo-content-area'),
+            tpoLoader: document.getElementById('tpo-loader'),
+            lookbookLoader: document.getElementById('lookbook-loader'),
+            lookbookImage: document.getElementById('lookbook-image'),
+            
+            weatherInfoBox: document.getElementById('weather-info-box'),
+            weatherSummary: document.getElementById('res-weather-summary'),
+            standardTipArea: document.getElementById('standard-tip-area'),
+            travelTipArea: document.getElementById('travel-tip-area')
+        };
+
+        const state = {
+            base64Image: null,
+            mimeType: null,
+            apiKey: "", // 자동 주입됨
+            currentMainTPO: "데일리",
+            currentSubTPO: "편안한 동네/카페",
+            location: "",
+            baseAnalysisCache: null
+        };
+
+        const TPO_DATA = {
+            '데일리': ['편안한 동네/카페', '쇼핑/핫플 방문', '가벼운 산책/운동'],
+            '출근': ['비즈니스 캐주얼', '격식 있는 정장', '자유로운 IT/디자인'],
+            '데이트': ['놀이공원/야외 액티비티', '고급 레스토랑/전시회', '아쿠아리움/실내 쇼핑몰'],
+            '경조사': ['결혼식 하객', '장례식 조문', '상견례 등 격식있는 모임'],
+            '여행': [] // 장소 직접 입력
+        };
+
+        const AFFILIATE_MALLS = {
+            'musinsa': { name: '무신사', color: 'bg-black text-white', icon: 'fa-bag-shopping', url: 'https://www.musinsa.com/search/musinsa/integration?q=' },
+            'oliveyoung': { name: '올리브영', color: 'bg-[#9fb46c] text-white', icon: 'fa-leaf', url: 'https://www.oliveyoung.co.kr/store/search/getSearchMain.do?query=' },
+            'naver': { name: '네이버쇼핑', color: 'bg-[#03c75a] text-white', icon: 'fa-n', url: 'https://search.shopping.naver.com/search/all?query=' },
+            'coupang': { name: '쿠팡', color: 'bg-[#ea1d2c] text-white', icon: 'fa-c', url: 'https://www.coupang.com/np/search?q=' },
+            'zigzag': { name: '지그재그', color: 'bg-[#ff518f] text-white', icon: 'fa-bolt', url: 'https://zigzag.kr/search?keyword=' },
+            'ably': { name: '에이블리', color: 'bg-[#ff4e50] text-white', icon: 'fa-heart', url: 'https://m.a-bly.com/search?keyword=' }
+        };
+
+        function buildAffiliateLink(mallId, keyword) {
+            const mall = AFFILIATE_MALLS[mallId] || AFFILIATE_MALLS['naver'];
+            return `${mall.url}${encodeURIComponent(keyword)}`;
+        }
+
+        async function fetchWithRetry(url, options, maxRetries = 2) {
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const res = await fetch(url, options);
+                    if (res.ok) return res;
+                    const err = await res.text();
+                    if (res.status !== 429 && res.status < 500) throw new Error(err);
+                } catch (e) {
+                    if (i === maxRetries - 1) throw e;
+                    await new Promise(r => setTimeout(r, 1500));
+                }
+            }
+        }
+
+        function parseCleanJSON(apiResult) {
+            try {
+                if (apiResult.error) throw new Error(apiResult.error.message);
+                let text = apiResult.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!text) throw new Error("분석 결과를 받지 못했습니다.");
+                text = text.replace(/```json/gi, '').replace(/```/gi, '').trim();
+                return JSON.parse(text);
+            } catch (e) {
+                console.error("JSON 파싱 에러:", e);
+                throw new Error("분석 중 데이터 형식이 맞지 않았습니다. 잠시 후 다시 시도해주세요.");
+            }
+        }
+
+        async function shareResult() {
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: '나의 AI 스타일 분석 결과',
+                        text: `내 퍼스널 컬러는 [${state.baseAnalysisCache?.color.season}] 이에요! AI가 추천해주는 코디 구경해보세요.`,
+                        url: window.location.href
+                    });
+                } catch (err) {
+                    console.log('공유 취소됨');
+                }
+            } else {
+                showToast("현재 기기에서는 공유 기능을 지원하지 않습니다.");
+            }
+        }
+
+        DOM.imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (file.size > 5 * 1024 * 1024) { showToast("5MB 이하의 사진을 선택해주세요."); return; }
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                state.base64Image = event.target.result.split(',')[1];
+                state.mimeType = file.type;
+                DOM.imagePreview.src = event.target.result;
+                DOM.imagePreview.classList.remove('hidden');
+                DOM.uploadPlaceholder.classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        });
+
+        DOM.analyzeBtn.addEventListener('click', async () => {
+            if (!state.base64Image) { showToast("사진을 먼저 업로드해주세요."); return; }
+            if (!DOM.height.value || !DOM.weight.value) { showToast("정확한 사이즈 추천을 위해 키와 몸무게를 입력해주세요."); return; }
+            
+            DOM.inputSection.classList.add('hidden');
+            DOM.errorMsg.classList.add('hidden');
+            DOM.loadingArea.classList.remove('hidden');
+            DOM.loadingArea.classList.add('flex');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            try {
+                DOM.loadingText.innerHTML = "피부톤과 윤곽을 스캔하고 있습니다.<br>AI 뷰티 전문가가 분석 중입니다...";
+                state.baseAnalysisCache = await analyzeBaseInfo();
+                renderBaseResults(state.baseAnalysisCache);
+                
+                DOM.loadingArea.classList.add('hidden');
+                DOM.loadingArea.classList.remove('flex');
+                DOM.resultArea.classList.remove('hidden');
+                
+                renderSubTabs('데일리');
+
+            } catch (error) {
+                DOM.loadingArea.classList.add('hidden');
+                DOM.loadingArea.classList.remove('flex');
+                DOM.inputSection.classList.remove('hidden');
+                DOM.errorText.textContent = error.message;
+                DOM.errorMsg.classList.remove('hidden');
+            }
+        });
+
+        async function analyzeBaseInfo() {
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${state.apiKey}`;
+            const isFemale = DOM.gender.value === '여성';
+            const makeupRecMall = isFemale ? 'oliveyoung' : 'oliveyoung';
+            const fashionRecMall = isFemale ? 'zigzag' : 'musinsa';
+
+            const prompt = `
+당신은 최고의 퍼스널 컬러 및 뷰티 마스터입니다.
+[사용자] 성별: ${DOM.gender.value}, 연령: ${DOM.age.value}, 키: ${DOM.height.value}cm, 몸무게: ${DOM.weight.value}kg, 체형: ${DOM.bodyType.value}
+
+* 필수 지시사항 (반드시 지킬 것):
+1. 퍼스널 컬러의 밝은 톤(bestLight) 3개, 어두운 톤(bestDark) 3개를 정확한 HEX 코드로 응답.
+2. 피부 진단: 이미지 속 얼굴의 피부 결/상태를 분석하여 피부 타입 진단.
+3. 뷰티 아이템 추천: 올리브영/네이버 기준 상위 랭킹의 '실제 존재하는 특정 제품명'을 적어주세요. 
+   - 남성은 파운데이션/비비 호수를 25호~27호 등으로 어색하지 않게 명시. 카테고리를 스킨/토너, 로션/올인원, 베이스(파데/쿠션) 등으로 세분화.
+
+반드시 아래 JSON 형식으로 응답:
+{
+  "color": {
+    "season": "예: 겨울 쿨톤 딥",
+    "description": "피부톤과 이미지 특징 요약 (2-3문장)",
+    "bestLight": ["#HEX", "#HEX", "#HEX"],
+    "bestDark": ["#HEX", "#HEX", "#HEX"]
+  },
+  "skin": {
+    "type": "예상 피부타입 (예: 수부지 복합성)",
+    "makeupTip": "피부 타입에 맞는 구체적 스킨케어/메이크업 팁 (톤과 성별 고려)"
+  },
+  "body": {
+    "size": "추천 상의/하의 사이즈 (예: 상의 M(100), 하의 30)",
+    "fitTip": "입력된 체형을 보완하는 세련된 핏 추천"
+  },
+  "beautyShopping": [
+    { "category": "스킨/토너", "mall": "${makeupRecMall}", "itemName": "실제 인기 제품명", "keyword": "쇼핑몰 검색용 정확한 키워드" },
+    { "category": "로션/올인원", "mall": "${makeupRecMall}", "itemName": "실제 인기 제품명", "keyword": "쇼핑몰 검색용 정확한 키워드" },
+    { "category": "쿠션/파데", "mall": "naver", "itemName": "톤/성별 맞춤 제품 (예: 남자 25호)", "keyword": "쇼핑몰 검색용 정확한 키워드" }
+  ]
+}`;
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: prompt }, { inlineData: { mimeType: state.mimeType, data: state.base64Image } }] }],
+                generationConfig: { responseMimeType: "application/json" }
+            };
+            const res = await fetchWithRetry(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            return parseCleanJSON(await res.json());
+        }
+
+        DOM.mainTabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                DOM.mainTabs.forEach(t => {
+                    t.classList.remove('bg-gray-900', 'text-white', 'shadow-md');
+                    t.classList.add('bg-gray-100', 'text-gray-600');
+                });
+                e.target.classList.remove('bg-gray-100', 'text-gray-600');
+                e.target.classList.add('bg-gray-900', 'text-white', 'shadow-md');
+
+                state.currentMainTPO = e.target.dataset.tpo;
+                renderSubTabs(state.currentMainTPO);
+            });
+        });
+
+        function renderSubTabs(mainTPO) {
+            DOM.subTabsArea.innerHTML = '';
+            DOM.weatherInfoBox.classList.add('hidden');
+            
+            if (mainTPO === '여행' || mainTPO === '데일리') {
+                DOM.locationInputArea.classList.remove('hidden');
+                DOM.locationInput.placeholder = mainTPO === '여행' ? "여행 도시 입력 (예: 삿포로, 다낭)" : "현재 지역 입력 (예: 서울 강남구)";
+                state.currentSubTPO = mainTPO === '여행' ? "여행 패션" : "데일리 룩";
+                
+                if (mainTPO === '데일리') {
+                    createSubTabButtons(TPO_DATA[mainTPO]);
+                } else {
+                    DOM.tpoContentArea.style.opacity = '0.5';
+                }
+            } else {
+                DOM.locationInputArea.classList.add('hidden');
+                DOM.tpoContentArea.style.opacity = '1';
+                createSubTabButtons(TPO_DATA[mainTPO]);
+                state.currentSubTPO = TPO_DATA[mainTPO][0];
+                triggerTPOAnalysis();
+            }
+        }
+
+        function createSubTabButtons(tabs) {
+            tabs.forEach((sub, index) => {
+                const btn = document.createElement('button');
+                btn.className = `sub-tab px-4 py-2 rounded-xl text-[13px] font-bold transition-all ${index === 0 ? 'bg-blue-100 text-blue-700 shadow-sm' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}`;
+                btn.textContent = sub;
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.sub-tab').forEach(b => {
+                        b.className = 'sub-tab px-4 py-2 rounded-xl text-[13px] font-bold bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 transition-all';
+                    });
+                    e.target.className = 'sub-tab px-4 py-2 rounded-xl text-[13px] font-bold bg-blue-100 text-blue-700 shadow-sm transition-all';
+                    state.currentSubTPO = sub;
+                    triggerTPOAnalysis();
+                });
+                DOM.subTabsArea.appendChild(btn);
+            });
+        }
+
+        DOM.applyLocationBtn.addEventListener('click', () => {
+            if (!DOM.locationInput.value.trim()) { showToast("지역/도시 이름을 입력해주세요."); return; }
+            state.location = DOM.locationInput.value.trim();
+            DOM.tpoContentArea.style.opacity = '1';
+            triggerTPOAnalysis();
+        });
+
+        async function triggerTPOAnalysis() {
+            DOM.tpoLoader.classList.remove('hidden');
+            DOM.tpoLoader.classList.add('flex');
+            DOM.weatherInfoBox.classList.add('hidden');
+            
+            try {
+                const fashionResult = await analyzeTPOStyle();
+                renderTPOResults(fashionResult);
+                generateAILookbook(fashionResult.lookbookPrompt);
+            } catch (err) {
+                showToast("코디 정보를 생성하지 못했습니다. 잠시 후 다시 시도해주세요.");
+                DOM.tpoLoader.classList.add('hidden');
+                DOM.tpoLoader.classList.remove('flex');
+            }
+        }
+
+        async function analyzeTPOStyle() {
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${state.apiKey}`;
+            const isTravel = state.currentMainTPO === '여행';
+            let tpoContext = `분류: ${state.currentMainTPO}, 세부상황: ${state.currentSubTPO}`;
+            let tools = [];
+            let extraInstruction = "";
+
+            if (state.location && (isTravel || state.currentMainTPO === '데일리')) {
+                tpoContext += `, 위치: ${state.location}`;
+                tools = [{ "google_search": {} }];
+                extraInstruction = `
+*중요: 구글 검색을 통해 '${state.location}'의 현재 실시간 날씨, 기온을 파악하세요.
+${isTravel ? "여행지의 경우 '낮과 밤의 일교차'가 크다면 이를 고려하여 낮 코디와 밤 코디를 반드시 다르게 추천하세요." : "현재 날씨에 맞는 옷 두께와 스타일을 추천하세요."}`;
+            }
+
+            const prompt = `
+[사용자] 성별: ${DOM.gender.value}, 퍼스널컬러: ${state.baseAnalysisCache?.color.season}
+[상황정보] ${tpoContext}
+${extraInstruction}
+
+지시사항:
+1. 해당 상황(TPO)과 날씨에 완벽히 맞는 코디를 제안하세요. 컬러는 사용자의 베스트 컬러를 활용하세요.
+2. 쇼핑 아이템 추천 시 수익화 제휴 링크 연동을 위해 쇼핑몰 키를 잘 지정하세요. (남성: musinsa, 여성: ably 또는 zigzag, 남녀공통 최저가: naver 또는 coupang).
+3. 룩북 프롬프트는 영문으로, 패션 에디토리얼 화보 스타일로 작성.
+
+반드시 아래 JSON 형식으로 응답:
+{
+  "weatherSummary": "검색된 날씨가 있다면 '서울 (맑음, 15도)' 형태로 요약, 없다면 빈 문자열",
+  "styleTip": "일반적인 코디 제안 (여행 탭이 아닐 경우 사용)",
+  "styleTipDay": "낮을 위한 코디 제안 (여행 탭일 경우에만 작성, 아니면 빈 문자열)",
+  "styleTipNight": "밤을 위한 코디 제안 (아우터 등) (여행 탭일 경우에만 작성, 아니면 빈 문자열)",
+  "lookbookPrompt": "A highly detailed, fashion editorial full body portrait photograph of a Korean ${DOM.gender.value === '여성' ? 'woman' : 'man'} wearing [CLOTHES AND COLORS], aesthetic, studio lighting, hyperrealistic --ar 3:4",
+  "fashionShopping": [
+    { "category": "상의/아우터", "mall": "${DOM.gender.value === '여성' ? 'ably' : 'musinsa'}", "itemName": "아이템명", "keyword": "검색 키워드" },
+    { "category": "하의", "mall": "naver", "itemName": "아이템명", "keyword": "검색 키워드" },
+    { "category": "신발/가방", "mall": "coupang", "itemName": "아이템명", "keyword": "검색 키워드" }
+  ]
+}`;
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: prompt }] }],
+                generationConfig: { responseMimeType: "application/json" }
+            };
+            if (tools.length > 0) payload.tools = tools;
+
+            const res = await fetchWithRetry(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            return parseCleanJSON(await res.json());
+        }
+
+        async function generateAILookbook(promptText) {
+            DOM.lookbookImage.classList.add('hidden');
+            DOM.lookbookLoader.classList.remove('hidden');
+
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${state.apiKey}`;
+            const payload = {
+                contents: [{
+                    role: "user",
+                    parts: [
+                        { text: `Create a professional fashion lookbook image. Keep general facial features from the uploaded image but change the outfit to match this style exactly: ${promptText}.` },
+                        { inlineData: { mimeType: state.mimeType, data: state.base64Image } }
+                    ]
+                }],
+                generationConfig: { responseModalities: ['IMAGE'], imageConfig: { aspectRatio: "3:4" } }
+            };
+
+            try {
+                const res = await fetchWithRetry(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const result = await res.json();
+                const part = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+                if (part) {
+                    DOM.lookbookImage.src = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                    DOM.lookbookImage.classList.remove('hidden');
+                }
+            } catch (e) {
+                DOM.lookbookLoader.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-2xl mb-2 text-red-300"></i><span class="text-xs text-red-400 font-bold">이미지 로드 실패</span>`;
+            } finally {
+                DOM.lookbookLoader.classList.add('hidden');
+                DOM.tpoLoader.classList.add('hidden');
+                DOM.tpoLoader.classList.remove('flex');
+            }
+        }
+
+        function renderBaseResults(data) {
+            document.getElementById('res-season').textContent = data.color.season;
+            document.getElementById('res-color-desc').textContent = data.color.description;
+            
+            const renderColors = (colors, id) => {
+                const container = document.getElementById(id);
+                container.innerHTML = '';
+                (colors || []).forEach(hex => {
+                    const el = document.createElement('div');
+                    el.className = 'color-swatch';
+                    el.style.backgroundColor = hex;
+                    container.appendChild(el);
+                });
+            };
+            renderColors(data.color.bestLight, 'res-best-light');
+            renderColors(data.color.bestDark, 'res-best-dark');
+
+            document.getElementById('res-skin-type').textContent = data.skin.type;
+            document.getElementById('res-makeup-tip').textContent = data.skin.makeupTip;
+            document.getElementById('res-size-recommend').textContent = data.body.size;
+            document.getElementById('res-fit-tip').textContent = data.body.fitTip;
+
+            renderShoppingList(data.beautyShopping, 'beauty-shopping-list');
+        }
+
+        function renderTPOResults(data) {
+            document.getElementById('res-tpo-title').innerHTML = `스타일링 포인트`;
+            
+            if (data.weatherSummary) {
+                DOM.weatherSummary.textContent = data.weatherSummary;
+                DOM.weatherInfoBox.classList.remove('hidden');
+            }
+
+            if (state.currentMainTPO === '여행' && data.styleTipDay && data.styleTipNight) {
+                DOM.standardTipArea.classList.add('hidden');
+                DOM.travelTipArea.classList.remove('hidden');
+                document.getElementById('res-style-tip-day').textContent = data.styleTipDay;
+                document.getElementById('res-style-tip-night').textContent = data.styleTipNight;
+            } else {
+                DOM.standardTipArea.classList.remove('hidden');
+                DOM.travelTipArea.classList.add('hidden');
+                document.getElementById('res-style-tip').textContent = data.styleTip;
+            }
+
+            renderShoppingList(data.fashionShopping, 'fashion-shopping-list');
+        }
+
+        function renderShoppingList(items, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            items.forEach(item => {
+                const mallId = item.mall.toLowerCase();
+                const mallInfo = AFFILIATE_MALLS[mallId] || AFFILIATE_MALLS['naver'];
+                const finalLink = buildAffiliateLink(mallId, item.keyword);
+
+                const card = document.createElement('a');
+                card.href = finalLink;
+                card.target = '_blank';
+                card.rel = 'noopener noreferrer';
+                card.className = 'flex items-center justify-between bg-[#f8f9fa] p-3.5 rounded-[16px] hover:bg-white transition-all shadow-sm border border-transparent hover:border-blue-200 group cursor-pointer';
+                
+                card.innerHTML = `
+                    <div class="flex-1 min-w-0 pr-3">
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <span class="text-[10px] text-gray-500 font-bold whitespace-nowrap bg-gray-100 px-1.5 py-0.5 rounded">${item.category}</span>
+                            <span class="${mallInfo.color} text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider flex items-center gap-1">
+                                <i class="fa-solid ${mallInfo.icon}"></i>${mallInfo.name}
+                            </span>
+                        </div>
+                        <p class="font-bold text-gray-900 text-[14px] truncate mb-0.5">${item.itemName}</p>
+                        <p class="text-[11px] text-blue-500 truncate group-hover:underline"><i class="fa-solid fa-search mr-1"></i>"${item.keyword}" 살펴보기</p>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400 group-hover:text-blue-500 group-hover:scale-110 transition-all flex-shrink-0">
+                        <i class="fa-solid fa-arrow-right -rotate-45 text-sm"></i>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>

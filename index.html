@@ -313,7 +313,7 @@
                 </div>
             </div>
 
-            <!-- 2. [얼굴 완전 제거] 상의·하의·신발·악세사리 착장 중심 시그니처 룩북 (1컷 고정) -->
+            <!-- 2. [얼굴 완전 제거] 상의·하의·신발 착장 중심 시그니처 룩북 (1컷 고정) -->
             <div class="apple-card p-6 md:p-8 fade-in">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="font-bold text-xl tracking-tight flex items-center text-gray-900">
@@ -417,70 +417,21 @@
         const ADMIN_API_KEY = "AQ.Ab8RN6LR9bVvqNLLLulzF54CiyXwPZkGl04ukue2gZrbmjFUPQ";
         const COUPANG_TRACKING_CODE = "AF4531799";
 
-        // 카테고리별 실물 패션 제품 썸네일 고화질 이미지 풀 (즉시 로딩 & 무결점 표시)
-        const FASHION_THUMBNAILS = {
-            '상의': {
-                'light': [
-                    'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=150&q=80',
-                    'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=150&q=80',
-                    'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=150&q=80'
-                ],
-                'dark': [
-                    'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=150&q=80',
-                    'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=150&q=80',
-                    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=150&q=80'
-                ]
-            },
-            '하의': {
-                'light': [
-                    'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=150&q=80',
-                    'https://images.unsplash.com/photo-1584370848010-d7fe6bc767ec?auto=format&fit=crop&w=150&q=80'
-                ],
-                'dark': [
-                    'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=150&q=80',
-                    'https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=150&q=80'
-                ]
-            },
-            '신발': {
-                'light': [
-                    'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=150&q=80',
-                    'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=150&q=80'
-                ],
-                'dark': [
-                    'https://images.unsplash.com/photo-1614252369475-531eba835eb1?auto=format&fit=crop&w=150&q=80',
-                    'https://images.unsplash.com/photo-1533867617858-e7b97e060509?auto=format&fit=crop&w=150&q=80'
-                ]
-            },
-            '악세사리': {
-                'light': [
-                    'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=150&q=80',
-                    'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=150&q=80'
-                ],
-                'dark': [
-                    'https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=150&q=80',
-                    'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=150&q=80'
-                ]
-            },
-            '뷰티': [
-                'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=150&q=80',
-                'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=150&q=80',
-                'https://images.unsplash.com/photo-1608248597359-53600f95213d?auto=format&fit=crop&w=150&q=80'
-            ]
+        // 카테고리별 세련된 패션 비주얼 아이콘 및 컬러 테마 맵
+        const CATEGORY_THEMES = {
+            '상의': { icon: 'fa-shirt', lightBg: 'bg-blue-50 text-blue-600', darkBg: 'bg-indigo-950/60 text-blue-400' },
+            '하의': { icon: 'fa-socks', lightBg: 'bg-emerald-50 text-emerald-600', darkBg: 'bg-emerald-950/60 text-emerald-400' },
+            '신발': { icon: 'fa-shoe-prints', lightBg: 'bg-orange-50 text-orange-600', darkBg: 'bg-orange-950/60 text-orange-400' },
+            '악세사리': { icon: 'fa-gem', lightBg: 'bg-purple-50 text-purple-600', darkBg: 'bg-purple-950/60 text-purple-400' },
+            '기타': { icon: 'fa-bag-shopping', lightBg: 'bg-gray-100 text-gray-600', darkBg: 'bg-gray-800 text-gray-300' }
         };
 
-        function getThumbnailUrl(category, toneType = 'light', index = 0) {
-            let catKey = '상의';
-            if (category.includes('하의') || category.includes('바지') || category.includes('스커트')) catKey = '하의';
-            else if (category.includes('신발') || category.includes('스니커즈') || category.includes('로퍼') || category.includes('구두')) catKey = '신발';
-            else if (category.includes('악세사리') || category.includes('잡화') || category.includes('가방') || category.includes('모자')) catKey = '악세사리';
-            else if (category.includes('토너') || category.includes('크림') || category.includes('뷰티') || category.includes('스킨')) {
-                const bList = FASHION_THUMBNAILS['뷰티'];
-                return bList[index % bList.length];
-            }
-
-            const tone = toneType === 'dark' ? 'dark' : 'light';
-            const list = FASHION_THUMBNAILS[catKey][tone];
-            return list[index % list.length];
+        function getCategoryTheme(categoryName) {
+            if (categoryName.includes('상의') || categoryName.includes('셔츠') || categoryName.includes('아우터') || categoryName.includes('니트')) return CATEGORY_THEMES['상의'];
+            if (categoryName.includes('하의') || categoryName.includes('바지') || categoryName.includes('슬랙스') || categoryName.includes('팬츠')) return CATEGORY_THEMES['하의'];
+            if (categoryName.includes('신발') || categoryName.includes('스니커즈') || categoryName.includes('로퍼') || categoryName.includes('구두')) return CATEGORY_THEMES['신발'];
+            if (categoryName.includes('악세사리') || categoryName.includes('잡화') || categoryName.includes('가방') || categoryName.includes('모자')) return CATEGORY_THEMES['악세사리'];
+            return CATEGORY_THEMES['기타'];
         }
 
         const AFFILIATE_MALLS = {
@@ -840,8 +791,8 @@ ${extraInstruction}
 
 지시사항:
 1. 사용자의 퍼스널 컬러 기반으로 취향에 맞게 두 가지 세트를 완전히 분리해서 제안하세요:
-   - 세트 1: [✨ 밝은 톤 선호 코디 (Light Tone Set)] - 사용자의 베스트 라이트 컬러를 적극 활용한 화사하고 경쾌한 조화.
-   - 세트 2: [🕶️ 어두운 톤 선호 코디 (Dark Tone Set)] - 사용자의 베스트 다크 컬러를 적극 활용한 차분하고 시크한 조화.
+   - 세트 1: [✨ 밝은 톤 선호 코디] - 베스트 라이트 컬러를 적극 활용한 화사한 조화.
+   - 세트 2: [🕶️ 어두운 톤 선호 코디] - 베스트 다크 컬러를 적극 활용한 차분하고 시크한 조화.
 2. 각 세트마다 반드시 [상의, 하의, 신발, 악세사리/잡화] 4종을 한 벌의 풀착장 패키지로 제안하세요.
 3. 쇼핑 아이템은 쿠팡에서 최저가 검색이 잘 되는 시판 브랜드의 구체적인 제품명을 기재할 것.
 4. 쇼핑몰 키(mall)는 100% 'coupang'으로 지정할 것.
@@ -964,7 +915,7 @@ ${extraInstruction}
             document.getElementById('res-size-recommend').textContent = data.body.size;
             document.getElementById('res-fit-tip').textContent = data.body.fitTip;
 
-            renderShoppingList(data.beautyShopping, 'beauty-shopping-list', 'beauty');
+            renderShoppingList(data.beautyShopping, 'beauty-shopping-list');
         }
 
         function renderTPOResults(data) {
@@ -986,11 +937,11 @@ ${extraInstruction}
                 document.getElementById('res-style-tip').textContent = data.styleTip;
             }
 
-            // ★ [핵심 2 & 3] 밝은 톤 선호 세트 & 어두운 톤 선호 세트 + 옆 썸네일 이미지 렌더링
+            // ★ 밝은 톤 선호 세트 & 어두운 톤 선호 세트 렌더링
             renderCoordSets(data.coordSets || []);
         }
 
-        // 세트별 묶음 UI (각 아이템 옆 썸네일 사진 포함)
+        // 세트별 묶음 UI (어설픈 짝퉁 썸네일을 없애고 카테고리별 세련된 패션 비주얼 뱃지 적용)
         function renderCoordSets(sets) {
             DOM.coordSetsContainer.innerHTML = '';
 
@@ -1019,17 +970,18 @@ ${extraInstruction}
                     <div class="space-y-2.5">
                 `;
 
-                (set.items || []).forEach((item, itemIdx) => {
+                (set.items || []).forEach(item => {
                     const mallId = (item.mall || 'coupang').toLowerCase();
-                    const thumbUrl = getThumbnailUrl(item.category, set.toneType || (isLight ? 'light' : 'dark'), itemIdx);
+                    const theme = getCategoryTheme(item.category);
+                    const iconColorClass = isLight ? theme.lightBg : theme.darkBg;
 
                     setHtml += `
                         <div onclick="triggerAffiliateModal('${mallId}', '${item.itemName.replace(/'/g, "\\'")}', '${item.keyword.replace(/'/g, "\\'")}')" 
                              class="flex items-center justify-between bg-[#f8f9fa] p-3 rounded-2xl hover:bg-blue-50/40 transition-all cursor-pointer group active:scale-98 border border-gray-100 hover:border-blue-200">
                             
-                            <!-- ★ 추천 아이템 실물 썸네일 이미지 -->
-                            <div class="w-14 h-14 rounded-xl overflow-hidden bg-gray-200 flex-shrink-0 mr-3 border border-gray-200/60 shadow-xs">
-                                <img src="${thumbUrl}" alt="${item.itemName}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                            <!-- 세련된 패션 카테고리 비주얼 뱃지 -->
+                            <div class="w-12 h-12 rounded-xl ${iconColorClass} flex items-center justify-center flex-shrink-0 mr-3 shadow-xs text-lg transition-transform group-hover:scale-105">
+                                <i class="fa-solid ${theme.icon}"></i>
                             </div>
 
                             <!-- 텍스트 영역 -->
@@ -1054,22 +1006,19 @@ ${extraInstruction}
             });
         }
 
-        // 뷰티 리스트에도 제품 썸네일 일관성 있게 표시
-        function renderShoppingList(items, containerId, type = 'beauty') {
+        function renderShoppingList(items, containerId) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
 
-            items.forEach((item, idx) => {
+            items.forEach(item => {
                 const mallId = item.mall.toLowerCase();
-                const thumbUrl = getThumbnailUrl(item.category, 'light', idx);
-
                 const card = document.createElement('div');
                 card.onclick = () => triggerAffiliateModal(mallId, item.itemName, item.keyword);
                 card.className = 'flex items-center justify-between bg-[#f8f9fa] p-3 rounded-2xl hover:bg-white transition-all shadow-xs border border-transparent hover:border-blue-200 group cursor-pointer active:scale-98';
                 
                 card.innerHTML = `
-                    <div class="w-12 h-12 rounded-xl overflow-hidden bg-gray-200 flex-shrink-0 mr-3 border border-gray-200/60 shadow-xs">
-                        <img src="${thumbUrl}" alt="${item.itemName}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0 mr-3 text-base">
+                        <i class="fa-solid fa-droplet"></i>
                     </div>
                     <div class="flex-1 min-w-0 pr-3">
                         <div class="flex items-center gap-2 mb-1">

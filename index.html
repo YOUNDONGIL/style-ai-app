@@ -155,11 +155,9 @@
 
             <div class="apple-card p-6 md:p-8">
                 <h3 class="text-lg font-bold mb-4 flex items-center text-gray-800"><i class="fa-solid fa-camera mr-2 text-blue-500"></i>정면 사진 업로드</h3>
-                
-                <!-- 정상 작동 보장: 절대 위치(absolute)로 박스 전체를 덮는 투명 file input -->
                 <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-[20px] p-8 md:p-12 text-center cursor-pointer hover:bg-gray-50/80 transition-colors relative overflow-hidden bg-gray-50/30 group">
-                    <input type="file" id="image-input" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                    <img id="image-preview" class="hidden w-auto h-auto max-h-64 mx-auto rounded-2xl shadow-lg mb-4 object-cover relative z-0 pointer-events-none" alt="미리보기" />
+                    <input type="file" id="image-input" accept="image/jpeg, image/png, image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                    <img id="image-preview" class="hidden w-auto h-auto max-h-64 mx-auto rounded-2xl shadow-lg mb-4 object-cover relative z-0" alt="미리보기" />
                     <div id="upload-placeholder" class="relative z-0 group-hover:scale-105 transition-transform duration-300 pointer-events-none">
                         <div class="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mx-auto mb-4 text-blue-500 text-2xl">
                             <i class="fa-solid fa-image"></i>
@@ -305,14 +303,16 @@
                         <i class="fa-solid fa-bolt text-[10px]"></i>Flux 8K Studio
                     </span>
                 </div>
-                <p class="text-xs text-gray-500 mb-5 leading-relaxed">얼굴 이질감을 배제하고 상의·하의·신발·잡화 원단과 핏에 집중한 초고화질 스튜디오 착장 룩북입니다.</p>
+                <!-- 텍스트 설명 수정됨 -->
+                <p class="text-xs text-gray-500 mb-5 leading-relaxed">회원님의 프로필과 분위기를 반영하여, 웜톤과 쿨톤이 감각적으로 믹스매치된 트렌디한 초고화질 스튜디오 풀착장 룩북입니다.</p>
 
+                <!-- 강제로 얼굴을 컷오프 하던 CSS(scale-110 object-bottom) 제거. 전신 실사가 나오도록 복구 -->
                 <div class="w-full relative rounded-[24px] overflow-hidden bg-[#f0f0f2] aspect-[3/4] flex items-center justify-center shadow-md border border-gray-100 max-w-md mx-auto">
                     <div id="lookbook-loader" class="text-gray-400 flex flex-col items-center p-6 text-center">
                         <div class="apple-spinner mb-4"></div>
                         <span class="text-xs font-bold leading-relaxed text-gray-600">Fal.ai Flux 엔진으로 초고화질 룩북을<br>렌더링 중입니다... (약 1.5초)</span>
                     </div>
-                    <img id="lookbook-image" class="hidden w-full h-full object-cover object-bottom scale-110 origin-bottom transition-opacity duration-700 opacity-0" alt="시그니처 착장 룩북" />
+                    <img id="lookbook-image" class="hidden w-full h-full object-cover transition-opacity duration-700 opacity-0" alt="시그니처 착장 룩북" />
                 </div>
             </div>
 
@@ -393,7 +393,7 @@
 
     <script>
         // ========================================================
-        // 💡 아래 큰따옴표 안에 발급받으신 2개의 API 키를 각각 넣어주세요!
+        // 💡 아래 큰따옴표 안에 발급받으신 API 키를 각각 넣어주세요!
         // ========================================================
         const GOOGLE_API_KEY = "AQ.Ab8RN6LR9bVvqNLLLulzF54CiyXwPZkGl04ukue2gZrbmjFUPQ";
         const FAL_API_KEY = "fal_sk_fa73529c061140e8bfc52db63907ad1b:2f00e529185d16d2808cd829d094a12b";
@@ -401,7 +401,7 @@
 
         const COUPANG_TRACKING_CODE = "AF4531799";
 
-        // 카테고리별 세련된 패션 비주얼 아이콘 및 컬러 테마 맵
+        // 카테고리별 세련된 패션 비주얼 아이콘 및 컬러 테마 맵 (가짜 썸네일 대신 아이콘 사용)
         const CATEGORY_THEMES = {
             '상의': { icon: 'fa-shirt', lightBg: 'bg-blue-50 text-blue-600', darkBg: 'bg-indigo-950/60 text-blue-400' },
             '하의': { icon: 'fa-socks', lightBg: 'bg-emerald-50 text-emerald-600', darkBg: 'bg-emerald-950/60 text-emerald-400' },
@@ -410,67 +410,12 @@
             '기타': { icon: 'fa-bag-shopping', lightBg: 'bg-gray-100 text-gray-600', darkBg: 'bg-gray-800 text-gray-300' }
         };
 
-        const FASHION_THUMBNAILS = {
-            '상의': {
-                'light': [
-                    'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=150&q=80',
-                    'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=150&q=80'
-                ],
-                'dark': [
-                    'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=150&q=80',
-                    'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=150&q=80'
-                ]
-            },
-            '하의': {
-                'light': [
-                    'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=150&q=80'
-                ],
-                'dark': [
-                    'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=150&q=80'
-                ]
-            },
-            '신발': {
-                'light': [
-                    'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=150&q=80'
-                ],
-                'dark': [
-                    'https://images.unsplash.com/photo-1614252369475-531eba835eb1?auto=format&fit=crop&w=150&q=80'
-                ]
-            },
-            '악세사리': {
-                'light': [
-                    'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=150&q=80'
-                ],
-                'dark': [
-                    'https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=150&q=80'
-                ]
-            },
-            '뷰티': [
-                'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=150&q=80'
-            ]
-        };
-
         function getCategoryTheme(categoryName) {
             if (categoryName.includes('상의') || categoryName.includes('셔츠') || categoryName.includes('아우터') || categoryName.includes('니트')) return CATEGORY_THEMES['상의'];
             if (categoryName.includes('하의') || categoryName.includes('바지') || categoryName.includes('슬랙스') || categoryName.includes('팬츠')) return CATEGORY_THEMES['하의'];
             if (categoryName.includes('신발') || categoryName.includes('스니커즈') || categoryName.includes('로퍼') || categoryName.includes('구두')) return CATEGORY_THEMES['신발'];
             if (categoryName.includes('악세사리') || categoryName.includes('잡화') || categoryName.includes('가방') || categoryName.includes('모자')) return CATEGORY_THEMES['악세사리'];
             return CATEGORY_THEMES['기타'];
-        }
-
-        function getThumbnailUrl(category, toneType = 'light', index = 0) {
-            let catKey = '상의';
-            if (category.includes('하의') || category.includes('바지') || category.includes('스커트') || category.includes('슬랙스')) catKey = '하의';
-            else if (category.includes('신발') || category.includes('스니커즈') || category.includes('로퍼') || category.includes('구두')) catKey = '신발';
-            else if (category.includes('악세사리') || category.includes('잡화') || category.includes('가방') || category.includes('모자')) catKey = '악세사리';
-            else if (category.includes('토너') || category.includes('크림') || category.includes('뷰티') || category.includes('스킨')) {
-                const bList = FASHION_THUMBNAILS['뷰티'];
-                return bList[index % bList.length];
-            }
-
-            const tone = toneType === 'dark' ? 'dark' : 'light';
-            const list = FASHION_THUMBNAILS[catKey][tone];
-            return list[index % list.length];
         }
 
         const AFFILIATE_MALLS = {
@@ -581,15 +526,10 @@
             '면접': ['대기업/공기업 정석 면접', '트렌디 직무 면접', '1:1 중요 비즈니스 미팅']
         };
 
-        // 회원님께서 확인하셨던 가장 안정적인 원본 사진 등록 리스너로 100% 복구 완료
-        DOM.imageInput.addEventListener('click', (e) => {
-            e.target.value = ''; // 동일한 사진을 지웠다 다시 올려도 반응하도록 초기화
-        });
-
         DOM.imageInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
-            if (file.size > 20 * 1024 * 1024) { showToast("20MB 이하의 사진을 선택해주세요."); return; }
+            if (file.size > 15 * 1024 * 1024) { showToast("15MB 이하의 사진을 선택해주세요."); return; }
             const reader = new FileReader();
             reader.onload = (event) => {
                 state.base64Image = event.target.result.split(',')[1];
@@ -679,8 +619,7 @@
         });
 
         async function analyzeBaseInfo() {
-            // ★ 회원님께서 원래 사용하시던 gemini-3.8-flash 버전으로 완벽하게 원상복구 했습니다.
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${GOOGLE_API_KEY}`;
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GOOGLE_API_KEY}`;
             const prompt = `
 당신은 최고의 퍼스널 컬러 및 패션/뷰티 마스터입니다.
 [사용자 프로필] 성별: ${DOM.gender.value}, 연령: ${DOM.age.value}, 키: ${DOM.height.value}cm, 몸무게: ${DOM.weight.value}kg, 체형: ${DOM.bodyType.value}
@@ -690,6 +629,7 @@
 2. 퍼스널 컬러의 밝은 톤(bestLight) 3개, 어두운 톤(bestDark) 3개를 정확한 HEX 코드로 응답.
 3. 뷰티 추천: 실제 시판 중인 구체적 브랜드 제품명을 적을 것.
 4. 쇼핑몰 키(mall)는 100% 'coupang'으로 지정할 것.
+5. facialFeatures: 사진 속 실제 인물의 얼굴 특징(헤어스타일, 눈매, 얼굴형 등)과 분위기를 매우 현실적인 실사 인물 생성을 위해 영어로 묘사하세요. (예: "A realistic Korean ${DOM.age.value} ${DOM.gender.value}, natural black hair, elegant facial features").
 
 반드시 아래 JSON 형식으로만 응답:
 {
@@ -699,6 +639,7 @@
     "bestLight": ["#HEX", "#HEX", "#HEX"],
     "bestDark": ["#HEX", "#HEX", "#HEX"]
   },
+  "facialFeatures": "영문 실사 인상 묘사",
   "skin": {
     "type": "예상 피부타입",
     "makeupTip": "피부 타입에 맞는 스킨케어/메이크업 꿀팁"
@@ -803,8 +744,7 @@
         }
 
         async function analyzeTPOStyle() {
-            // ★ 회원님께서 원래 사용하시던 gemini-3.8-flash 버전으로 완벽하게 원상복구 했습니다.
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${GOOGLE_API_KEY}`;
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GOOGLE_API_KEY}`;
             const isTravel = state.currentMainTPO === '여행';
             let tpoContext = `분류: ${state.currentMainTPO}, 세부상황: ${state.currentSubTPO}`;
             let extraInstruction = "";
@@ -866,7 +806,7 @@ ${extraInstruction}
             return parseCleanJSON(await res.json());
         }
 
-        // ★ [Fal.ai 유료 연동] 얼굴 배제 + 초고화질 전신 룩북 생성
+        // ★ [Fal.ai 유료 연동] 사용자 분석 얼굴을 반영한 현실적이고 세련된 전신 화보
         async function generateSignatureFullbodyLookbookWithFal() {
             if (state.isHeroImageGenerated) return;
             state.isHeroImageGenerated = true;
@@ -878,7 +818,10 @@ ${extraInstruction}
             const gender = DOM.gender.value || "남성";
             const season = state.baseAnalysisCache?.color?.season || "personal color tone";
             
-            const promptText = `High-end commercial catalog fashion photography, complete full-body outfit on invisible ghost mannequin, strictly cropped below the neck, no human head, no face, outfit perfectly coordinated for ${season}, stylish layered jacket, tailored trousers, luxury shoes, elegant studio lighting, ultra-realistic fabric wrinkles and cloth textures, photorealistic 8k`;
+            // ★ AI가 분석한 회원님의 얼굴 특징을 프롬프트에 주입 (목이 잘린 마네킹 명령어 제거)
+            const facialFeatures = state.baseAnalysisCache?.facialFeatures || `attractive realistic Korean ${gender}`;
+            
+            const promptText = `High-end commercial catalog fashion photography, full-body shot of an ${facialFeatures}, wearing a highly stylish outfit perfectly coordinated for ${season} season. Harmonious mix of warm and cool tones, stylish layered jacket, tailored trousers, luxury shoes, elegant studio lighting, ultra-realistic human face, natural skin texture, highly detailed photorealistic 8k.`;
 
             try {
                 const response = await fetch("https://fal.run/fal-ai/flux/schnell", {
@@ -998,14 +941,16 @@ ${extraInstruction}
 
                 (set.items || []).forEach((item, itemIdx) => {
                     const mallId = (item.mall || 'coupang').toLowerCase();
-                    const thumbUrl = getThumbnailUrl(item.category, set.toneType || (isLight ? 'light' : 'dark'), itemIdx);
+                    const theme = getCategoryTheme(item.category);
+                    const iconColorClass = isLight ? theme.lightBg : theme.darkBg;
 
+                    // 가짜 사진 삭제 및 깔끔한 카테고리 테마 아이콘 적용
                     setHtml += `
                         <div onclick="triggerAffiliateModal('${mallId}', '${item.itemName.replace(/'/g, "\\'")}', '${item.keyword.replace(/'/g, "\\'")}')" 
                              class="flex items-center justify-between bg-[#f8f9fa] p-3 rounded-2xl hover:bg-blue-50/40 transition-all cursor-pointer group active:scale-98 border border-gray-100 hover:border-blue-200">
                             
-                            <div class="w-14 h-14 rounded-xl overflow-hidden bg-gray-200 flex-shrink-0 mr-3 border border-gray-200/60 shadow-xs">
-                                <img src="${thumbUrl}" alt="${item.itemName}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                            <div class="w-12 h-12 rounded-xl ${iconColorClass} flex items-center justify-center flex-shrink-0 mr-3 shadow-xs text-lg transition-transform group-hover:scale-105">
+                                <i class="fa-solid ${theme.icon}"></i>
                             </div>
 
                             <div class="flex-1 min-w-0 pr-2">
@@ -1035,15 +980,15 @@ ${extraInstruction}
 
             items.forEach((item, idx) => {
                 const mallId = item.mall.toLowerCase();
-                const thumbUrl = getThumbnailUrl(item.category, 'light', idx);
+                const iconClass = 'bg-blue-50 text-blue-600';
 
                 const card = document.createElement('div');
                 card.onclick = () => triggerAffiliateModal(mallId, item.itemName, item.keyword);
                 card.className = 'flex items-center justify-between bg-[#f8f9fa] p-3 rounded-2xl hover:bg-white transition-all shadow-xs border border-transparent hover:border-blue-200 group cursor-pointer active:scale-98';
                 
                 card.innerHTML = `
-                    <div class="w-12 h-12 rounded-xl overflow-hidden bg-gray-200 flex-shrink-0 mr-3 border border-gray-200/60 shadow-xs">
-                        <img src="${thumbUrl}" alt="${item.itemName}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                    <div class="w-10 h-10 rounded-xl ${iconClass} flex items-center justify-center flex-shrink-0 mr-3 text-base">
+                        <i class="fa-solid fa-droplet"></i>
                     </div>
                     <div class="flex-1 min-w-0 pr-3">
                         <div class="flex items-center gap-2 mb-1">

@@ -108,6 +108,7 @@
 </head>
 <body class="min-h-screen pb-24 selection:bg-blue-200">
 
+    <!-- 상단 헤더 (불필요한 비밀 API 뱃지 완전 삭제) -->
     <header class="sticky top-0 z-50 bg-[#f5f5f7]/80 backdrop-blur-xl border-b border-gray-200/50 supports-[backdrop-filter]:bg-[#f5f5f7]/60">
         <div class="max-w-2xl mx-auto px-6 py-4 flex items-center justify-between relative pt-safe">
             <h1 class="text-xl font-bold tracking-tight text-gray-900 flex items-center">
@@ -156,15 +157,16 @@
 
             <div class="apple-card p-6 md:p-8">
                 <h3 class="text-lg font-bold mb-4 flex items-center text-gray-800"><i class="fa-solid fa-camera mr-2 text-blue-500"></i>정면 사진 업로드</h3>
-                <!-- 클릭 및 드래그앤드롭 완벽 지원 영역 -->
+                
+                <!-- ★ [정상 복구] 네이티브 input이 박스 전체를 덮어 클릭 시 100% 파일창이 열리는 구조 -->
                 <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-[20px] p-8 md:p-12 text-center cursor-pointer hover:bg-gray-50/80 transition-colors relative overflow-hidden bg-gray-50/30 group">
-                    <input type="file" id="image-input" accept="image/*" class="hidden" />
-                    <img id="image-preview" class="hidden w-auto h-auto max-h-64 mx-auto rounded-2xl shadow-lg mb-4 object-cover" alt="미리보기" />
-                    <div id="upload-placeholder" class="group-hover:scale-105 transition-transform duration-300">
+                    <input type="file" id="image-input" accept="image/jpeg, image/png, image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                    <img id="image-preview" class="hidden w-auto h-auto max-h-64 mx-auto rounded-2xl shadow-lg mb-4 object-cover relative z-0" alt="미리보기" />
+                    <div id="upload-placeholder" class="relative z-0 group-hover:scale-105 transition-transform duration-300">
                         <div class="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mx-auto mb-4 text-blue-500 text-2xl">
                             <i class="fa-solid fa-image"></i>
                         </div>
-                        <p class="font-bold text-gray-800 text-lg">터치하여 사진 선택 또는 드래그</p>
+                        <p class="font-bold text-gray-800 text-lg">터치하여 앨범에서 선택</p>
                         <p class="text-sm text-gray-400 mt-2">자연광에서 마스크 없이 찍은 얼굴 정면 권장</p>
                     </div>
                 </div>
@@ -457,7 +459,6 @@ d4d4cead";
             imageInput: document.getElementById('image-input'),
             imagePreview: document.getElementById('image-preview'),
             uploadPlaceholder: document.getElementById('upload-placeholder'),
-            uploadArea: document.getElementById('upload-area'),
             analyzeBtn: document.getElementById('analyze-btn'),
             inputSection: document.getElementById('input-section'),
             loadingArea: document.getElementById('loading-area'),
@@ -551,16 +552,13 @@ d4d4cead";
             }
         }
 
-        // ★ 사진 업로드 안정성 100% 보장 함수
-        function processFile(file) {
+        // ★ [정상 복구] 네이티브 파일 선택 change 리스너
+        DOM.imageInput.addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
             if (!file) return;
-            if (!file.type.startsWith('image/')) {
-                showToast("이미지 파일(JPG, PNG 등)만 등록 가능합니다.");
-                return;
-            }
-            if (file.size > 10 * 1024 * 1024) {
-                showToast("10MB 이하의 사진을 선택해주세요.");
-                return;
+            if (file.size > 10 * 1024 * 1024) { 
+                showToast("10MB 이하의 사진을 선택해주세요."); 
+                return; 
             }
             const reader = new FileReader();
             reader.onload = (event) => {
@@ -572,41 +570,6 @@ d4d4cead";
                 showToast("사진이 정상 등록되었습니다!");
             };
             reader.readAsDataURL(file);
-        }
-
-        // 영역 터치 시 파일 탐색기 즉시 호출
-        DOM.uploadArea.addEventListener('click', () => {
-            DOM.imageInput.click();
-        });
-
-        DOM.imageInput.addEventListener('change', (e) => {
-            if (e.target.files && e.target.files[0]) {
-                processFile(e.target.files[0]);
-            }
-        });
-
-        // PC 드래그 앤 드롭 완벽 지원
-        ['dragenter', 'dragover'].forEach(eventName => {
-            DOM.uploadArea.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                DOM.uploadArea.classList.add('border-blue-500', 'bg-blue-50/40');
-            }, false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            DOM.uploadArea.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                DOM.uploadArea.classList.remove('border-blue-500', 'bg-blue-50/40');
-            }, false);
-        });
-
-        DOM.uploadArea.addEventListener('drop', (e) => {
-            const dt = e.dataTransfer;
-            if (dt.files && dt.files[0]) {
-                processFile(dt.files[0]);
-            }
         });
 
         DOM.analyzeBtn.addEventListener('click', async () => {

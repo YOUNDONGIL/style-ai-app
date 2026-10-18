@@ -108,6 +108,7 @@
 </head>
 <body class="min-h-screen pb-24 selection:bg-blue-200">
 
+    <!-- 상단 헤더 (보안상 위험했던 비밀 뱃지 완전 삭제) -->
     <header class="sticky top-0 z-50 bg-[#f5f5f7]/80 backdrop-blur-xl border-b border-gray-200/50 supports-[backdrop-filter]:bg-[#f5f5f7]/60">
         <div class="max-w-2xl mx-auto px-6 py-4 flex items-center justify-between relative pt-safe">
             <h1 class="text-xl font-bold tracking-tight text-gray-900 flex items-center">
@@ -147,38 +148,26 @@
 
     <main class="max-w-2xl mx-auto px-5 mt-6">
         
-        <!-- 입력 섹션 -->
         <section id="input-section" class="space-y-6 fade-in">
             <div class="text-center mb-8 mt-4">
                 <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-3 leading-tight">당신만의 고유한 톤,<br>완벽한 스타일.</h2>
-                <p class="text-gray-500 font-medium text-sm md:text-base">사진 한 장으로 피부톤, 맞춤 코디 세트, 최저가 쇼핑까지.</p>
+                <p class="text-gray-500 font-medium text-sm md:text-base">사진 한 장으로 피부톤, 맞춤 코디, 최저가 쇼핑까지.</p>
             </div>
 
+            <!-- 사진 업로드 영역 (정상 작동 원본 구조) -->
             <div class="apple-card p-6 md:p-8">
                 <h3 class="text-lg font-bold mb-4 flex items-center text-gray-800"><i class="fa-solid fa-camera mr-2 text-blue-500"></i>정면 사진 업로드</h3>
-                
-                <!-- 100% 네이티브 파일 열림 + 드래그 앤 드롭 지원 라벨 영역 -->
-                <label for="image-input" id="upload-area" class="block border-2 border-dashed border-gray-300 rounded-[20px] p-6 md:p-10 text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50/20 transition-all bg-gray-50/30 overflow-hidden select-none">
-                    <input type="file" id="image-input" accept="image/*" class="sr-only" />
-                    
-                    <!-- 사진 등록 후 미리보기 영역 -->
-                    <div id="preview-container" class="hidden flex-col items-center">
-                        <img id="image-preview" class="max-h-64 rounded-2xl shadow-md object-contain mb-3 mx-auto" alt="등록된 사진" />
-                        <div class="inline-flex items-center gap-2 text-xs font-bold text-blue-600 bg-blue-50 px-3.5 py-1.5 rounded-full border border-blue-100">
-                            <i class="fa-solid fa-circle-check text-emerald-500"></i>
-                            <span>사진 등록 완료 (클릭하여 다른 사진으로 변경)</span>
+                <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-[20px] p-8 md:p-12 text-center cursor-pointer hover:bg-gray-50/80 transition-colors relative overflow-hidden bg-gray-50/30 group">
+                    <input type="file" id="image-input" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                    <img id="image-preview" class="hidden w-auto h-auto max-h-64 mx-auto rounded-2xl shadow-lg mb-4 object-cover relative z-0" alt="미리보기" />
+                    <div id="upload-placeholder" class="relative z-0 group-hover:scale-105 transition-transform duration-300">
+                        <div class="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mx-auto mb-4 text-blue-500 text-2xl">
+                            <i class="fa-solid fa-image"></i>
                         </div>
+                        <p class="font-bold text-gray-800 text-lg">터치하여 앨범에서 선택</p>
+                        <p class="text-sm text-gray-400 mt-2">자연광에서 마스크 없이 찍은 얼굴 정면 권장</p>
                     </div>
-
-                    <!-- 초기 상태 플레이스홀더 -->
-                    <div id="upload-placeholder" class="py-4">
-                        <div class="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mx-auto mb-3 text-blue-500 text-2xl">
-                            <i class="fa-solid fa-cloud-arrow-up"></i>
-                        </div>
-                        <p class="font-bold text-gray-800 text-base mb-1">터치하여 사진 선택 또는 드래그</p>
-                        <p class="text-xs text-gray-400">자연광에서 마스크 없이 찍은 얼굴 정면 권장 (Ctrl+V 붙여넣기 가능)</p>
-                    </div>
-                </label>
+                </div>
             </div>
 
             <div class="apple-card p-6 md:p-8">
@@ -231,14 +220,12 @@
             </button>
         </section>
 
-        <!-- 로딩 인디케이터 -->
         <div id="loading-area" class="hidden flex-col items-center justify-center py-32 fade-in">
             <div class="apple-spinner mb-8"></div>
             <h3 class="text-2xl font-bold text-gray-900 mb-3 tracking-tight">AI가 분석을 진행 중입니다</h3>
             <p class="text-gray-500 text-center text-sm leading-relaxed" id="loading-text">피부톤과 윤곽을 스캔하고 있습니다.<br>잠시만 기다려주세요.</p>
         </div>
 
-        <!-- 에러 메시지 -->
         <div id="error-message" class="hidden bg-red-50 text-red-600 p-6 rounded-[24px] text-center my-8 border border-red-100 flex-col items-center fade-in">
             <i class="fa-solid fa-triangle-exclamation text-3xl mb-3 text-red-500"></i>
             <h4 class="font-bold mb-2 text-lg">앗, 문제가 발생했어요</h4>
@@ -246,18 +233,13 @@
             <button onclick="location.reload()" class="mt-4 px-5 py-2 bg-white text-red-600 rounded-full text-sm font-bold shadow-sm border border-red-100 hover:bg-red-50">다시 시도하기</button>
         </div>
 
-        <!-- 분석 결과 영역 -->
         <section id="result-area" class="hidden space-y-6 pb-12">
             <div class="flex justify-end gap-2 fade-in">
-                <button onclick="shareResult()" class="px-4 py-2 bg-white rounded-full text-sm font-bold text-gray-700 shadow-sm border border-gray-200 hover:bg-gray-50 flex items-center">
-                    <i class="fa-solid fa-arrow-up-from-bracket mr-2"></i>공유하기
-                </button>
                 <button onclick="location.reload()" class="px-4 py-2 bg-white rounded-full text-sm font-bold text-gray-700 shadow-sm border border-gray-200 hover:bg-gray-50 flex items-center">
                     <i class="fa-solid fa-rotate-right mr-2"></i>다시하기
                 </button>
             </div>
 
-            <!-- 1. 퍼스널 컬러 및 체형/뷰티 분석 -->
             <div class="apple-card p-6 md:p-8 fade-in">
                 <div class="text-center mb-8">
                     <span class="inline-block px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full text-xs font-bold mb-4 tracking-wider">PERSONAL COLOR</span>
@@ -279,18 +261,6 @@
                     </div>
                 </div>
 
-                <!-- 체형 & 사이즈 추천 박스 -->
-                <div class="bg-white border border-gray-200 p-5 rounded-2xl mb-6 flex items-start gap-3 shadow-sm">
-                    <div class="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <i class="fa-solid fa-ruler-combined text-base"></i>
-                    </div>
-                    <div>
-                        <p id="res-size-recommend" class="font-bold text-gray-900 text-sm mb-1"></p>
-                        <p id="res-fit-tip" class="text-[13px] text-gray-600 leading-relaxed"></p>
-                    </div>
-                </div>
-
-                <!-- AI 스킨케어 & 뷰티 -->
                 <div class="bg-[#f8f9fa] p-6 rounded-3xl border border-gray-100">
                     <div class="flex items-center mb-4">
                         <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
@@ -308,35 +278,11 @@
                 </div>
             </div>
 
-            <!-- 2. [Fal.ai 초고화질 전신 룩북] 얼굴 컷오프 + 스튜디오 착장 화보 (1컷 고정) -->
             <div class="apple-card p-6 md:p-8 fade-in">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-bold text-xl tracking-tight flex items-center text-gray-900">
-                        <i class="fa-solid fa-wand-magic-sparkles mr-2 text-blue-500"></i>퍼스널 톤 맞춤 시그니처 착장 룩북
-                    </h3>
-                    <span class="text-xs bg-emerald-50 text-emerald-600 font-bold px-3 py-1 rounded-full border border-emerald-100 flex items-center gap-1">
-                        <i class="fa-solid fa-bolt text-[10px]"></i>Flux 8K Studio
-                    </span>
-                </div>
-                <p class="text-xs text-gray-500 mb-5 leading-relaxed">얼굴 이질감을 완전히 배제하고, 상의·하의·신발·잡화 원단과 핏에 집중한 초고화질 스튜디오 착장 룩북입니다.</p>
-
-                <div class="w-full relative rounded-[24px] overflow-hidden bg-[#f0f0f2] aspect-[3/4] flex items-center justify-center shadow-md border border-gray-100 max-w-md mx-auto">
-                    <div id="lookbook-loader" class="text-gray-400 flex flex-col items-center p-6 text-center">
-                        <div class="apple-spinner mb-4"></div>
-                        <span class="text-xs font-bold leading-relaxed text-gray-600">Fal.ai Flux 엔진으로 초고화질 시그니처 착장 룩북을<br>렌더링 중입니다... (약 1.5초)</span>
-                    </div>
-                    <!-- 목 아래 착장 중심 컷오프 프레임 -->
-                    <img id="lookbook-image" class="hidden w-full h-full object-cover object-bottom scale-110 origin-bottom transition-opacity duration-700 opacity-0" alt="시그니처 착장 룩북" />
-                </div>
-            </div>
-
-            <!-- 3. 테마별 상황별 맞춤 세트 코디 (밝은 톤 선호 vs 어두운 톤 선호 세트 분리) -->
-            <div class="apple-card p-6 md:p-8 fade-in">
-                <h3 class="font-bold text-xl mb-5 tracking-tight flex items-center text-gray-900">
-                    <i class="fa-solid fa-layer-group mr-2 text-gray-800"></i>상황별 맞춤 코디 세트
+                <h3 class="font-bold text-xl mb-5 tracking-tight flex items-center">
+                    <i class="fa-solid fa-shirt mr-2 text-gray-800"></i>상황별 맞춤 스타일링
                 </h3>
                 
-                <!-- TPO 탭 -->
                 <div class="relative mb-5">
                     <div id="main-tpo-tabs" class="flex overflow-x-auto gap-2 pb-2 hide-scroll snap-x">
                         <button class="main-tab snap-start flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-bold bg-gray-900 text-white transition-all shadow-md" data-tpo="데일리">👕 데일리/마실</button>
@@ -348,9 +294,9 @@
                         <button class="main-tab snap-start flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="모임">🎉 모임/파티/클럽</button>
                         <button class="main-tab snap-start flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" data-tpo="면접">🎯 면접/중요미팅</button>
                     </div>
+                    <div class="absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-white/80 to-transparent pointer-events-none rounded-r-lg"></div>
                 </div>
 
-                <!-- 세부 서브 탭 & 위치 입력 -->
                 <div id="sub-tpo-container" class="bg-[#f8f9fa] rounded-2xl p-5 mb-6 border border-gray-100">
                     <div id="sub-tabs-area" class="flex flex-wrap gap-2"></div>
                     
@@ -366,41 +312,64 @@
                     </div>
                 </div>
 
-                <!-- TPO 로더 및 결과 영역 -->
                 <div id="tpo-content-area" class="relative">
                     <div id="tpo-loader" class="hidden absolute inset-0 z-20 bg-white/80 backdrop-blur-md rounded-2xl flex-col items-center justify-center">
                         <div class="apple-spinner mb-4"></div>
-                        <span class="text-sm font-bold text-gray-800">톤별 맞춤 코디 세트를 불러오는 중...</span>
+                        <span class="text-sm font-bold text-gray-800" id="tpo-loader-text">Fal.ai Flux 엔진으로 룩북 렌더링 중...</span>
                     </div>
 
                     <div id="weather-info-box" class="hidden mb-5 bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-center">
                         <i class="fa-solid fa-cloud-sun text-xl text-blue-500 mr-3"></i>
                         <div>
-                            <p class="text-xs font-bold text-blue-800 tracking-wider">현지 날씨 기반 스타일링</p>
+                            <p class="text-xs font-bold text-blue-800 tracking-wider">현지 실시간 날씨 기반</p>
                             <p id="res-weather-summary" class="text-sm text-gray-700 font-medium"></p>
                         </div>
                     </div>
 
-                    <!-- 스타일링 설명 -->
-                    <div class="mb-6 bg-white border border-gray-100 p-5 rounded-2xl shadow-sm">
-                        <h4 class="text-lg font-extrabold mb-2 text-gray-900" id="res-tpo-title">코디 포인트</h4>
-                        <div id="standard-tip-area">
-                            <p id="res-style-tip" class="text-[14px] text-gray-600 leading-relaxed"></p>
-                        </div>
-                        <div id="travel-tip-area" class="hidden space-y-3 mt-3">
-                            <div class="bg-orange-50/60 p-3.5 rounded-xl border border-orange-100">
-                                <h5 class="font-bold text-orange-800 text-xs mb-1"><i class="fa-solid fa-sun mr-1"></i>낮 코디 가이드</h5>
-                                <p id="res-style-tip-day" class="text-[13px] text-gray-700 leading-relaxed"></p>
+                    <div class="flex flex-col md:flex-row items-start gap-6 md:gap-8">
+                        <div class="w-full md:w-[45%] self-start relative rounded-[24px] overflow-hidden bg-[#f0f0f2] aspect-[3/4] flex items-center justify-center shadow-md border border-gray-100">
+                            <div id="lookbook-loader" class="text-gray-400 flex flex-col items-center p-6 text-center">
+                                <div class="apple-spinner mb-4"></div>
+                                <span class="text-xs font-bold leading-relaxed text-gray-600">Fal.ai Flux 엔진으로 초고화질 룩북을<br>렌더링 중입니다... (약 1.5초)</span>
                             </div>
-                            <div class="bg-indigo-50/60 p-3.5 rounded-xl border border-indigo-100">
-                                <h5 class="font-bold text-indigo-800 text-xs mb-1"><i class="fa-solid fa-moon mr-1"></i>밤 코디 가이드</h5>
-                                <p id="res-style-tip-night" class="text-[13px] text-gray-700 leading-relaxed"></p>
+                            <!-- 목 아래 중심 컷오프 프레임 -->
+                            <img id="lookbook-image" class="hidden w-full h-full object-cover object-bottom scale-110 origin-bottom transition-opacity duration-700 opacity-0" alt="Fal.ai 룩북" />
+                        </div>
+                        
+                        <div class="w-full md:w-[55%] flex flex-col">
+                            <h4 class="text-xl font-extrabold mb-3 tracking-tight text-gray-900" id="res-tpo-title">코디 제안</h4>
+                            
+                            <div id="standard-tip-area" class="mb-5">
+                                <p id="res-style-tip" class="text-[15px] text-gray-600 leading-relaxed"></p>
+                            </div>
+                            
+                            <div id="travel-tip-area" class="hidden mb-5 space-y-4">
+                                <div class="bg-orange-50/50 p-4 rounded-xl border border-orange-100">
+                                    <h5 class="font-bold text-orange-800 text-sm mb-1"><i class="fa-solid fa-sun mr-1.5"></i>낮 코디 제안</h5>
+                                    <p id="res-style-tip-day" class="text-[14px] text-gray-700 leading-relaxed"></p>
+                                </div>
+                                <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
+                                    <h5 class="font-bold text-indigo-800 text-sm mb-1"><i class="fa-solid fa-moon mr-1.5"></i>밤 코디 제안</h5>
+                                    <p id="res-style-tip-night" class="text-[14px] text-gray-700 leading-relaxed"></p>
+                                </div>
+                            </div>
+
+                            <div class="bg-white border border-gray-200 p-4 rounded-2xl mb-6 flex items-start gap-3 shadow-sm">
+                                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <i class="fa-solid fa-ruler-combined text-gray-600 text-sm"></i>
+                                </div>
+                                <div>
+                                    <p id="res-size-recommend" class="font-bold text-gray-900 text-sm mb-1"></p>
+                                    <p id="res-fit-tip" class="text-[13px] text-gray-500 leading-relaxed"></p>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto">
+                                <p class="text-[11px] font-bold text-gray-400 tracking-wider mb-3">🔥 스타일 완성 아이템</p>
+                                <div id="fashion-shopping-list" class="space-y-2.5"></div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- 밝은 톤 vs 어두운 톤 코디 세트 렌더링 컨테이너 -->
-                    <div id="coord-sets-container" class="space-y-6"></div>
                 </div>
             </div>
         </section>
@@ -414,28 +383,11 @@
         // ★ 1. 구글 Gemini API 키를 여기에 입력하세요
         const GOOGLE_API_KEY = "AQ.Ab8RN6LR9bVvqNLLLulzF54CiyXwPZkGl04ukue2gZrbmjFUPQ";
 
-        // ★ 2. Fal.ai에서 발급받은 API 키를 여기에 입력하세요
+        // ★ 2. Fal.ai에서 발급받은 API 키를 여기에 입력하세요 (예: fal_... 또는 key_id:secret)
         const FAL_API_KEY = "fal_sk_754f115a1ffe400b90920ca3
 d4d4cead";
 
         const COUPANG_TRACKING_CODE = "AF4531799";
-
-        // 카테고리별 세련된 패션 비주얼 아이콘 및 컬러 테마 맵
-        const CATEGORY_THEMES = {
-            '상의': { icon: 'fa-shirt', lightBg: 'bg-blue-50 text-blue-600', darkBg: 'bg-indigo-950/60 text-blue-400' },
-            '하의': { icon: 'fa-socks', lightBg: 'bg-emerald-50 text-emerald-600', darkBg: 'bg-emerald-950/60 text-emerald-400' },
-            '신발': { icon: 'fa-shoe-prints', lightBg: 'bg-orange-50 text-orange-600', darkBg: 'bg-orange-950/60 text-orange-400' },
-            '악세사리': { icon: 'fa-gem', lightBg: 'bg-purple-50 text-purple-600', darkBg: 'bg-purple-950/60 text-purple-400' },
-            '기타': { icon: 'fa-bag-shopping', lightBg: 'bg-gray-100 text-gray-600', darkBg: 'bg-gray-800 text-gray-300' }
-        };
-
-        function getCategoryTheme(categoryName) {
-            if (categoryName.includes('상의') || categoryName.includes('셔츠') || categoryName.includes('아우터') || categoryName.includes('니트')) return CATEGORY_THEMES['상의'];
-            if (categoryName.includes('하의') || categoryName.includes('바지') || categoryName.includes('슬랙스') || categoryName.includes('팬츠')) return CATEGORY_THEMES['하의'];
-            if (categoryName.includes('신발') || categoryName.includes('스니커즈') || categoryName.includes('로퍼') || categoryName.includes('구두')) return CATEGORY_THEMES['신발'];
-            if (categoryName.includes('악세사리') || categoryName.includes('잡화') || categoryName.includes('가방') || categoryName.includes('모자')) return CATEGORY_THEMES['악세사리'];
-            return CATEGORY_THEMES['기타'];
-        }
 
         const AFFILIATE_MALLS = {
             'coupang': { 
@@ -446,26 +398,9 @@ d4d4cead";
 
         function showToast(message) {
             const toast = document.getElementById('toast');
-            if (!toast) return;
             toast.textContent = message;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-
-        function shareResult() {
-            if (navigator.share) {
-                navigator.share({
-                    title: 'StyleAI 퍼스널 컬러 & 맞춤 스타일링',
-                    text: `나의 퍼스널 컬러 맞춤 분석 결과`,
-                    url: window.location.href
-                }).catch(() => {});
-            } else {
-                navigator.clipboard.writeText(window.location.href).then(() => {
-                    showToast("결과 링크가 클립보드에 복사되었습니다!");
-                }).catch(() => {
-                    showToast("주소 복사에 실패했습니다.");
-                });
-            }
         }
 
         function triggerAffiliateModal(mallKey, itemName, keyword) {
@@ -484,9 +419,7 @@ d4d4cead";
         const DOM = {
             imageInput: document.getElementById('image-input'),
             imagePreview: document.getElementById('image-preview'),
-            previewContainer: document.getElementById('preview-container'),
             uploadPlaceholder: document.getElementById('upload-placeholder'),
-            uploadArea: document.getElementById('upload-area'),
             analyzeBtn: document.getElementById('analyze-btn'),
             inputSection: document.getElementById('input-section'),
             loadingArea: document.getElementById('loading-area'),
@@ -511,8 +444,7 @@ d4d4cead";
             weatherInfoBox: document.getElementById('weather-info-box'),
             weatherSummary: document.getElementById('res-weather-summary'),
             standardTipArea: document.getElementById('standard-tip-area'),
-            travelTipArea: document.getElementById('travel-tip-area'),
-            coordSetsContainer: document.getElementById('coord-sets-container')
+            travelTipArea: document.getElementById('travel-tip-area')
         };
 
         DOM.gender.addEventListener('change', (e) => {
@@ -534,8 +466,7 @@ d4d4cead";
             currentMainTPO: "데일리",
             currentSubTPO: "편안한 동네/카페",
             location: "",
-            baseAnalysisCache: null,
-            isHeroImageGenerated: false
+            baseAnalysisCache: null
         };
 
         const TPO_DATA = {
@@ -548,95 +479,6 @@ d4d4cead";
             '모임': ['동창회/연말 파티', '핫플 펍/클럽', '야외 페스티벌'],
             '면접': ['대기업/공기업 정석 면접', '트렌디 직무 면접', '1:1 중요 비즈니스 미팅']
         };
-
-        // ★ [100% 무결점 사진 처리 엔진]
-        function processImageFile(file) {
-            if (!file) return;
-
-            const isImage = file.type.startsWith('image/') || /\.(jpg|jpeg|png|webp|gif|bmp|heic|jfif)$/i.test(file.name);
-            if (!isImage) {
-                showToast("이미지 파일만 등록 가능합니다.");
-                return;
-            }
-
-            if (file.size > 20 * 1024 * 1024) { 
-                showToast("20MB 이하의 사진을 선택해주세요."); 
-                return; 
-            }
-
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const dataUrl = event.target.result;
-                const base64Data = dataUrl.split(',')[1];
-                if (!base64Data) {
-                    showToast("사진 데이터를 불러오지 못했습니다. 다시 시도해주세요.");
-                    return;
-                }
-
-                state.base64Image = base64Data;
-                state.mimeType = file.type || 'image/jpeg';
-
-                DOM.imagePreview.src = dataUrl;
-                DOM.uploadPlaceholder.classList.add('hidden');
-                DOM.previewContainer.classList.remove('hidden');
-                DOM.previewContainer.classList.add('flex');
-                showToast("사진이 정상 등록되었습니다!");
-            };
-
-            reader.onerror = () => {
-                showToast("사진을 읽어오지 못했습니다. 다시 시도해주세요.");
-            };
-
-            reader.readAsDataURL(file);
-        }
-
-        // 1. 파일창 열릴 때 값 초기화 (동일한 사진을 다시 선택해도 무조건 작동)
-        DOM.imageInput.addEventListener('click', () => {
-            DOM.imageInput.value = '';
-        });
-
-        // 2. 파일 선택 완료 시
-        DOM.imageInput.addEventListener('change', (e) => {
-            if (e.target.files && e.target.files[0]) {
-                processImageFile(e.target.files[0]);
-            }
-        });
-
-        // 3. 드래그 앤 드롭 지원
-        ['dragenter', 'dragover'].forEach(name => {
-            DOM.uploadArea.addEventListener(name, (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                DOM.uploadArea.classList.add('border-blue-500', 'bg-blue-50/40');
-            });
-        });
-
-        ['dragleave', 'drop'].forEach(name => {
-            DOM.uploadArea.addEventListener(name, (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                DOM.uploadArea.classList.remove('border-blue-500', 'bg-blue-50/40');
-            });
-        });
-
-        DOM.uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
-                processImageFile(e.dataTransfer.files[0]);
-            }
-        });
-
-        // 브라우저 밖으로 잘못 드롭되어 새 탭으로 사진이 열리는 현상 방지
-        window.addEventListener('dragover', (e) => e.preventDefault());
-        window.addEventListener('drop', (e) => e.preventDefault());
-
-        // 4. 클립보드 붙여넣기 (Ctrl + V)
-        window.addEventListener('paste', (e) => {
-            if (e.clipboardData && e.clipboardData.files && e.clipboardData.files[0]) {
-                processImageFile(e.clipboardData.files[0]);
-            }
-        });
 
         async function fetchWithRetry(url, options, maxRetries = 2) {
             for (let i = 0; i < maxRetries; i++) {
@@ -669,16 +511,34 @@ d4d4cead";
             }
         }
 
+        // 100% 정상 작동하던 원본 사진 등록 리스너
+        DOM.imageInput.addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            if (file.size > 20 * 1024 * 1024) { showToast("20MB 이하의 사진을 선택해주세요."); return; }
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                state.base64Image = event.target.result.split(',')[1];
+                state.mimeType = file.type || 'image/jpeg';
+                DOM.imagePreview.src = event.target.result;
+                DOM.imagePreview.classList.remove('hidden');
+                DOM.uploadPlaceholder.classList.add('hidden');
+                showToast("사진이 정상 등록되었습니다!");
+            };
+            reader.readAsDataURL(file);
+        });
+
         DOM.analyzeBtn.addEventListener('click', async () => {
             if (!state.googleApiKey || state.googleApiKey.includes("여기에_구글")) { 
                 showToast("코드 상단(GOOGLE_API_KEY)에 구글 API 키를 먼저 입력해주세요!"); 
                 return; 
             }
-
-            if (!state.base64Image) { 
-                showToast("본인의 사진을 먼저 업로드해주세요."); 
+            if (!state.falApiKey || state.falApiKey.includes("여기에_FAL")) { 
+                showToast("코드 상단(FAL_API_KEY)에 Fal.ai API 키를 먼저 입력해주세요!"); 
                 return; 
             }
+
+            if (!state.base64Image) { showToast("본인의 사진을 먼저 업로드해주세요."); return; }
             if (!DOM.gender.value) { showToast("성별을 선택해주세요."); return; }
             if (!DOM.age.value) { showToast("연령대를 선택해주세요."); return; }
             if (!DOM.height.value) { showToast("키(cm)를 입력해주세요."); return; }
@@ -692,14 +552,10 @@ d4d4cead";
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
             try {
-                DOM.loadingText.innerHTML = "피부톤, 체형 비율을 정밀 분석 중입니다...<br>회원님만을 위한 톤별 맞춤 코디 세트를 설계하고 있습니다.";
-                
+                DOM.loadingText.innerHTML = "피부톤, 이목구비 윤곽 및 명도 대비를 스캔하고 있습니다.<br>AI 뷰티 전문가가 분석 중입니다...";
                 state.baseAnalysisCache = await analyzeBaseInfo();
                 renderBaseResults(state.baseAnalysisCache);
                 
-                // Fal.ai Flux.1 초고화질 전신 룩북 1컷 생성 (얼굴 완전 배제)
-                generateSignatureFullbodyLookbookWithFal();
-
                 DOM.loadingArea.classList.add('hidden');
                 DOM.loadingArea.classList.remove('flex');
                 DOM.resultArea.classList.remove('hidden');
@@ -715,14 +571,14 @@ d4d4cead";
         });
 
         async function analyzeBaseInfo() {
-            // ★ 검증된 정상 작동 엔드포인트 그대로 유지
+            // 회원님의 환경에서 정상 작동하던 엔드포인트 그대로 유지
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${state.googleApiKey}`;
             const prompt = `
 당신은 최고의 퍼스널 컬러 및 패션/뷰티 마스터입니다.
 [사용자 프로필] 성별: ${DOM.gender.value}, 연령: ${DOM.age.value}, 키: ${DOM.height.value}cm, 몸무게: ${DOM.weight.value}kg, 체형: ${DOM.bodyType.value}
 
 * 필수 지시사항:
-1. 사진 속 실제 인물의 얼굴 피부 톤, 얼굴형, 헤어스타일을 정밀 분석하세요.
+1. 사진 속 실제 인물의 얼굴 피부 톤, 얼굴형, 헤어스타일을 자연스럽게 분석하세요.
 2. 퍼스널 컬러의 밝은 톤(bestLight) 3개, 어두운 톤(bestDark) 3개를 정확한 HEX 코드로 응답.
 3. 뷰티 추천: 실제 시판 중인 구체적 브랜드 제품명을 적을 것.
 4. 쇼핑몰 키(mall)는 100% 'coupang'으로 지정할 것.
@@ -741,7 +597,7 @@ d4d4cead";
   },
   "body": {
     "size": "추천 상의/하의 사이즈",
-    "fitTip": "체형 단점을 보완하는 실질적인 핏 제안"
+    "fitTip": "체형 보완 핏 추천"
   },
   "beautyShopping": [
     { "category": "스킨/토너", "mall": "coupang", "itemName": "구체적 브랜드 제품명", "keyword": "쇼핑 검색 키워드" },
@@ -820,7 +676,6 @@ d4d4cead";
             triggerTPOAnalysis();
         });
 
-        // 탭 전환 시 0.1초 만에 [밝은 톤 선호 코디 / 어두운 톤 선호 코디] 갱신
         async function triggerTPOAnalysis() {
             DOM.tpoLoader.classList.remove('hidden');
             DOM.tpoLoader.classList.add('flex');
@@ -830,8 +685,9 @@ d4d4cead";
                 const fashionResult = await analyzeTPOStyle();
                 renderTPOResults(fashionResult);
                 
-                DOM.tpoLoader.classList.add('hidden');
-                DOM.tpoLoader.classList.remove('flex');
+                // Fal.ai 초고화질 전신 룩북 생성 호출
+                generateFalLookbook(fashionResult.lookbookPrompt);
+                
             } catch (err) {
                 showToast("코디 정보를 가져오는데 문제가 발생했습니다.");
                 DOM.tpoLoader.classList.add('hidden');
@@ -840,6 +696,7 @@ d4d4cead";
         }
 
         async function analyzeTPOStyle() {
+            // 회원님의 환경에서 정상 작동하던 엔드포인트 그대로 유지
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${state.googleApiKey}`;
             const isTravel = state.currentMainTPO === '여행';
             let tpoContext = `분류: ${state.currentMainTPO}, 세부상황: ${state.currentSubTPO}`;
@@ -847,7 +704,7 @@ d4d4cead";
 
             if (state.location && (isTravel || state.currentMainTPO === '데일리')) {
                 tpoContext += `, 위치: ${state.location}`;
-                extraInstruction = `* 중요: 지정된 위치(${state.location})의 계절감과 날씨를 완벽히 반영하세요.`;
+                extraInstruction = `* 중요: 지정된 위치(${state.location})의 계절감과 날씨를 반영하세요.`;
             }
 
             const prompt = `
@@ -856,12 +713,11 @@ d4d4cead";
 ${extraInstruction}
 
 지시사항:
-1. 사용자의 퍼스널 컬러 기반으로 취향에 맞게 두 가지 세트를 완전히 분리해서 제안하세요:
-   - 세트 1: [✨ 밝은 톤 선호 코디] - 베스트 라이트 컬러를 적극 활용한 화사한 조화.
-   - 세트 2: [🕶️ 어두운 톤 선호 코디] - 베스트 다크 컬러를 적극 활용한 차분하고 시크한 조화.
-2. 각 세트마다 반드시 [상의, 하의, 신발, 악세사리/잡화] 4종을 한 벌의 풀착장 패키지로 제안하세요.
-3. 쇼핑 아이템은 쿠팡에서 최저가 검색이 잘 되는 시판 브랜드의 구체적인 제품명을 기재할 것.
-4. 쇼핑몰 키(mall)는 100% 'coupang'으로 지정할 것.
+1. 사용자의 퍼스널 컬러 및 체형에 최적화된 착장을 추천하세요.
+2. 쇼핑 아이템은 쿠팡에서 최저가 검색이 잘 되는 실제 브랜드와 구체적 상품명을 명시할 것.
+3. 쇼핑몰 키(mall)는 100% 'coupang'으로 지정할 것.
+4. lookbookPrompt (매우 중요):
+   - 얼굴 이질감이 생기지 않도록 모델의 '목 아래 전신 룩북(Ghost mannequin display, strictly cropped below the neck, no human head, no face)'으로 영문 프롬프트를 30단어 내외로 작성하세요.
 
 반드시 아래 JSON 형식으로 응답:
 {
@@ -869,29 +725,11 @@ ${extraInstruction}
   "styleTip": "상세 코디 제안 (여행 탭 아닐 때)",
   "styleTipDay": "낮 코디 제안 (여행 탭일 때만)",
   "styleTipNight": "밤 코디 제안 (여행 탭일 때만)",
-  "coordSets": [
-    {
-      "toneType": "light",
-      "setName": "✨ 밝은 톤 선호 추천 코디",
-      "concept": "화사하고 세련된 라이트 톤 중심 풀착장 조합",
-      "items": [
-        { "category": "상의", "mall": "coupang", "itemName": "구체적 브랜드 상의명", "keyword": "쇼핑 검색어" },
-        { "category": "하의", "mall": "coupang", "itemName": "구체적 브랜드 하의명", "keyword": "쇼핑 검색어" },
-        { "category": "신발", "mall": "coupang", "itemName": "구체적 브랜드 신발명", "keyword": "쇼핑 검색어" },
-        { "category": "악세사리", "mall": "coupang", "itemName": "구체적 브랜드 가방/잡화명", "keyword": "쇼핑 검색어" }
-      ]
-    },
-    {
-      "toneType": "dark",
-      "setName": "🕶️ 어두운 톤 선호 추천 코디",
-      "concept": "시크하고 묵직한 딥 톤 중심 풀착장 조합",
-      "items": [
-        { "category": "상의", "mall": "coupang", "itemName": "구체적 브랜드 상의명", "keyword": "쇼핑 검색어" },
-        { "category": "하의", "mall": "coupang", "itemName": "구체적 브랜드 하의명", "keyword": "쇼핑 검색어" },
-        { "category": "신발", "mall": "coupang", "itemName": "구체적 브랜드 신발명", "keyword": "쇼핑 검색어" },
-        { "category": "악세사리", "mall": "coupang", "itemName": "구체적 브랜드 가방/잡화명", "keyword": "쇼핑 검색어" }
-      ]
-    }
+  "lookbookPrompt": "영어 실사 인물 사진 프롬프트",
+  "fashionShopping": [
+    { "category": "상의/아우터", "mall": "coupang", "itemName": "구체적 브랜드 제품명", "keyword": "쇼핑 검색어" },
+    { "category": "하의", "mall": "coupang", "itemName": "구체적 브랜드 제품명", "keyword": "쇼핑 검색어" },
+    { "category": "신발/잡화", "mall": "coupang", "itemName": "구체적 브랜드 제품명", "keyword": "쇼핑 검색어" }
   ]
 }`;
             const payload = {
@@ -902,11 +740,8 @@ ${extraInstruction}
             return parseCleanJSON(await res.json());
         }
 
-        // ★ [Fal.ai Flux.1 유료 연동] 얼굴 100% 배제 + 초고화질 전신 룩북 생성
-        async function generateSignatureFullbodyLookbookWithFal() {
-            if (state.isHeroImageGenerated) return;
-            state.isHeroImageGenerated = true;
-
+        // ★ [Fal.ai 유료 연동] 1.5초 만에 뽑아내는 초고화질 전신 룩북 엔진
+        async function generateFalLookbook(promptText) {
             DOM.lookbookImage.classList.add('hidden');
             DOM.lookbookImage.classList.add('opacity-0');
             DOM.lookbookLoader.classList.remove('hidden');
@@ -914,8 +749,8 @@ ${extraInstruction}
             const gender = DOM.gender.value || "남성";
             const season = state.baseAnalysisCache?.color?.season || "personal color tone";
             
-            // Fal.ai Flux 전용: 목 아래 전신 카탈로그 룩북 프롬프트
-            const promptText = `High-end commercial catalog fashion photography, complete full-body outfit on invisible ghost mannequin, strictly cropped below the neck, no human head, no face, outfit perfectly coordinated for ${season}, stylish layered jacket, tailored trousers, luxury shoes, elegant studio lighting, ultra-realistic fabric wrinkles and cloth textures, photorealistic 8k`;
+            // 고스트 마네킹 컷으로 얼굴 생성 자체를 완전 차단
+            const fullPrompt = `High-end commercial catalog fashion photography, complete full-body outfit on invisible ghost mannequin, strictly cropped below the neck, no human head, no face, outfit perfectly coordinated for ${season}, stylish layered jacket, tailored trousers, luxury shoes, elegant studio lighting, ultra-realistic fabric wrinkles and cloth textures, photorealistic 8k, ${promptText}`;
 
             try {
                 const response = await fetch("https://fal.run/fal-ai/flux/schnell", {
@@ -925,7 +760,7 @@ ${extraInstruction}
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        prompt: promptText,
+                        prompt: fullPrompt,
                         image_size: "portrait_4_3",
                         num_inference_steps: 4,
                         enable_safety_checker: true
@@ -933,26 +768,35 @@ ${extraInstruction}
                 });
 
                 if (!response.ok) {
-                    const errDetail = await response.text();
-                    throw new Error("Fal.ai API 호출 실패: " + errDetail);
+                    const errData = await response.text();
+                    throw new Error("Fal.ai 실패: " + errData);
                 }
 
                 const data = await response.json();
-                const aiImageUrl = data.images[0].url;
+                const aiImageUrl = data.images && data.images[0] ? data.images[0].url : null;
+                if (!aiImageUrl) throw new Error("이미지 URL 없음");
 
-                DOM.lookbookImage.src = aiImageUrl;
-                DOM.lookbookLoader.classList.add('hidden');
-                DOM.lookbookImage.classList.remove('hidden');
-                setTimeout(() => DOM.lookbookImage.classList.remove('opacity-0'), 80);
+                const imgLoader = new Image();
+                imgLoader.onload = () => {
+                    DOM.lookbookImage.src = aiImageUrl;
+                    DOM.lookbookLoader.classList.add('hidden');
+                    DOM.tpoLoader.classList.add('hidden');
+                    DOM.tpoLoader.classList.remove('flex');
+                    DOM.lookbookImage.classList.remove('hidden');
+                    setTimeout(() => DOM.lookbookImage.classList.remove('opacity-0'), 80);
+                };
+                imgLoader.src = aiImageUrl;
 
-            } catch (err) {
-                console.error(err);
-                const fallbackFullbody = gender === "여성"
+            } catch (e) {
+                console.error("Fal.ai error:", e);
+                // 네트워크 오류 시 대비용 고화질 대체 이미지
+                const fallback = gender === "여성"
                     ? "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=768&q=80"
                     : "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=768&q=80";
-                
-                DOM.lookbookImage.src = fallbackFullbody;
+                DOM.lookbookImage.src = fallback;
                 DOM.lookbookLoader.classList.add('hidden');
+                DOM.tpoLoader.classList.add('hidden');
+                DOM.tpoLoader.classList.remove('flex');
                 DOM.lookbookImage.classList.remove('hidden');
                 setTimeout(() => DOM.lookbookImage.classList.remove('opacity-0'), 80);
             }
@@ -984,7 +828,7 @@ ${extraInstruction}
         }
 
         function renderTPOResults(data) {
-            document.getElementById('res-tpo-title').innerHTML = `${state.currentMainTPO} 스타일링 포인트`;
+            document.getElementById('res-tpo-title').innerHTML = `스타일링 포인트`;
             
             if (data.weatherSummary) {
                 DOM.weatherSummary.textContent = data.weatherSummary;
@@ -1002,70 +846,7 @@ ${extraInstruction}
                 document.getElementById('res-style-tip').textContent = data.styleTip;
             }
 
-            renderCoordSets(data.coordSets || []);
-        }
-
-        // 세트별 묶음 UI 렌더링 함수
-        function renderCoordSets(sets) {
-            DOM.coordSetsContainer.innerHTML = '';
-
-            if (!sets || sets.length === 0) {
-                DOM.coordSetsContainer.innerHTML = '<p class="text-sm text-gray-400 text-center py-4">추천 코디를 불러오는 중입니다.</p>';
-                return;
-            }
-
-            sets.forEach((set, setIndex) => {
-                const setCard = document.createElement('div');
-                setCard.className = 'bg-white rounded-2xl p-5 border border-gray-200/80 shadow-sm';
-
-                const isLight = set.toneType === 'light' || setIndex === 0;
-                const badgeStyle = isLight 
-                    ? 'bg-amber-100 text-amber-800 border border-amber-200' 
-                    : 'bg-slate-800 text-white border border-slate-700';
-
-                let setHtml = `
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-extrabold px-3 py-1 rounded-full ${badgeStyle}">
-                            ${set.setName}
-                        </span>
-                        <span class="text-[11px] font-bold ${isLight ? 'text-amber-700' : 'text-slate-600'}">풀착장 매칭 100%</span>
-                    </div>
-                    <p class="text-xs text-gray-500 font-medium mb-4 pl-0.5">${set.concept}</p>
-                    <div class="space-y-2.5">
-                `;
-
-                (set.items || []).forEach(item => {
-                    const mallId = (item.mall || 'coupang').toLowerCase();
-                    const theme = getCategoryTheme(item.category);
-                    const iconColorClass = isLight ? theme.lightBg : theme.darkBg;
-
-                    setHtml += `
-                        <div onclick="triggerAffiliateModal('${mallId}', '${item.itemName.replace(/'/g, "\\'")}', '${item.keyword.replace(/'/g, "\\'")}')" 
-                             class="flex items-center justify-between bg-[#f8f9fa] p-3 rounded-2xl hover:bg-blue-50/40 transition-all cursor-pointer group active:scale-98 border border-gray-100 hover:border-blue-200">
-                            
-                            <div class="w-12 h-12 rounded-xl ${iconColorClass} flex items-center justify-center flex-shrink-0 mr-3 shadow-xs text-lg transition-transform group-hover:scale-105">
-                                <i class="fa-solid ${theme.icon}"></i>
-                            </div>
-
-                            <div class="flex-1 min-w-0 pr-2">
-                                <div class="flex items-center gap-1.5 mb-1">
-                                    <span class="text-[10px] font-bold text-gray-600 bg-white px-2 py-0.5 rounded-md border border-gray-200">${item.category}</span>
-                                    <span class="text-[13px] font-bold text-gray-900 truncate">${item.itemName}</span>
-                                </div>
-                                <p class="text-[11px] text-blue-500 truncate group-hover:underline"><i class="fa-solid fa-search mr-1"></i>"${item.keyword}" 최저가 확인</p>
-                            </div>
-
-                            <div class="w-8 h-8 rounded-full bg-white shadow-xs flex items-center justify-center text-gray-400 group-hover:text-blue-500 group-hover:scale-110 transition-all flex-shrink-0">
-                                <i class="fa-solid fa-arrow-right -rotate-45 text-xs"></i>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                setHtml += `</div></div>`;
-                setCard.innerHTML = setHtml;
-                DOM.coordSetsContainer.appendChild(setCard);
-            });
+            renderShoppingList(data.fashionShopping, 'fashion-shopping-list');
         }
 
         function renderShoppingList(items, containerId) {
@@ -1073,24 +854,20 @@ ${extraInstruction}
             container.innerHTML = '';
 
             items.forEach(item => {
-                const mallId = item.mall.toLowerCase();
                 const card = document.createElement('div');
-                card.onclick = () => triggerAffiliateModal(mallId, item.itemName, item.keyword);
-                card.className = 'flex items-center justify-between bg-[#f8f9fa] p-3 rounded-2xl hover:bg-white transition-all shadow-xs border border-transparent hover:border-blue-200 group cursor-pointer active:scale-98';
+                card.onclick = () => triggerAffiliateModal('coupang', item.itemName, item.keyword);
+                card.className = 'flex items-center justify-between bg-[#f8f9fa] p-3.5 rounded-[16px] hover:bg-white transition-all shadow-sm border border-transparent hover:border-blue-200 group cursor-pointer active:scale-98';
                 
                 card.innerHTML = `
-                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0 mr-3 text-base">
-                        <i class="fa-solid fa-droplet"></i>
-                    </div>
                     <div class="flex-1 min-w-0 pr-3">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="text-[10px] text-gray-500 font-bold whitespace-nowrap bg-white px-2 py-0.5 rounded-md border border-gray-200">${item.category}</span>
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <span class="text-[10px] text-gray-500 font-bold whitespace-nowrap bg-gray-100 px-2 py-0.5 rounded-full">${item.category}</span>
                             <span class="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded-full font-bold">AI 맞춤 추천</span>
                         </div>
-                        <p class="font-bold text-gray-900 text-[13px] truncate mb-0.5">${item.itemName}</p>
+                        <p class="font-bold text-gray-900 text-[14px] truncate mb-0.5">${item.itemName}</p>
                         <p class="text-[11px] text-blue-500 truncate group-hover:underline"><i class="fa-solid fa-search mr-1"></i>"${item.keyword}" 최저가 검색</p>
                     </div>
-                    <div class="w-8 h-8 rounded-full bg-white shadow-xs flex items-center justify-center text-gray-400 group-hover:text-blue-500 group-hover:scale-110 transition-all flex-shrink-0">
+                    <div class="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400 group-hover:text-blue-500 group-hover:scale-110 transition-all flex-shrink-0">
                         <i class="fa-solid fa-arrow-right -rotate-45 text-sm"></i>
                     </div>
                 `;

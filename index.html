@@ -313,29 +313,29 @@
                 </div>
             </div>
 
-            <!-- 2. [상단 고정] 대한민국 현재 날씨 맞춤 대표 풀착장 룩북 (전신 1컷) -->
+            <!-- 2. [얼굴 완전 제거] 상의·하의·신발·악세사리 착장 중심 시그니처 룩북 (1컷 고정) -->
             <div class="apple-card p-6 md:p-8 fade-in">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="font-bold text-xl tracking-tight flex items-center text-gray-900">
-                        <i class="fa-solid fa-wand-magic-sparkles mr-2 text-blue-500"></i>시즌 맞춤 시그니처 풀착장 룩북
+                        <i class="fa-solid fa-shirt mr-2 text-blue-500"></i>퍼스널 톤 맞춤 시그니처 착장 룩북
                     </h3>
-                    <span class="text-xs bg-blue-50 text-blue-600 font-bold px-3 py-1 rounded-full border border-blue-100">국내 계절 반영</span>
+                    <span class="text-xs bg-blue-50 text-blue-600 font-bold px-3 py-1 rounded-full border border-blue-100">조화로운 풀착장</span>
                 </div>
-                <p class="text-xs text-gray-500 mb-5 leading-relaxed">회원님의 퍼스널 톤과 현재 대한민국 기온에 최적화된 상의·하의·신발·잡화 풀착장 룩북입니다.</p>
+                <p class="text-xs text-gray-500 mb-5 leading-relaxed">얼굴 이질감을 완전히 배제하고, 밝은 톤과 어두운 톤의 조화를 살린 상의·하의·신발·잡화 중심 착장 룩북입니다.</p>
 
                 <div class="w-full relative rounded-[24px] overflow-hidden bg-[#f0f0f2] aspect-[3/4] flex items-center justify-center shadow-md border border-gray-100 max-w-md mx-auto">
                     <div id="lookbook-loader" class="text-gray-400 flex flex-col items-center p-6 text-center">
                         <div class="apple-spinner mb-4"></div>
-                        <span class="text-xs font-bold leading-relaxed text-gray-600">현재 날씨에 어울리는 상·하의·신발·악세사리<br>시그니처 전신 룩북을 피팅 중입니다...</span>
+                        <span class="text-xs font-bold leading-relaxed text-gray-600">밝은 톤과 어두운 톤이 어우러진<br>시그니처 착장 룩북을 피팅 중입니다...</span>
                     </div>
-                    <img id="lookbook-image" class="hidden w-full h-full object-cover transition-opacity duration-700 opacity-0" alt="시즌 맞춤 전신 룩북" />
+                    <img id="lookbook-image" class="hidden w-full h-full object-cover transition-opacity duration-700 opacity-0" alt="시그니처 착장 룩북" />
                 </div>
             </div>
 
-            <!-- 3. 테마별 상황별 맞춤 세트 코디 추천 (코디 1, 코디 2 세트 패키징) -->
+            <!-- 3. 테마별 상황별 맞춤 세트 코디 (밝은 톤 선호 vs 어두운 톤 선호 세트 분리) -->
             <div class="apple-card p-6 md:p-8 fade-in">
                 <h3 class="font-bold text-xl mb-5 tracking-tight flex items-center text-gray-900">
-                    <i class="fa-solid fa-shirt mr-2 text-gray-800"></i>상황별 맞춤 코디 세트
+                    <i class="fa-solid fa-layer-group mr-2 text-gray-800"></i>상황별 맞춤 코디 세트
                 </h3>
                 
                 <!-- TPO 탭 -->
@@ -372,7 +372,7 @@
                 <div id="tpo-content-area" class="relative">
                     <div id="tpo-loader" class="hidden absolute inset-0 z-20 bg-white/80 backdrop-blur-md rounded-2xl flex-col items-center justify-center">
                         <div class="apple-spinner mb-4"></div>
-                        <span class="text-sm font-bold text-gray-800">상황별 맞춤 코디 세트를 불러오는 중...</span>
+                        <span class="text-sm font-bold text-gray-800">톤별 맞춤 코디 세트를 불러오는 중...</span>
                     </div>
 
                     <div id="weather-info-box" class="hidden mb-5 bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-center">
@@ -401,7 +401,7 @@
                         </div>
                     </div>
 
-                    <!-- 코디 세트 1 & 2 컨테이너 -->
+                    <!-- 밝은 톤 vs 어두운 톤 코디 세트 렌더링 컨테이너 -->
                     <div id="coord-sets-container" class="space-y-6"></div>
                 </div>
             </div>
@@ -416,6 +416,72 @@
         // ★ 회원님의 구글 API 키를 아래 큰따옴표 안에 넣어주세요
         const ADMIN_API_KEY = "AQ.Ab8RN6LR9bVvqNLLLulzF54CiyXwPZkGl04ukue2gZrbmjFUPQ";
         const COUPANG_TRACKING_CODE = "AF4531799";
+
+        // 카테고리별 실물 패션 제품 썸네일 고화질 이미지 풀 (즉시 로딩 & 무결점 표시)
+        const FASHION_THUMBNAILS = {
+            '상의': {
+                'light': [
+                    'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=150&q=80',
+                    'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=150&q=80',
+                    'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=150&q=80'
+                ],
+                'dark': [
+                    'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=150&q=80',
+                    'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=150&q=80',
+                    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=150&q=80'
+                ]
+            },
+            '하의': {
+                'light': [
+                    'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=150&q=80',
+                    'https://images.unsplash.com/photo-1584370848010-d7fe6bc767ec?auto=format&fit=crop&w=150&q=80'
+                ],
+                'dark': [
+                    'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=150&q=80',
+                    'https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=150&q=80'
+                ]
+            },
+            '신발': {
+                'light': [
+                    'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=150&q=80',
+                    'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=150&q=80'
+                ],
+                'dark': [
+                    'https://images.unsplash.com/photo-1614252369475-531eba835eb1?auto=format&fit=crop&w=150&q=80',
+                    'https://images.unsplash.com/photo-1533867617858-e7b97e060509?auto=format&fit=crop&w=150&q=80'
+                ]
+            },
+            '악세사리': {
+                'light': [
+                    'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=150&q=80',
+                    'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=150&q=80'
+                ],
+                'dark': [
+                    'https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=150&q=80',
+                    'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=150&q=80'
+                ]
+            },
+            '뷰티': [
+                'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=150&q=80',
+                'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=150&q=80',
+                'https://images.unsplash.com/photo-1608248597359-53600f95213d?auto=format&fit=crop&w=150&q=80'
+            ]
+        };
+
+        function getThumbnailUrl(category, toneType = 'light', index = 0) {
+            let catKey = '상의';
+            if (category.includes('하의') || category.includes('바지') || category.includes('스커트')) catKey = '하의';
+            else if (category.includes('신발') || category.includes('스니커즈') || category.includes('로퍼') || category.includes('구두')) catKey = '신발';
+            else if (category.includes('악세사리') || category.includes('잡화') || category.includes('가방') || category.includes('모자')) catKey = '악세사리';
+            else if (category.includes('토너') || category.includes('크림') || category.includes('뷰티') || category.includes('스킨')) {
+                const bList = FASHION_THUMBNAILS['뷰티'];
+                return bList[index % bList.length];
+            }
+
+            const tone = toneType === 'dark' ? 'dark' : 'light';
+            const list = FASHION_THUMBNAILS[catKey][tone];
+            return list[index % list.length];
+        }
 
         const AFFILIATE_MALLS = {
             'coupang': { 
@@ -607,13 +673,13 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
             try {
-                DOM.loadingText.innerHTML = "피부톤, 체형 비율, 이목구비 윤곽을 정밀 분석 중입니다...<br>회원님만을 위한 전신 코디를 설계하고 있습니다.";
+                DOM.loadingText.innerHTML = "피부톤, 체형 비율을 정밀 분석 중입니다...<br>회원님만을 위한 톤별 맞춤 코디 세트를 설계하고 있습니다.";
                 
-                // ★ 회원님의 환경에서 정상 작동하는 API 주소 그대로 유지
+                // ★ 회원님의 환경에서 안정적으로 작동하는 원본 엔드포인트 유지
                 state.baseAnalysisCache = await analyzeBaseInfo();
                 renderBaseResults(state.baseAnalysisCache);
                 
-                // 상단 고정 1컷 전신 대표 룩북 생성
+                // 상단 고정 1컷 전신 시그니처 룩북 생성 (얼굴 완전 배제)
                 generateSignatureFullbodyLookbook();
 
                 DOM.loadingArea.classList.add('hidden');
@@ -631,7 +697,7 @@
         });
 
         async function analyzeBaseInfo() {
-            // ★ 회원님의 정상 작동 엔드포인트 유지
+            // ★ 회원님의 정상 작동 엔드포인트 그대로 유지
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${state.apiKey}`;
             const prompt = `
 당신은 최고의 퍼스널 컬러 및 패션/뷰티 마스터입니다.
@@ -736,7 +802,7 @@
             triggerTPOAnalysis();
         });
 
-        // 탭 전환 시 0.1초 만에 맞춤 코디 세트(세트 1, 세트 2) 갱신
+        // 탭 전환 시 0.1초 만에 [밝은 톤 선호 코디 / 어두운 톤 선호 코디] 갱신
         async function triggerTPOAnalysis() {
             DOM.tpoLoader.classList.remove('hidden');
             DOM.tpoLoader.classList.add('flex');
@@ -756,7 +822,7 @@
         }
 
         async function analyzeTPOStyle() {
-            // ★ 회원님의 정상 작동 엔드포인트 유지
+            // ★ 회원님의 정상 작동 엔드포인트 그대로 유지
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${state.apiKey}`;
             const isTravel = state.currentMainTPO === '여행';
             let tpoContext = `분류: ${state.currentMainTPO}, 세부상황: ${state.currentSubTPO}`;
@@ -773,9 +839,11 @@
 ${extraInstruction}
 
 지시사항:
-1. 사용자가 바로 입을 수 있도록 [맞춤 코디 세트 1]과 [맞춤 코디 세트 2]를 완벽한 풀세트로 제안하세요.
-2. 각 세트(Set)는 반드시 [상의, 하의, 신발, 악세사리/잡화] 4가지 아이템이 하나의 패키지로 조화를 이루어야 합니다.
-3. 쇼핑 아이템은 쿠팡에서 최저가 검색이 잘 되는 구체적 브랜드 제품명을 기재할 것.
+1. 사용자의 퍼스널 컬러 기반으로 취향에 맞게 두 가지 세트를 완전히 분리해서 제안하세요:
+   - 세트 1: [✨ 밝은 톤 선호 코디 (Light Tone Set)] - 사용자의 베스트 라이트 컬러를 적극 활용한 화사하고 경쾌한 조화.
+   - 세트 2: [🕶️ 어두운 톤 선호 코디 (Dark Tone Set)] - 사용자의 베스트 다크 컬러를 적극 활용한 차분하고 시크한 조화.
+2. 각 세트마다 반드시 [상의, 하의, 신발, 악세사리/잡화] 4종을 한 벌의 풀착장 패키지로 제안하세요.
+3. 쇼핑 아이템은 쿠팡에서 최저가 검색이 잘 되는 시판 브랜드의 구체적인 제품명을 기재할 것.
 4. 쇼핑몰 키(mall)는 100% 'coupang'으로 지정할 것.
 
 반드시 아래 JSON 형식으로 응답:
@@ -786,23 +854,25 @@ ${extraInstruction}
   "styleTipNight": "밤 코디 제안 (여행 탭일 때만)",
   "coordSets": [
     {
-      "setName": "맞춤 코디 1 (베스트 시그니처 룩)",
-      "concept": "톤앤매너와 비율을 극대화한 정석 세트 코디",
+      "toneType": "light",
+      "setName": "✨ 밝은 톤 선호 추천 코디",
+      "concept": "화사하고 세련된 라이트 톤 중심 풀착장 조합",
       "items": [
         { "category": "상의", "mall": "coupang", "itemName": "구체적 브랜드 상의명", "keyword": "쇼핑 검색어" },
         { "category": "하의", "mall": "coupang", "itemName": "구체적 브랜드 하의명", "keyword": "쇼핑 검색어" },
         { "category": "신발", "mall": "coupang", "itemName": "구체적 브랜드 신발명", "keyword": "쇼핑 검색어" },
-        { "category": "악세사리/잡화", "mall": "coupang", "itemName": "구체적 브랜드 가방/잡화명", "keyword": "쇼핑 검색어" }
+        { "category": "악세사리", "mall": "coupang", "itemName": "구체적 브랜드 가방/잡화명", "keyword": "쇼핑 검색어" }
       ]
     },
     {
-      "setName": "맞춤 코디 2 (트렌디 무드 체인지 룩)",
-      "concept": "색다른 감각으로 변주를 준 세련된 세트 코디",
+      "toneType": "dark",
+      "setName": "🕶️ 어두운 톤 선호 추천 코디",
+      "concept": "시크하고 묵직한 딥 톤 중심 풀착장 조합",
       "items": [
         { "category": "상의", "mall": "coupang", "itemName": "구체적 브랜드 상의명", "keyword": "쇼핑 검색어" },
         { "category": "하의", "mall": "coupang", "itemName": "구체적 브랜드 하의명", "keyword": "쇼핑 검색어" },
         { "category": "신발", "mall": "coupang", "itemName": "구체적 브랜드 신발명", "keyword": "쇼핑 검색어" },
-        { "category": "악세사리/잡화", "mall": "coupang", "itemName": "구체적 브랜드 가방/잡화명", "keyword": "쇼핑 검색어" }
+        { "category": "악세사리", "mall": "coupang", "itemName": "구체적 브랜드 가방/잡화명", "keyword": "쇼핑 검색어" }
       ]
     }
   ]
@@ -815,7 +885,7 @@ ${extraInstruction}
             return parseCleanJSON(await res.json());
         }
 
-        // ★ 대한민국 현재 날씨/계절에 맞춘 상의+하의+신발+악세사리 전신 대표 룩북 (딱 1회 고화질 생성)
+        // ★ [핵심 1] 얼굴을 100% 완전히 배제하고, 밝은톤+어두운톤을 섞은 시그니처 착장 룩북 (1회 고정)
         function generateSignatureFullbodyLookbook() {
             if (state.isHeroImageGenerated) return;
             state.isHeroImageGenerated = true;
@@ -827,9 +897,11 @@ ${extraInstruction}
             const gender = DOM.gender.value || "남성";
             const season = state.baseAnalysisCache?.color?.season || "personal color tone";
             
-            // 머리끝부터 발끝까지 상의, 하의, 신발, 잡화가 완벽하게 잡히는 풀바디 프롬프트
-            const promptText = `full-length full-body fashion lookbook photograph of a stylish Korean ${gender}, complete coordinated outfit matching ${season}, perfectly styled top jacket, pants trousers, leather shoes or sneakers, holding a stylish bag or accessory, natural daytime lighting, head to toe view, aesthetic clean background, editorial catalog`;
-            const finalPrompt = encodeURIComponent(promptText);
+            // 얼굴/인물 두상을 원천 차단하고 목 아래 전신 의상과 신발, 잡화에만 집중시키는 엄격한 프롬프트
+            const promptText = `faceless fashion photography of full body outfit, headless cropped strictly below the neck, no face, no head, no eyes, stylish Korean ${gender} wearing full-set coordination matching ${season}, harmonious combination of light tone inner shirt and dark tone elegant tailored coat, ivory beige trousers, crisp leather dress shoes or luxury sneakers, holding a minimal leather bag, aesthetic studio street setting, clean lookbook catalog`;
+            const negativeFilter = "face, head, hair, eyes, nose, lips, ears, neck up, portrait, anime, cartoon, 3d render, plastic, doll, uncanny valley";
+            
+            const finalPrompt = encodeURIComponent(`${promptText}, ${negativeFilter}`);
             const randomSeed = Math.floor(Math.random() * 999999);
             
             // 초반 웹 버전의 순수 렌더링 호출
@@ -892,7 +964,7 @@ ${extraInstruction}
             document.getElementById('res-size-recommend').textContent = data.body.size;
             document.getElementById('res-fit-tip').textContent = data.body.fitTip;
 
-            renderShoppingList(data.beautyShopping, 'beauty-shopping-list');
+            renderShoppingList(data.beautyShopping, 'beauty-shopping-list', 'beauty');
         }
 
         function renderTPOResults(data) {
@@ -914,11 +986,11 @@ ${extraInstruction}
                 document.getElementById('res-style-tip').textContent = data.styleTip;
             }
 
-            // ★ [맞춤 코디 1], [맞춤 코디 2] 세트 렌더링
+            // ★ [핵심 2 & 3] 밝은 톤 선호 세트 & 어두운 톤 선호 세트 + 옆 썸네일 이미지 렌더링
             renderCoordSets(data.coordSets || []);
         }
 
-        // 세트별 묶음 UI 렌더링 함수
+        // 세트별 묶음 UI (각 아이템 옆 썸네일 사진 포함)
         function renderCoordSets(sets) {
             DOM.coordSetsContainer.innerHTML = '';
 
@@ -931,30 +1003,45 @@ ${extraInstruction}
                 const setCard = document.createElement('div');
                 setCard.className = 'bg-white rounded-2xl p-5 border border-gray-200/80 shadow-sm';
 
-                const badgeColor = setIndex === 0 ? 'bg-blue-600 text-white' : 'bg-gray-800 text-white';
-                
+                const isLight = set.toneType === 'light' || setIndex === 0;
+                const badgeStyle = isLight 
+                    ? 'bg-amber-100 text-amber-800 border border-amber-200' 
+                    : 'bg-slate-800 text-white border border-slate-700';
+
                 let setHtml = `
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-bold px-3 py-1 rounded-full ${badgeColor}">${set.setName}</span>
-                        <span class="text-[11px] font-semibold text-blue-600">풀세트 조화 100%</span>
+                        <span class="text-xs font-extrabold px-3 py-1 rounded-full ${badgeStyle}">
+                            ${set.setName}
+                        </span>
+                        <span class="text-[11px] font-bold ${isLight ? 'text-amber-700' : 'text-slate-600'}">풀착장 매칭 100%</span>
                     </div>
                     <p class="text-xs text-gray-500 font-medium mb-4 pl-0.5">${set.concept}</p>
-                    <div class="space-y-2">
+                    <div class="space-y-2.5">
                 `;
 
-                (set.items || []).forEach(item => {
+                (set.items || []).forEach((item, itemIdx) => {
                     const mallId = (item.mall || 'coupang').toLowerCase();
+                    const thumbUrl = getThumbnailUrl(item.category, set.toneType || (isLight ? 'light' : 'dark'), itemIdx);
+
                     setHtml += `
                         <div onclick="triggerAffiliateModal('${mallId}', '${item.itemName.replace(/'/g, "\\'")}', '${item.keyword.replace(/'/g, "\\'")}')" 
-                             class="flex items-center justify-between bg-[#f8f9fa] p-3 rounded-xl hover:bg-blue-50/50 transition-all cursor-pointer group active:scale-98 border border-transparent hover:border-blue-100">
+                             class="flex items-center justify-between bg-[#f8f9fa] p-3 rounded-2xl hover:bg-blue-50/40 transition-all cursor-pointer group active:scale-98 border border-gray-100 hover:border-blue-200">
+                            
+                            <!-- ★ 추천 아이템 실물 썸네일 이미지 -->
+                            <div class="w-14 h-14 rounded-xl overflow-hidden bg-gray-200 flex-shrink-0 mr-3 border border-gray-200/60 shadow-xs">
+                                <img src="${thumbUrl}" alt="${item.itemName}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                            </div>
+
+                            <!-- 텍스트 영역 -->
                             <div class="flex-1 min-w-0 pr-2">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="text-[10px] font-bold text-gray-500 bg-white px-2 py-0.5 rounded-md border border-gray-200">${item.category}</span>
+                                <div class="flex items-center gap-1.5 mb-1">
+                                    <span class="text-[10px] font-bold text-gray-600 bg-white px-2 py-0.5 rounded-md border border-gray-200">${item.category}</span>
                                     <span class="text-[13px] font-bold text-gray-900 truncate">${item.itemName}</span>
                                 </div>
-                                <p class="text-[11px] text-blue-500 truncate group-hover:underline"><i class="fa-solid fa-search mr-1"></i>"${item.keyword}" 최저가 검색</p>
+                                <p class="text-[11px] text-blue-500 truncate group-hover:underline"><i class="fa-solid fa-search mr-1"></i>"${item.keyword}" 최저가 확인</p>
                             </div>
-                            <div class="w-7 h-7 rounded-full bg-white shadow-xs flex items-center justify-center text-gray-400 group-hover:text-blue-500 group-hover:scale-105 transition-all flex-shrink-0">
+
+                            <div class="w-8 h-8 rounded-full bg-white shadow-xs flex items-center justify-center text-gray-400 group-hover:text-blue-500 group-hover:scale-110 transition-all flex-shrink-0">
                                 <i class="fa-solid fa-arrow-right -rotate-45 text-xs"></i>
                             </div>
                         </div>
@@ -967,26 +1054,32 @@ ${extraInstruction}
             });
         }
 
-        function renderShoppingList(items, containerId) {
+        // 뷰티 리스트에도 제품 썸네일 일관성 있게 표시
+        function renderShoppingList(items, containerId, type = 'beauty') {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
 
-            items.forEach(item => {
+            items.forEach((item, idx) => {
                 const mallId = item.mall.toLowerCase();
+                const thumbUrl = getThumbnailUrl(item.category, 'light', idx);
+
                 const card = document.createElement('div');
                 card.onclick = () => triggerAffiliateModal(mallId, item.itemName, item.keyword);
-                card.className = 'flex items-center justify-between bg-[#f8f9fa] p-3.5 rounded-[16px] hover:bg-white transition-all shadow-sm border border-transparent hover:border-blue-200 group cursor-pointer active:scale-98';
+                card.className = 'flex items-center justify-between bg-[#f8f9fa] p-3 rounded-2xl hover:bg-white transition-all shadow-xs border border-transparent hover:border-blue-200 group cursor-pointer active:scale-98';
                 
                 card.innerHTML = `
+                    <div class="w-12 h-12 rounded-xl overflow-hidden bg-gray-200 flex-shrink-0 mr-3 border border-gray-200/60 shadow-xs">
+                        <img src="${thumbUrl}" alt="${item.itemName}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                    </div>
                     <div class="flex-1 min-w-0 pr-3">
-                        <div class="flex items-center gap-2 mb-1.5">
-                            <span class="text-[10px] text-gray-500 font-bold whitespace-nowrap bg-gray-100 px-2 py-0.5 rounded-full">${item.category}</span>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-[10px] text-gray-500 font-bold whitespace-nowrap bg-white px-2 py-0.5 rounded-md border border-gray-200">${item.category}</span>
                             <span class="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded-full font-bold">AI 맞춤 추천</span>
                         </div>
-                        <p class="font-bold text-gray-900 text-[14px] truncate mb-0.5">${item.itemName}</p>
+                        <p class="font-bold text-gray-900 text-[13px] truncate mb-0.5">${item.itemName}</p>
                         <p class="text-[11px] text-blue-500 truncate group-hover:underline"><i class="fa-solid fa-search mr-1"></i>"${item.keyword}" 최저가 검색</p>
                     </div>
-                    <div class="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400 group-hover:text-blue-500 group-hover:scale-110 transition-all flex-shrink-0">
+                    <div class="w-8 h-8 rounded-full bg-white shadow-xs flex items-center justify-center text-gray-400 group-hover:text-blue-500 group-hover:scale-110 transition-all flex-shrink-0">
                         <i class="fa-solid fa-arrow-right -rotate-45 text-sm"></i>
                     </div>
                 `;

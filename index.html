@@ -91,7 +91,6 @@
         }
         #toast.show { bottom: 40px; }
 
-        /* 모달 스타일 추가 */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
@@ -113,7 +112,6 @@
             <h1 class="text-xl font-bold tracking-tight text-gray-900 flex items-center">
                 <i class="fa-solid fa-sparkles text-blue-500 mr-2"></i>StyleAI
             </h1>
-            <!-- 설정 버튼 추가 -->
             <button id="settings-btn" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-colors">
                 <i class="fa-solid fa-gear"></i>
             </button>
@@ -122,11 +120,10 @@
 
     <div id="toast">메시지</div>
 
-    <!-- API 설정 모달창 추가 -->
     <div id="settings-modal" class="modal-overlay">
         <div class="modal-content apple-card">
             <h3 class="text-lg font-bold mb-2 flex items-center"><i class="fa-solid fa-key mr-2 text-blue-500"></i>AI 두뇌 연결하기</h3>
-            <p class="text-xs text-gray-500 mb-4 leading-relaxed">구글 AI Studio에서 발급받은 무료 API 키를 입력해 주세요. (기기에만 안전하게 저장됩니다.)</p>
+            <p class="text-xs text-gray-500 mb-4 leading-relaxed">구글 AI Studio에서 발급받은 무료 API 키를 입력해 주세요.</p>
             <input type="password" id="api-key-input" placeholder="AI Studio API 키 입력 (AIzaSy...)" class="apple-input w-full p-3.5 text-[14px] text-gray-800 outline-none mb-4" />
             <div class="flex gap-2">
                 <button id="close-settings-btn" class="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold text-sm">닫기</button>
@@ -137,14 +134,12 @@
 
     <main class="max-w-2xl mx-auto px-5 mt-6">
         
-        <!-- 1. Input Section -->
         <section id="input-section" class="space-y-6 fade-in">
             <div class="text-center mb-8 mt-4">
                 <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-3 leading-tight">당신만의 고유한 톤,<br>완벽한 스타일.</h2>
                 <p class="text-gray-500 font-medium text-sm md:text-base">사진 한 장으로 피부톤, 맞춤 코디, 최저가 쇼핑까지.</p>
             </div>
 
-            <!-- Image Upload Card -->
             <div class="apple-card p-6 md:p-8">
                 <h3 class="text-lg font-bold mb-4 flex items-center text-gray-800"><i class="fa-solid fa-camera mr-2 text-blue-500"></i>정면 사진 업로드</h3>
                 <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-[20px] p-8 md:p-12 text-center cursor-pointer hover:bg-gray-50/80 transition-colors relative overflow-hidden bg-gray-50/30 group">
@@ -160,7 +155,6 @@
                 </div>
             </div>
 
-            <!-- Details Card -->
             <div class="apple-card p-6 md:p-8">
                 <h3 class="text-lg font-bold mb-5 flex items-center text-gray-800"><i class="fa-solid fa-sliders mr-2 text-blue-500"></i>프로필 정보</h3>
                 <div class="grid grid-cols-2 gap-4 mb-4">
@@ -168,7 +162,7 @@
                         <label class="block text-[13px] font-bold text-gray-500 mb-1.5 pl-1">성별</label>
                         <select id="gender-input" class="apple-input w-full p-3.5 text-gray-800 outline-none">
                             <option value="여성">여성</option>
-                            <option value="남성">남성</option>
+                            <option value="남성" selected>남성</option>
                         </select>
                     </div>
                     <div>
@@ -184,16 +178,16 @@
                 <div class="grid grid-cols-3 gap-3">
                     <div>
                         <label class="block text-[13px] font-bold text-gray-500 mb-1.5 pl-1">키 (cm)</label>
-                        <input type="number" id="height-input" placeholder="165" class="apple-input w-full p-3.5 text-gray-800 outline-none" />
+                        <input type="number" id="height-input" placeholder="184" value="184" class="apple-input w-full p-3.5 text-gray-800 outline-none" />
                     </div>
                     <div>
                         <label class="block text-[13px] font-bold text-gray-500 mb-1.5 pl-1">체중 (kg)</label>
-                        <input type="number" id="weight-input" placeholder="50" class="apple-input w-full p-3.5 text-gray-800 outline-none" />
+                        <input type="number" id="weight-input" placeholder="80" value="80" class="apple-input w-full p-3.5 text-gray-800 outline-none" />
                     </div>
                     <div>
                         <label class="block text-[13px] font-bold text-gray-500 mb-1.5 pl-1">체형</label>
                         <select id="body-type-input" class="apple-input w-full p-3.5 text-gray-800 outline-none">
-                            <option value="보통 체형">보통</option>
+                            <option value="보통 체형" selected>보통</option>
                             <option value="하체 발달">하체 발달</option>
                             <option value="상체 발달">상체 발달</option>
                             <option value="마른 체형">마른 체형</option>
@@ -208,7 +202,6 @@
             </button>
         </section>
 
-        <!-- 2. Loading State -->
         <div id="loading-area" class="hidden flex-col items-center justify-center py-32 fade-in">
             <div class="apple-spinner mb-8"></div>
             <h3 class="text-2xl font-bold text-gray-900 mb-3 tracking-tight">AI가 분석을 진행 중입니다</h3>
@@ -222,9 +215,7 @@
             <button onclick="location.reload()" class="mt-4 px-5 py-2 bg-white text-red-600 rounded-full text-sm font-bold shadow-sm border border-red-100 hover:bg-red-50">다시 시도하기</button>
         </div>
 
-        <!-- 3. Result Section -->
         <section id="result-area" class="hidden space-y-6 pb-12">
-            
             <div class="flex justify-end gap-2 fade-in">
                 <button onclick="shareResult()" class="px-4 py-2 bg-white rounded-full text-sm font-bold text-gray-700 shadow-sm border border-gray-200 hover:bg-gray-50 flex items-center">
                     <i class="fa-solid fa-arrow-up-from-bracket mr-2"></i>공유하기
@@ -234,7 +225,6 @@
                 </button>
             </div>
 
-            <!-- Color Analysis Result -->
             <div class="apple-card p-6 md:p-8 fade-in" style="animation-delay: 0.1s;">
                 <div class="text-center mb-8">
                     <span class="inline-block px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full text-xs font-bold mb-4 tracking-wider">PERSONAL COLOR</span>
@@ -256,7 +246,6 @@
                     </div>
                 </div>
 
-                <!-- Beauty Clinic -->
                 <div class="bg-[#f8f9fa] p-6 rounded-3xl border border-gray-100">
                     <div class="flex items-center mb-4">
                         <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
@@ -274,7 +263,6 @@
                 </div>
             </div>
 
-            <!-- TPO Styling Module -->
             <div class="apple-card p-6 md:p-8 fade-in" style="animation-delay: 0.2s;">
                 <h3 class="font-bold text-xl mb-5 tracking-tight flex items-center">
                     <i class="fa-solid fa-shirt mr-2 text-gray-800"></i>상황별 맞춤 스타일링
@@ -441,7 +429,6 @@
             standardTipArea: document.getElementById('standard-tip-area'),
             travelTipArea: document.getElementById('travel-tip-area'),
 
-            // 모달창 DOM
             settingsBtn: document.getElementById('settings-btn'),
             settingsModal: document.getElementById('settings-modal'),
             closeSettingsBtn: document.getElementById('close-settings-btn'),
@@ -452,14 +439,13 @@
         const state = {
             base64Image: null,
             mimeType: null,
-            apiKey: localStorage.getItem('styleai_gemini_key') || "", // 로컬 스토리지에서 키 불러오기
+            apiKey: localStorage.getItem('styleai_gemini_key') || "",
             currentMainTPO: "데일리",
             currentSubTPO: "편안한 동네/카페",
             location: "",
             baseAnalysisCache: null
         };
 
-        // 모달창 이벤트 설정
         DOM.settingsBtn.addEventListener('click', () => {
             DOM.apiKeyInput.value = state.apiKey;
             DOM.settingsModal.classList.add('active');
@@ -591,9 +577,10 @@
         });
 
         async function analyzeBaseInfo() {
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${state.apiKey}`;
+            // 해결: 기존 gemini-1.5-flash 모델을 가장 안정적이고 최신인 gemini-2.5-flash 로 업데이트
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${state.apiKey}`;
             const isFemale = DOM.gender.value === '여성';
-            const makeupRecMall = 'oliveyoung'; // 화장품은 주로 올리브영
+            const makeupRecMall = 'oliveyoung';
 
             const prompt = `
 당신은 최고의 퍼스널 컬러 및 뷰티 마스터입니다.
@@ -713,7 +700,8 @@
         }
 
         async function analyzeTPOStyle() {
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${state.apiKey}`;
+            // 해결: 여기도 최신 gemini-2.5-flash 모델로 이름 업데이트
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${state.apiKey}`;
             const isTravel = state.currentMainTPO === '여행';
             let tpoContext = `분류: ${state.currentMainTPO}, 세부상황: ${state.currentSubTPO}`;
             let tools = [];
@@ -721,7 +709,7 @@
 
             if (state.location && (isTravel || state.currentMainTPO === '데일리')) {
                 tpoContext += `, 위치: ${state.location}`;
-                tools = [{ "google_search": {} }]; // 구글 검색 도구 사용
+                tools = [{ "google_search": {} }]; 
                 extraInstruction = `
 *중요: 구글 검색을 통해 '${state.location}'의 현재 실시간 날씨, 기온을 파악하세요.
 ${isTravel ? "여행지의 경우 '낮과 밤의 일교차'가 크다면 이를 고려하여 낮 코디와 밤 코디를 반드시 다르게 추천하세요." : "현재 날씨에 맞는 옷 두께와 스타일을 추천하세요."}`;
@@ -764,8 +752,6 @@ ${extraInstruction}
             DOM.lookbookImage.classList.add('hidden');
             DOM.lookbookLoader.classList.remove('hidden');
 
-            // 실제 상용화 시에는 Imagen 3 또는 다른 이미지 생성 모델 API 연동이 필요합니다.
-            // 여기서는 UI의 자연스러운 전환과 안내를 위한 시뮬레이션을 제공합니다.
             setTimeout(() => {
                DOM.lookbookLoader.innerHTML = `<div class="p-6 text-center text-gray-500"><i class="fa-solid fa-shirt text-3xl mb-3"></i><p class="text-xs font-bold leading-relaxed">회원님만의 맞춤 스타일이<br>제안되었습니다.</p></div>`;
                DOM.tpoLoader.classList.add('hidden');

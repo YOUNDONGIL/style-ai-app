@@ -119,7 +119,7 @@
 
     <div id="toast">알림</div>
 
-    <!-- 숨겨진 관리자 API 키 설정 모달 -->
+    <!-- 숨겨진 관리자 API 키 설정 모달 (우측 상단 뱃지 3회 탭) -->
     <div id="admin-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
@@ -135,7 +135,7 @@
         </div>
     </div>
 
-    <!-- 쇼핑몰 이동 팝업 (쿠팡 빨간 로고 제거) -->
+    <!-- 쇼핑몰 이동 및 공정위 고지 모달 -->
     <div id="affiliate-modal" class="modal-overlay">
         <div class="modal-content">
             <div id="modal-icon-container" class="w-14 h-14 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-sm">
@@ -185,6 +185,7 @@
                 </div>
             </div>
 
+            <!-- 프로필 정보 (성별 선택 시 대한민국 평균 데이터 연동) -->
             <div class="apple-card p-6 md:p-8">
                 <h3 class="text-lg font-bold mb-5 flex items-center text-gray-800"><i class="fa-solid fa-sliders mr-2 text-blue-500"></i>프로필 정보</h3>
                 <div class="grid grid-cols-2 gap-4 mb-4">
@@ -296,6 +297,7 @@
                 </div>
             </div>
 
+            <!-- TPO 카테고리 8종 확장 영역 -->
             <div class="apple-card p-6 md:p-8 fade-in">
                 <h3 class="font-bold text-xl mb-5 tracking-tight flex items-center">
                     <i class="fa-solid fa-shirt mr-2 text-gray-800"></i>상황별 맞춤 스타일링
@@ -345,6 +347,7 @@
                     </div>
 
                     <div class="flex flex-col md:flex-row items-start gap-6 md:gap-8">
+                        <!-- AI 룩북 가상 피팅 캔버스 (3:4 비율 고정) -->
                         <div class="w-full md:w-[45%] self-start relative rounded-[24px] overflow-hidden bg-[#f0f0f2] aspect-[3/4] flex items-center justify-center shadow-md border border-gray-100">
                             <div id="lookbook-loader" class="text-gray-400 flex flex-col items-center p-6 text-center">
                                 <i class="fa-solid fa-wand-magic-sparkles text-3xl mb-3 text-blue-500 animate-pulse"></i>
@@ -488,6 +491,7 @@
             travelTipArea: document.getElementById('travel-tip-area')
         };
 
+        // 대한민국 남녀 평균 키·체중 동적 플레이스홀더 연동
         DOM.gender.addEventListener('change', (e) => {
             const selectedGender = e.target.value;
             if (selectedGender === '남성') {
@@ -529,7 +533,7 @@
                     let errMsg = `오류 코드: ${res.status}`;
                     try { errMsg = JSON.parse(errText).error.message; } catch(e){}
                     if (res.status === 400 && errMsg.includes("API key not valid")) {
-                        throw new Error("입력된 구글 API 키가 유효하지 않습니다. 우측 상단 뱃지를 눌러 키를 다시 확인해주세요.");
+                        throw new Error("입력된 구글 API 키가 유효하지 않습니다. 키를 다시 확인해주세요.");
                     }
                     if (res.status !== 429 && res.status < 500) throw new Error(errMsg);
                 } catch (e) {
@@ -589,8 +593,6 @@
 
             try {
                 DOM.loadingText.innerHTML = "피부톤, 이목구비 윤곽 및 명도 대비를 스캔하고 있습니다.<br>AI 뷰티 전문가가 분석 중입니다...";
-                
-                // ★ 완벽하게 작동하는 가장 기본적이고 정확한 공식 API 주소
                 state.baseAnalysisCache = await analyzeBaseInfo();
                 renderBaseResults(state.baseAnalysisCache);
                 
@@ -609,8 +611,7 @@
         });
 
         async function analyzeBaseInfo() {
-            // 구글 Gemini의 가장 정확하고 오리지널 호출명 (이것이 100% 맞는 주소입니다)
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${state.apiKey}`;
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${state.apiKey}`;
             const prompt = `
 당신은 최고의 퍼스널 컬러 및 패션/뷰티 마스터입니다.
 [사용자 프로필] 성별: ${DOM.gender.value}, 연령: ${DOM.age.value}, 키: ${DOM.height.value}cm, 몸무게: ${DOM.weight.value}kg, 체형: ${DOM.bodyType.value}
@@ -620,7 +621,7 @@
 2. 퍼스널 컬러의 밝은 톤(bestLight) 3개, 어두운 톤(bestDark) 3개를 정확한 HEX 코드로 응답.
 3. 뷰티 추천: 실제 시판 중인 구체적 브랜드 제품명을 적을 것.
 4. 쇼핑몰 키(mall)는 100% 'coupang'으로 지정할 것.
-5. facialFeatures (매우 중요): 인공지능 느낌이나 만화 느낌을 모두 빼고, 실제 한국인의 무보정 얼굴 특징을 영어로 정밀 묘사하세요. (예: "A real Korean 20s young adult, natural black hair, clear skin, realistic human face, authentic facial shape").
+5. facialFeatures (매우 중요): 사진 속 실제 인물의 얼굴 특징을 현실적인 실사 인물 사진을 위해 영어로 정밀 묘사하세요. (예: "A real Korean 20s young adult, natural black hair, clean monolid eyes, realistic human face, authentic facial shape").
 
 반드시 아래 JSON 형식으로만 응답:
 {
@@ -735,8 +736,7 @@
         }
 
         async function analyzeTPOStyle() {
-            // ★ 정확히 일치하는 공식 모델명 gemini-1.5-flash
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${state.apiKey}`;
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${state.apiKey}`;
             const isTravel = state.currentMainTPO === '여행';
             let tpoContext = `분류: ${state.currentMainTPO}, 세부상황: ${state.currentSubTPO}`;
             let extraInstruction = "";
@@ -754,12 +754,12 @@ ${extraInstruction}
 
 지시사항:
 1. 사용자의 퍼스널 컬러 및 얼굴 명도 대비감에 최적화된 착장을 추천하세요.
-2. 쇼핑 아이템은 구매하기 쉬운 실제 브랜드와 구체적 상품명을 명시할 것.
+2. 쇼핑 아이템은 쿠팡 로켓배송 등에서 쉽게 찾을 수 있는 실제 브랜드와 구체적 상품명을 명시할 것.
 3. 쇼핑몰 키(mall)는 100% 'coupang'으로 지정할 것.
 4. lookbookPrompt (매우 중요):
-   - 화보나 스튜디오 사진(editorial, studio)이라는 단어를 절대 쓰지 마세요. 인위적인 AI 느낌이 납니다.
-   - 친구가 스마트폰으로 대충 찍어준 일상 무보정 사진(amateur smartphone photo, raw unedited candid) 컨셉으로 작성하세요.
-   - [실제 얼굴 분석 특징]을 반드시 주어에 포함하고, 추천된 옷과 신발을 착용한 전신 사진(Full-body portrait) 구도를 45단어 내외로 묘사할 것.
+   - 절대 만화, 애니메이션, 인형, 3D 그래픽 스타일의 단어(anime, illustration, airbrushed, 3d render 등)를 쓰지 마세요.
+   - 실제 패션 스트리트 스냅 사진(Raw candid 35mm street photo)처럼 실제 원단의 구김, 텍스처, 자연광을 묘사하세요.
+   - [실제 얼굴 분석 특징]을 반영하여 사용자가 추천 코디를 입고 서 있는 전신 구도(Full-body shot)를 영문 40단어 내외로 작성하세요.
 
 반드시 아래 JSON 형식으로 응답:
 {
@@ -767,7 +767,7 @@ ${extraInstruction}
   "styleTip": "상세 코디 제안 (여행 탭 아닐 때)",
   "styleTipDay": "낮 코디 제안 (여행 탭일 때만)",
   "styleTipNight": "밤 코디 제안 (여행 탭일 때만)",
-  "lookbookPrompt": "영어 일상 실사 사진 프롬프트",
+  "lookbookPrompt": "영어 실사 인물 사진 프롬프트",
   "fashionShopping": [
     { "category": "상의/아우터", "mall": "coupang", "itemName": "구체적 브랜드 제품명", "keyword": "쇼핑 검색어" },
     { "category": "하의", "mall": "coupang", "itemName": "구체적 브랜드 제품명", "keyword": "쇼핑 검색어" },
@@ -782,20 +782,20 @@ ${extraInstruction}
             return parseCleanJSON(await res.json());
         }
 
+        // 실사 고화질 DSLR 인물 사진 생성 엔진
         function generatePhotorealisticLookbook(promptText) {
             DOM.lookbookImage.classList.add('hidden');
             DOM.lookbookImage.classList.add('opacity-0');
             DOM.lookbookLoader.classList.remove('hidden');
 
-            // 애니메이션, 인형 느낌을 제거하고 실제 일반인 폰카메라 필터를 씌우는 프롬프트
-            const realisticTokens = "amateur smartphone photo, iPhone 14 Pro camera, raw unedited, visible skin pores, natural everyday lighting, real life authentic photograph, casual pose, messy background";
-            const negativeFilter = "anime, cartoon, 3d render, CGI, plastic skin, smooth skin, doll face, professional studio lighting, heavily edited, airbrushed, digital art";
+            // 실제 카메라 및 텍스처 키워드 보강 (애니메이션 느낌 차단)
+            const realisticTokens = "candid 35mm photograph, shot on Sony A7R IV, natural human skin texture, authentic facial features, real fabric wrinkles and cloth texture, natural day lighting, unretouched real life street photo";
+            const negativeFilter = "no anime, no cartoon, no 3d render, no illustration, no drawing, no doll face, no plastic skin, no CGI";
             
-            const finalPrompt = encodeURIComponent(`${promptText}, ${realisticTokens}, ${negativeFilter}`);
+            const fullPrompt = encodeURIComponent(`${promptText}, ${realisticTokens}, ${negativeFilter}`);
             const randomSeed = Math.floor(Math.random() * 999999);
             
-            // 실사에 강한 flux 모델
-            const aiImageUrl = `https://image.pollinations.ai/prompt/${finalPrompt}?width=768&height=1024&nologo=true&model=flux&seed=${randomSeed}`;
+            const aiImageUrl = `https://image.pollinations.ai/prompt/${fullPrompt}?width=768&height=1024&nologo=true&model=turbo&seed=${randomSeed}`;
 
             const imgLoader = new Image();
             let isLoaded = false;
@@ -830,7 +830,7 @@ ${extraInstruction}
                 if (!isLoaded) {
                     displayImage(aiImageUrl);
                 }
-            }, 15000);
+            }, 6500);
 
             imgLoader.src = aiImageUrl;
         }
@@ -882,16 +882,14 @@ ${extraInstruction}
             renderShoppingList(data.fashionShopping, 'fashion-shopping-list');
         }
 
+        // 빨간색 쿠팡 뱃지 제거 및 프리미엄 카드 UI 렌더링
         function renderShoppingList(items, containerId) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
 
             items.forEach(item => {
-                const mallId = item.mall.toLowerCase();
-                const mallInfo = AFFILIATE_MALLS[mallId] || AFFILIATE_MALLS['coupang'];
-
                 const card = document.createElement('div');
-                card.onclick = () => triggerAffiliateModal(mallId, item.itemName, item.keyword);
+                card.onclick = () => triggerAffiliateModal('coupang', item.itemName, item.keyword);
                 card.className = 'flex items-center justify-between bg-[#f8f9fa] p-3.5 rounded-[16px] hover:bg-white transition-all shadow-sm border border-transparent hover:border-blue-200 group cursor-pointer active:scale-98';
                 
                 card.innerHTML = `

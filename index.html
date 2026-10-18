@@ -113,9 +113,6 @@
             <h1 class="text-xl font-bold tracking-tight text-gray-900 flex items-center">
                 <i class="fa-solid fa-sparkles text-blue-500 mr-2"></i>StyleAI
             </h1>
-            <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full select-none flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>Flux Studio Pro
-            </span>
         </div>
     </header>
 
@@ -159,14 +156,15 @@
 
             <div class="apple-card p-6 md:p-8">
                 <h3 class="text-lg font-bold mb-4 flex items-center text-gray-800"><i class="fa-solid fa-camera mr-2 text-blue-500"></i>정면 사진 업로드</h3>
+                <!-- 클릭 및 드래그앤드롭 완벽 지원 영역 -->
                 <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-[20px] p-8 md:p-12 text-center cursor-pointer hover:bg-gray-50/80 transition-colors relative overflow-hidden bg-gray-50/30 group">
-                    <input type="file" id="image-input" accept="image/jpeg, image/png, image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                    <img id="image-preview" class="hidden w-auto h-auto max-h-64 mx-auto rounded-2xl shadow-lg mb-4 object-cover relative z-0" alt="미리보기" />
-                    <div id="upload-placeholder" class="relative z-0 group-hover:scale-105 transition-transform duration-300">
+                    <input type="file" id="image-input" accept="image/*" class="hidden" />
+                    <img id="image-preview" class="hidden w-auto h-auto max-h-64 mx-auto rounded-2xl shadow-lg mb-4 object-cover" alt="미리보기" />
+                    <div id="upload-placeholder" class="group-hover:scale-105 transition-transform duration-300">
                         <div class="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mx-auto mb-4 text-blue-500 text-2xl">
                             <i class="fa-solid fa-image"></i>
                         </div>
-                        <p class="font-bold text-gray-800 text-lg">터치하여 앨범에서 선택</p>
+                        <p class="font-bold text-gray-800 text-lg">터치하여 사진 선택 또는 드래그</p>
                         <p class="text-sm text-gray-400 mt-2">자연광에서 마스크 없이 찍은 얼굴 정면 권장</p>
                     </div>
                 </div>
@@ -299,14 +297,14 @@
                 </div>
             </div>
 
-            <!-- 2. [Fal.ai 초고화질 전신 룩북] 얼굴 컷오프 + 명품 카탈로그 화보 (1컷 고정) -->
+            <!-- 2. [Fal.ai 초고화질 전신 룩북] 얼굴 컷오프 + 스튜디오 착장 화보 (1컷 고정) -->
             <div class="apple-card p-6 md:p-8 fade-in">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="font-bold text-xl tracking-tight flex items-center text-gray-900">
                         <i class="fa-solid fa-wand-magic-sparkles mr-2 text-blue-500"></i>퍼스널 톤 맞춤 시그니처 착장 룩북
                     </h3>
                     <span class="text-xs bg-emerald-50 text-emerald-600 font-bold px-3 py-1 rounded-full border border-emerald-100 flex items-center gap-1">
-                        <i class="fa-solid fa-bolt text-[10px]"></i>Fal.ai Flux 8K
+                        <i class="fa-solid fa-bolt text-[10px]"></i>Flux 8K Studio
                     </span>
                 </div>
                 <p class="text-xs text-gray-500 mb-5 leading-relaxed">얼굴 이질감을 완전히 배제하고, 상의·하의·신발·잡화 원단과 핏에 집중한 초고화질 스튜디오 착장 룩북입니다.</p>
@@ -405,7 +403,7 @@
         // ★ 1. 구글 Gemini API 키를 여기에 입력하세요
         const GOOGLE_API_KEY = "AQ.Ab8RN6LR9bVvqNLLLulzF54CiyXwPZkGl04ukue2gZrbmjFUPQ";
 
-        // ★ 2. Fal.ai에서 발급받은 API 키를 여기에 입력하세요 (예: fal_... 또는 key_id:secret)
+        // ★ 2. Fal.ai에서 발급받은 API 키를 여기에 입력하세요
         const FAL_API_KEY = "fal_sk_754f115a1ffe400b90920ca3
 d4d4cead";
 
@@ -459,6 +457,7 @@ d4d4cead";
             imageInput: document.getElementById('image-input'),
             imagePreview: document.getElementById('image-preview'),
             uploadPlaceholder: document.getElementById('upload-placeholder'),
+            uploadArea: document.getElementById('upload-area'),
             analyzeBtn: document.getElementById('analyze-btn'),
             inputSection: document.getElementById('input-section'),
             loadingArea: document.getElementById('loading-area'),
@@ -552,23 +551,66 @@ d4d4cead";
             }
         }
 
-        DOM.imageInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
+        // ★ 사진 업로드 안정성 100% 보장 함수
+        function processFile(file) {
             if (!file) return;
-            if (file.size > 5 * 1024 * 1024) { showToast("5MB 이하의 사진을 선택해주세요."); return; }
+            if (!file.type.startsWith('image/')) {
+                showToast("이미지 파일(JPG, PNG 등)만 등록 가능합니다.");
+                return;
+            }
+            if (file.size > 10 * 1024 * 1024) {
+                showToast("10MB 이하의 사진을 선택해주세요.");
+                return;
+            }
             const reader = new FileReader();
             reader.onload = (event) => {
                 state.base64Image = event.target.result.split(',')[1];
-                state.mimeType = file.type;
+                state.mimeType = file.type || 'image/jpeg';
                 DOM.imagePreview.src = event.target.result;
                 DOM.imagePreview.classList.remove('hidden');
                 DOM.uploadPlaceholder.classList.add('hidden');
+                showToast("사진이 정상 등록되었습니다!");
             };
             reader.readAsDataURL(file);
+        }
+
+        // 영역 터치 시 파일 탐색기 즉시 호출
+        DOM.uploadArea.addEventListener('click', () => {
+            DOM.imageInput.click();
+        });
+
+        DOM.imageInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                processFile(e.target.files[0]);
+            }
+        });
+
+        // PC 드래그 앤 드롭 완벽 지원
+        ['dragenter', 'dragover'].forEach(eventName => {
+            DOM.uploadArea.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                DOM.uploadArea.classList.add('border-blue-500', 'bg-blue-50/40');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            DOM.uploadArea.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                DOM.uploadArea.classList.remove('border-blue-500', 'bg-blue-50/40');
+            }, false);
+        });
+
+        DOM.uploadArea.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            if (dt.files && dt.files[0]) {
+                processFile(dt.files[0]);
+            }
         });
 
         DOM.analyzeBtn.addEventListener('click', async () => {
-            if (!state.googleApiKey || state.googleApiKey === "여기에_구글_API_키를_넣으세요") { 
+            if (!state.googleApiKey || state.googleApiKey.includes("여기에_구글")) { 
                 showToast("코드 상단(GOOGLE_API_KEY)에 구글 API 키를 먼저 입력해주세요!"); 
                 return; 
             }
@@ -589,11 +631,10 @@ d4d4cead";
             try {
                 DOM.loadingText.innerHTML = "피부톤, 체형 비율을 정밀 분석 중입니다...<br>회원님만을 위한 톤별 맞춤 코디 세트를 설계하고 있습니다.";
                 
-                // 회원님의 정상 작동 엔드포인트 그대로 실행
                 state.baseAnalysisCache = await analyzeBaseInfo();
                 renderBaseResults(state.baseAnalysisCache);
                 
-                // ★ Fal.ai Flux.1 초고화질 전신 룩북 1컷 생성 (얼굴 완전 배제)
+                // Fal.ai Flux.1 초고화질 전신 룩북 1컷 생성 (얼굴 완전 배제)
                 generateSignatureFullbodyLookbookWithFal();
 
                 DOM.loadingArea.classList.add('hidden');
@@ -845,7 +886,6 @@ ${extraInstruction}
 
             } catch (err) {
                 console.error(err);
-                // 키 오류 또는 장애 발생 시 대체 고화질 이미지
                 const fallbackFullbody = gender === "여성"
                     ? "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=768&q=80"
                     : "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=768&q=80";

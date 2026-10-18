@@ -90,7 +90,6 @@
         }
         #toast.show { bottom: 40px; }
 
-        /* 법적 고지 팝업 모달 */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.5); backdrop-filter: blur(6px);
@@ -113,26 +112,26 @@
             <h1 class="text-xl font-bold tracking-tight text-gray-900 flex items-center">
                 <i class="fa-solid fa-sparkles text-blue-500 mr-2"></i>StyleAI
             </h1>
-            <span class="text-xs font-semibold text-blue-600 bg-blue-50 border border-blue-100 px-3 py-1 rounded-full">AI Master</span>
+            <span class="text-xs font-semibold text-blue-600 bg-blue-50 border border-blue-100 px-3 py-1 rounded-full">AI Studio Pro</span>
         </div>
     </header>
 
     <div id="toast">알림</div>
 
-    <!-- 공정거래위원회 법적 고지 모달 -->
+    <!-- 쇼핑몰 이동 및 법적 고지 모달 -->
     <div id="affiliate-modal" class="modal-overlay">
         <div class="modal-content">
-            <div class="w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-sm">
-                <i class="fa-solid fa-bag-shopping"></i>
+            <div id="modal-icon-container" class="w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-sm">
+                <i id="modal-icon" class="fa-solid fa-bag-shopping"></i>
             </div>
-            <h3 class="text-lg font-bold text-gray-900 mb-1" id="modal-mall-name">쇼핑몰 연결 안내</h3>
-            <p class="text-xs text-blue-600 font-bold mb-3" id="modal-item-name">추천 아이템으로 이동합니다</p>
+            <h3 class="text-lg font-bold text-gray-900 mb-1" id="modal-mall-name">쇼핑몰 연결</h3>
+            <p class="text-xs text-blue-600 font-bold mb-4" id="modal-item-name">추천 아이템으로 이동합니다</p>
             
-            <div class="bg-gray-50 border border-gray-100 rounded-2xl p-4 text-left mb-5">
-                <p class="text-[11px] font-bold text-gray-700 leading-relaxed mb-2">
-                    <i class="fa-solid fa-circle-info mr-1 text-blue-500"></i>공정거래위원회 지침 안내
+            <div id="modal-disclaimer-box" class="bg-gray-50 border border-gray-100 rounded-2xl p-4 text-left mb-5">
+                <p class="text-[11px] font-bold text-gray-700 leading-relaxed mb-1">
+                    <i class="fa-solid fa-circle-info mr-1 text-blue-500"></i>공정거래위원회 안내
                 </p>
-                <p class="text-[11px] text-gray-500 leading-normal">
+                <p class="text-[11px] text-gray-500 leading-normal" id="modal-disclaimer-text">
                     "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."
                 </p>
             </div>
@@ -140,7 +139,7 @@
             <div class="flex gap-2">
                 <button onclick="closeAffiliateModal()" class="flex-1 py-3.5 bg-gray-100 text-gray-600 rounded-2xl font-bold text-sm">닫기</button>
                 <a id="modal-redirect-btn" href="#" target="_blank" onclick="closeAffiliateModal()" class="flex-1 py-3.5 bg-blue-600 text-white rounded-2xl font-bold text-sm shadow-md shadow-blue-500/20 flex items-center justify-center gap-1">
-                    쇼핑몰 가기 <i class="fa-solid fa-arrow-up-right-from-square text-xs ml-1"></i>
+                    상품 보러가기 <i class="fa-solid fa-arrow-up-right-from-square text-xs ml-1"></i>
                 </a>
             </div>
         </div>
@@ -271,7 +270,7 @@
                     <p id="res-makeup-tip" class="text-sm text-gray-600 leading-relaxed mb-6"></p>
                     
                     <div class="space-y-3">
-                        <p class="text-[11px] font-bold text-gray-400 tracking-wider">🔥 실시간 뷰티템 최저가 보기</p>
+                        <p class="text-[11px] font-bold text-gray-400 tracking-wider">🔥 실시간 추천 뷰티템</p>
                         <div id="beauty-shopping-list" class="space-y-2"></div>
                     </div>
                 </div>
@@ -378,14 +377,29 @@
         // ★ 1. 회원님의 구글 AI Studio API 키를 입력하세요.
         const ADMIN_API_KEY = "AQ.Ab8RN6JH1uNitwHFFz_WbzUp1QmgzWRjnBvf2ZyGYCs86ZyyoQ";
 
-        // ★ 2. 회원님의 쿠팡 파트너스 단축 주소를 입력했습니다 (두 번째 사진의 주소).
-        const COUPANG_PARTNERS_URL = "https://coupa.ng/cqeVFI";
+        // ★ 2. 회원님의 쿠팡 파트너스 트래킹 코드가 영구 등록되었습니다.
+        const COUPANG_TRACKING_CODE = "AF4531799";
 
+        // ★ 3. 3대 핵심 쇼핑몰 설정 (쿠팡, 무신사, 올리브영)
         const AFFILIATE_MALLS = {
-            'coupang': { name: '쿠팡', color: 'bg-[#ea1d2c] text-white', icon: 'fa-c', url: COUPANG_PARTNERS_URL },
-            'musinsa': { name: '무신사', color: 'bg-black text-white', icon: 'fa-bag-shopping', url: 'https://www.musinsa.com/search/musinsa/integration?q=' },
-            'oliveyoung': { name: '올리브영', color: 'bg-[#9fb46c] text-white', icon: 'fa-leaf', url: 'https://www.oliveyoung.co.kr/store/search/getSearchMain.do?query=' },
-            'naver': { name: '네이버쇼핑', color: 'bg-[#03c75a] text-white', icon: 'fa-n', url: 'https://search.shopping.naver.com/search/all?query=' }
+            'coupang': { 
+                name: '쿠팡', 
+                color: 'bg-[#ea1d2c] text-white', 
+                icon: 'fa-c',
+                buildUrl: (keyword) => `https://www.coupang.com/np/search?q=${encodeURIComponent(keyword)}&channel=user&lptag=${COUPANG_TRACKING_CODE}`
+            },
+            'musinsa': { 
+                name: '무신사', 
+                color: 'bg-black text-white', 
+                icon: 'fa-bag-shopping',
+                buildUrl: (keyword) => `https://www.musinsa.com/search/musinsa/integration?q=${encodeURIComponent(keyword)}`
+            },
+            'oliveyoung': { 
+                name: '올리브영', 
+                color: 'bg-[#9fb46c] text-white', 
+                icon: 'fa-leaf',
+                buildUrl: (keyword) => `https://www.oliveyoung.co.kr/store/search/getSearchMain.do?query=${encodeURIComponent(keyword)}`
+            }
         };
 
         function setupPWA() {
@@ -426,24 +440,23 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        // 제휴 공정위 안내 모달 제어 함수
+        // 쇼핑몰 바로가기 & 공정위 안내 팝업
         function triggerAffiliateModal(mallKey, itemName, keyword) {
             const mall = AFFILIATE_MALLS[mallKey] || AFFILIATE_MALLS['coupang'];
-            let targetUrl = mall.url;
-
-            // 쿠팡일 경우 파트너스 링크로 이동하고, 검색어는 클립보드에 자동 복사
-            if (mallKey === 'coupang') {
-                targetUrl = COUPANG_PARTNERS_URL;
-                navigator.clipboard.writeText(keyword).then(() => {
-                    showToast(`"${keyword}" 검색어가 복사되었습니다!`);
-                }).catch(() => {});
-            } else {
-                targetUrl = `${mall.url}${encodeURIComponent(keyword)}`;
-            }
+            const targetUrl = mall.buildUrl(keyword);
 
             document.getElementById('modal-mall-name').textContent = `${mall.name} 이동 안내`;
             document.getElementById('modal-item-name').textContent = `선택 아이템: ${itemName}`;
             document.getElementById('modal-redirect-btn').href = targetUrl;
+
+            // 쿠팡일 때만 공정위 문구 노출
+            const disclaimerBox = document.getElementById('modal-disclaimer-box');
+            if (mallKey === 'coupang') {
+                disclaimerBox.classList.remove('hidden');
+            } else {
+                disclaimerBox.classList.add('hidden');
+            }
+
             document.getElementById('affiliate-modal').classList.add('active');
         }
 
@@ -513,7 +526,7 @@
                     let errMsg = `오류 코드: ${res.status}`;
                     try { errMsg = JSON.parse(errText).error.message; } catch(e){}
                     if (res.status === 400 && errMsg.includes("API key not valid")) {
-                        throw new Error("코드 내부에 입력된 관리자 API 키가 올바르지 않습니다.");
+                        throw new Error("코드 상단에 입력된 관리자 API 키가 올바르지 않습니다.");
                     }
                     if (res.status !== 429 && res.status < 500) throw new Error(errMsg);
                 } catch (e) {
@@ -602,7 +615,8 @@
 * 필수 지시사항:
 1. 퍼스널 컬러의 밝은 톤(bestLight) 3개, 어두운 톤(bestDark) 3개를 정확한 HEX 코드로 응답.
 2. 피부 진단: 이미지 속 얼굴 피부 결/상태를 분석하여 구체적인 피부 타입 진단.
-3. 뷰티 아이템 추천: 쿠팡 및 올리브영 랭킹 기준 실제 판매 중인 구체적인 브랜드/제품명을 적을 것 (예: 롬앤 쥬시래스팅 틴트 피그피그, 라운드랩 독도 토너 등).
+3. 뷰티 아이템 추천: 올리브영 랭킹 및 쿠팡 기준 실제 시판 중인 구체적인 브랜드와 정확한 제품명을 적을 것 (예: 롬앤 쥬시래스팅 틴트 피그피그, 라운드랩 독도 토너 등).
+4. 쇼핑몰 mall 키는 무조건 'oliveyoung' 또는 'coupang' 중 하나로만 지정할 것.
 
 반드시 아래 JSON 형식으로만 응답:
 {
@@ -621,8 +635,8 @@
     "fitTip": "입력된 체형을 보완하는 세련된 핏 추천"
   },
   "beautyShopping": [
-    { "category": "스킨/토너", "mall": "coupang", "itemName": "구체적 브랜드 인기 제품명 1", "keyword": "쇼핑몰 검색 키워드" },
-    { "category": "로션/크림", "mall": "coupang", "itemName": "구체적 브랜드 인기 제품명 2", "keyword": "쇼핑몰 검색 키워드" },
+    { "category": "스킨/토너", "mall": "oliveyoung", "itemName": "구체적 브랜드 인기 제품명 1", "keyword": "쇼핑몰 검색 키워드" },
+    { "category": "로션/크림", "mall": "oliveyoung", "itemName": "구체적 브랜드 인기 제품명 2", "keyword": "쇼핑몰 검색 키워드" },
     { "category": "포인트 뷰티", "mall": "coupang", "itemName": "구체적 브랜드 톤 맞춤 제품명", "keyword": "쇼핑몰 검색 키워드" }
   ]
 }`;
@@ -733,8 +747,10 @@ ${extraInstruction}
 
 지시사항:
 1. 해당 TPO 상황에 맞는 세련된 코디 제안.
-2. 쇼핑 추천 시 두루뭉술한 표현 금지. 쿠팡 등에서 실제 판매되는 구체적인 브랜드와 제품명(예: 아디다스 삼바 OG, 나이키 클럽 후디 등) 명시.
-3. 쇼핑몰 키 지정 (모든 패션/뷰티 항목은 'coupang' 우선 지정, 필요시 'musinsa' 또는 'naver').
+2. 쇼핑 추천 시 두루뭉술한 표현 금지. 실제 시판 중인 구체적인 브랜드와 제품명(예: 무신사 스탠다드 와이드 슬랙스 블랙, 나이키 에어포스 1, 아디다스 삼바 등) 명시.
+3. 쇼핑몰 키(mall) 지정 규칙:
+   - 상의/아우터/하의 등 패션 의류: 'musinsa'
+   - 신발/가방/패션잡화: 'coupang'
 
 반드시 아래 JSON 형식으로 응답:
 {
@@ -744,8 +760,8 @@ ${extraInstruction}
   "styleTipNight": "밤을 위한 상세 코디 제안 (여행 탭일 경우에만 작성, 아니면 빈 문자열)",
   "lookbookPrompt": "A highly detailed fashion editorial full body portrait...",
   "fashionShopping": [
-    { "category": "상의/아우터", "mall": "coupang", "itemName": "구체적인 브랜드와 제품명", "keyword": "쇼핑몰 검색 키워드" },
-    { "category": "하의", "mall": "coupang", "itemName": "구체적인 브랜드와 제품명", "keyword": "쇼핑몰 검색 키워드" },
+    { "category": "상의/아우터", "mall": "musinsa", "itemName": "구체적인 브랜드와 제품명", "keyword": "쇼핑몰 검색 키워드" },
+    { "category": "하의", "mall": "musinsa", "itemName": "구체적인 브랜드와 제품명", "keyword": "쇼핑몰 검색 키워드" },
     { "category": "신발/잡화", "mall": "coupang", "itemName": "구체적인 브랜드와 제품명", "keyword": "쇼핑몰 검색 키워드" }
   ]
 }`;
@@ -837,7 +853,7 @@ ${extraInstruction}
                             </span>
                         </div>
                         <p class="font-bold text-gray-900 text-[14px] truncate mb-0.5">${item.itemName}</p>
-                        <p class="text-[11px] text-blue-500 truncate group-hover:underline"><i class="fa-solid fa-search mr-1"></i>"${item.keyword}" 최저가 확인</p>
+                        <p class="text-[11px] text-blue-500 truncate group-hover:underline"><i class="fa-solid fa-search mr-1"></i>"${item.keyword}" 최저가 검색</p>
                     </div>
                     <div class="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400 group-hover:text-blue-500 group-hover:scale-110 transition-all flex-shrink-0">
                         <i class="fa-solid fa-arrow-right -rotate-45 text-sm"></i>

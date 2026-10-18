@@ -716,4 +716,207 @@
         }
 
         DOM.applyLocationBtn.addEventListener('click', () => {
-            if (!DOM.locationInput.value
+            if (!DOM.locationInput.value.trim()) { showToast("지역/도시를 입력해주세요."); return; }
+            state.location = DOM.locationInput.value.trim();
+            DOM.tpoContentArea.style.opacity = '1';
+            triggerTPOAnalysis();
+        });
+
+        async function triggerTPOAnalysis() {
+            DOM.tpoLoader.classList.remove('hidden');
+            DOM.tpoLoader.classList.add('flex');
+            DOM.weatherInfoBox.classList.add('hidden');
+            
+            try {
+                const fashionResult = await analyzeTPOStyle();
+                renderTPOResults(fashionResult);
+                
+                generatePhotorealisticLookbook(fashionResult.lookbookPrompt);
+                
+            } catch (err) {
+                showToast("코디 정보를 가져오는데 문제가 발생했습니다.");
+                DOM.tpoLoader.classList.add('hidden');
+                DOM.tpoLoader.classList.remove('flex');
+            }
+        }
+
+        async function analyzeTPOStyle() {
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${state.apiKey}`;
+            const isTravel = state.currentMainTPO === '여행';
+            let tpoContext = `분류: ${state.currentMainTPO}, 세부상황: ${state.currentSubTPO}`;
+            let extraInstruction = "";
+
+            if (state.location && (isTravel || state.currentMainTPO === '데일리')) {
+                tpoContext += `, 위치: ${state.location}`;
+                extraInstruction = `* 중요: 지정된 위치(${state.location})의 계절감과 날씨를 반영하세요.`;
+            }
+
+            const prompt = `
+[사용자 프로필] 성별: ${DOM.gender.value}, 나이: ${DOM.age.value}, 퍼스널컬러: ${state.baseAnalysisCache?.color.season}
+[실제 얼굴 분석 특징]: ${state.baseAnalysisCache?.facialFeatures || "A real Korean model"}
+[상황정보] ${tpoContext}
+${extraInstruction}
+
+지시사항:
+1. 사용자의 퍼스널 컬러 및 얼굴 명도 대비감에 최적화된 착장을 추천하세요.
+2. 쇼핑 아이템은 쿠팡 로켓배송에서 쉽게 찾을 수 있는 실제 브랜드와 구체적 상품명을 명시할 것.
+3. 쇼핑몰 키(mall)는 100% 'coupang'으로 지정할 것.
+4. lookbookPrompt (매우 중요):
+   - 만화, 일러스트, 3D 느낌을 일체 배제하고 실제 DSLR 카메라로 찍은 인물 패션 화보(Candid raw photograph) 프롬프트를 영어로 작성하세요.
+   - [실제 얼굴 분석 특징]을 반드시 주어에 포함하고, 추천된 옷과 신발을 머리부터 발끝까지 착용한 전신 룩북(Full-body fashion editorial portrait) 구도를 45단어 내외로 묘사할 것.
+
+반드시 아래 JSON 형식으로 응답:
+{
+  "weatherSummary": "날씨 요약 (위치 입력 없으면 빈 문자열)",
+  "styleTip": "상세 코디 제안 (여행 탭 아닐 때)",
+  "styleTipDay": "낮 코디 제안 (여행 탭일 때만)",
+  "styleTipNight": "밤 코디 제안 (여행 탭일 때만)",
+  "lookbookPrompt": "영어 실사 인물 사진 프롬프트",
+  "fashionShopping": [
+    { "category": "상의/아우터", "mall": "coupang", "itemName": "쿠팡 구매 가능 구체적 브랜드 제품명", "keyword": "쇼핑 검색어" },
+    { "category": "하의", "mall": "coupang", "itemName": "쿠팡 구매 가능 구체적 브랜드 제품명", "keyword": "쇼핑 검색어" },
+    { "category": "신발/잡화", "mall": "coupang", "itemName": "쿠팡 구매 가능 구체적 브랜드 제품명", "keyword": "쇼핑 검색어" }
+  ]
+}`;
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: prompt }] }],
+                generationConfig: { responseMimeType: "application/json" }
+            };
+            const res = await fetchWithRetry(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            return parseCleanJSON(await res.json());
+        }
+
+        // 실사 고화질 DSLR 인물 사진 생성 엔진
+        function generatePhotorealisticLookbook(promptText) {
+            DOM.lookbookImage.classList.add('hidden');
+            DOM.lookbookImage.classList.add('opacity-0');
+            DOM.lookbookLoader.classList.remove('hidden');
+
+            // 만화/애니메이션/그래픽 느낌을 차단하는 실사 카메라 토큰 결합
+            const realisticPhotoTokens = "candid raw photograph, shot on Sony A7R IV 85mm lens, realistic human skin texture, authentic facial features, soft natural daylight, depth of field, real life documentary photography, 4k resolution";
+            const antiCartoonTokens = "no anime, no cartoon, no 3d render, no illustration, no painting, no airbrushed face, no plastic skin, no drawing";
+            
+            const finalPrompt = encodeURIComponent(`${promptText}, ${realisticPhotoTokens}, ${antiCartoonTokens}`);
+            const randomSeed = Math.floor(Math.random() * 999999);
+            
+            // 768x1024 고해상도 규격으로 호출
+            const aiImageUrl = `https://image.pollinations.ai/prompt/${finalPrompt}?width=768&height=1024&nologo=true&model=turbo&seed=${randomSeed}`;
+
+            const imgLoader = new Image();
+            let isLoaded = false;
+
+            const displayImage = (url) => {
+                if (isLoaded) return;
+                isLoaded = true;
+                DOM.lookbookImage.src = url;
+                DOM.lookbookLoader.classList.add('hidden');
+                DOM.tpoLoader.classList.add('hidden');
+                DOM.tpoLoader.classList.remove('flex');
+                
+                DOM.lookbookImage.classList.remove('hidden');
+                setTimeout(() => {
+                    DOM.lookbookImage.classList.remove('opacity-0');
+                }, 80);
+            };
+
+            imgLoader.onload = () => {
+                displayImage(aiImageUrl);
+            };
+
+            imgLoader.onerror = () => {
+                const gender = DOM.gender.value || "남성";
+                const fallbackFullbody = gender === "여성"
+                    ? "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=768&q=80"
+                    : "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=768&q=80";
+                displayImage(fallbackFullbody);
+            };
+
+            setTimeout(() => {
+                if (!isLoaded) {
+                    displayImage(aiImageUrl);
+                }
+            }, 6500);
+
+            imgLoader.src = aiImageUrl;
+        }
+
+        function renderBaseResults(data) {
+            document.getElementById('res-season').textContent = data.color.season;
+            document.getElementById('res-color-desc').textContent = data.color.description;
+            
+            const renderColors = (colors, id) => {
+                const container = document.getElementById(id);
+                container.innerHTML = '';
+                (colors || []).forEach(hex => {
+                    const el = document.createElement('div');
+                    el.className = 'color-swatch';
+                    el.style.backgroundColor = hex;
+                    container.appendChild(el);
+                });
+            };
+            renderColors(data.color.bestLight, 'res-best-light');
+            renderColors(data.color.bestDark, 'res-best-dark');
+
+            document.getElementById('res-skin-type').textContent = data.skin.type;
+            document.getElementById('res-makeup-tip').textContent = data.skin.makeupTip;
+            document.getElementById('res-size-recommend').textContent = data.body.size;
+            document.getElementById('res-fit-tip').textContent = data.body.fitTip;
+
+            renderShoppingList(data.beautyShopping, 'beauty-shopping-list');
+        }
+
+        function renderTPOResults(data) {
+            document.getElementById('res-tpo-title').innerHTML = `스타일링 포인트`;
+            
+            if (data.weatherSummary) {
+                DOM.weatherSummary.textContent = data.weatherSummary;
+                DOM.weatherInfoBox.classList.remove('hidden');
+            }
+
+            if (state.currentMainTPO === '여행' && data.styleTipDay && data.styleTipNight) {
+                DOM.standardTipArea.classList.add('hidden');
+                DOM.travelTipArea.classList.remove('hidden');
+                document.getElementById('res-style-tip-day').textContent = data.styleTipDay;
+                document.getElementById('res-style-tip-night').textContent = data.styleTipNight;
+            } else {
+                DOM.standardTipArea.classList.remove('hidden');
+                DOM.travelTipArea.classList.add('hidden');
+                document.getElementById('res-style-tip').textContent = data.styleTip;
+            }
+
+            renderShoppingList(data.fashionShopping, 'fashion-shopping-list');
+        }
+
+        function renderShoppingList(items, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            items.forEach(item => {
+                const mallId = item.mall.toLowerCase();
+                const mallInfo = AFFILIATE_MALLS[mallId] || AFFILIATE_MALLS['coupang'];
+
+                const card = document.createElement('div');
+                card.onclick = () => triggerAffiliateModal(mallId, item.itemName, item.keyword);
+                card.className = 'flex items-center justify-between bg-[#f8f9fa] p-3.5 rounded-[16px] hover:bg-white transition-all shadow-sm border border-transparent hover:border-blue-200 group cursor-pointer active:scale-98';
+                
+                card.innerHTML = `
+                    <div class="flex-1 min-w-0 pr-3">
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <span class="text-[10px] text-gray-500 font-bold whitespace-nowrap bg-gray-100 px-1.5 py-0.5 rounded">${item.category}</span>
+                            <span class="${mallInfo.color} text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider flex items-center gap-1">
+                                <i class="fa-solid ${mallInfo.icon}"></i>${mallInfo.name}
+                            </span>
+                        </div>
+                        <p class="font-bold text-gray-900 text-[14px] truncate mb-0.5">${item.itemName}</p>
+                        <p class="text-[11px] text-blue-500 truncate group-hover:underline"><i class="fa-solid fa-search mr-1"></i>"${item.keyword}" 최저가 검색</p>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400 group-hover:text-blue-500 group-hover:scale-110 transition-all flex-shrink-0">
+                        <i class="fa-solid fa-arrow-right -rotate-45 text-sm"></i>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>

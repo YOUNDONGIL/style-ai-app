@@ -164,6 +164,10 @@
                         </div>
                         <p class="font-bold text-gray-800 text-lg">터치하여 앨범에서 선택</p>
                         <p class="text-sm text-gray-400 mt-2">자연광에서 마스크 없이 찍은 얼굴 정면 권장</p>
+                        <!-- 소비자 안심 문구 -->
+                        <p class="text-[11px] text-emerald-600 font-medium mt-3 flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-shield-halved"></i> 사진은 분석 즉시 파기되며 서버에 저장되지 않습니다.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -213,9 +217,15 @@
                 </div>
             </div>
 
-            <button id="analyze-btn" class="apple-button-primary w-full py-4 text-[17px] shadow-lg shadow-blue-500/20 mt-4">
-                결과 확인하기
-            </button>
+            <div>
+                <button id="analyze-btn" class="apple-button-primary w-full py-4 text-[17px] shadow-lg shadow-blue-500/20 mt-4">
+                    결과 확인하기
+                </button>
+                <!-- AI 분석 동의 간결 안내 -->
+                <p class="text-[11px] text-gray-400 text-center mt-2.5">
+                    '결과 확인하기' 터치 시 사진의 AI 분석 처리에 동의하는 것으로 간주됩니다.
+                </p>
+            </div>
         </section>
 
         <!-- 로딩 -->
@@ -284,7 +294,11 @@
                         <h4 class="font-bold text-gray-900 text-lg tracking-tight">AI 스킨케어 & 뷰티</h4>
                     </div>
                     <p id="res-skin-type" class="text-sm font-bold text-blue-600 mb-2"></p>
-                    <p id="res-makeup-tip" class="text-sm text-gray-600 leading-relaxed mb-6"></p>
+                    <p id="res-makeup-tip" class="text-sm text-gray-600 leading-relaxed mb-3"></p>
+                    <!-- 미용 참고용 면책 문구 -->
+                    <p class="text-[11px] text-gray-400 mb-5 leading-normal">
+                        * 본 분석은 스타일링 및 뷰티 참고용이며, 의학적 진단이나 치료를 대신하지 않습니다.
+                    </p>
                     
                     <div class="space-y-3">
                         <p class="text-[11px] font-bold text-gray-400 tracking-wider">🔥 추천 뷰티 아이템</p>
@@ -303,10 +317,8 @@
                         <i class="fa-solid fa-bolt text-[10px]"></i>Flux 8K Studio
                     </span>
                 </div>
-                <!-- 문구 그대로 유지 -->
                 <p class="text-xs text-gray-500 mb-5 leading-relaxed">회원님의 프로필과 분위기를 반영하여, 웜톤과 쿨톤이 감각적으로 믹스매치된 초고화질 스튜디오 풀착장 룩북입니다.</p>
 
-                <!-- 머리부터 발끝까지 완벽하게 한눈에 들어오는 전신 룩북 프레임 -->
                 <div class="w-full relative rounded-[24px] overflow-hidden bg-[#f0f0f2] aspect-[3/4] flex items-center justify-center shadow-md border border-gray-100 max-w-md mx-auto">
                     <div id="lookbook-loader" class="text-gray-400 flex flex-col items-center p-6 text-center">
                         <div class="apple-spinner mb-4"></div>
@@ -387,7 +399,8 @@
         </section>
     </main>
 
-    <footer class="text-center py-6 text-[11px] text-gray-400">
+    <footer class="text-center py-6 text-[11px] text-gray-400 space-y-1">
+        <p>업로드된 사진은 분석 완료 후 즉시 파기되며 일체 저장되지 않습니다.</p>
         <p>StyleAI는 파트너스 활동을 통해 일정액의 수수료를 제공받을 수 있습니다.</p>
     </footer>
 
@@ -624,7 +637,7 @@
         });
 
         async function analyzeBaseInfo() {
-            // ★ 회원님 파일 원본 모델 코드 100% 유지 (절대 변경 안 함)
+            // 회원님 파일 원본 모델 코드 100% 유지 (gemini-3.8-flash)
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${GOOGLE_API_KEY}`;
             const prompt = `
 당신은 최고의 퍼스널 컬러 및 패션/뷰티 마스터입니다.
@@ -750,7 +763,7 @@
         }
 
         async function analyzeTPOStyle() {
-            // ★ 회원님 파일 원본 모델 코드 100% 유지 (절대 변경 안 함)
+            // 회원님 파일 원본 모델 코드 100% 유지 (gemini-3.8-flash)
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${GOOGLE_API_KEY}`;
             const isTravel = state.currentMainTPO === '여행';
             let tpoContext = `분류: ${state.currentMainTPO}, 세부상황: ${state.currentSubTPO}`;
@@ -813,7 +826,7 @@ ${extraInstruction}
             return parseCleanJSON(await res.json());
         }
 
-        // ★ [풀샷 개선] 상반신 클로즈업을 방지하고 머리끝부터 신발 바닥까지 다 나오는 전신 패션 화보
+        // Fal.ai 유료 연동 전신 룩북 화보 생성
         async function generateSignatureFullbodyLookbookWithFal() {
             if (state.isHeroImageGenerated) return;
             state.isHeroImageGenerated = true;
@@ -826,7 +839,6 @@ ${extraInstruction}
             const season = state.baseAnalysisCache?.color?.season || "personal color tone";
             const facialFeatures = state.baseAnalysisCache?.facialFeatures || `attractive realistic Korean ${gender}`;
             
-            // 전신 풀샷을 강제하고 웜/쿨톤 믹스매치 착장 명시
             const promptText = `Ultra-wide high-end fashion catalog photography, complete full-length body shot showing the entire person from head to toe, standing posture on solid floor. A ${facialFeatures} model fully visible with head, torso, legs, and luxury shoes all captured in frame. Wearing a sophisticated autumn season outfit harmoniously mixing warm tones and cool tones, stylish layered jacket, perfectly tailored trousers, and matching leather footwear. Full body in frame, no cropping, head-to-toe full shot, photorealistic 8k, elegant studio lighting.`;
 
             try {
